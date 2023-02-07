@@ -1,0 +1,89 @@
+
+\newpage
+\subsection{A4.1.c}
+%
+\begin{itemize}
+  \item \emph{Is the problem of whether a SIS program terminates (with or
+    without error) regardless of input a trivial, decidable, or undecidable
+    property?}
+\end{itemize}
+
+\emph{Unfortunately, I have not managed to work out a foolproof answer to this
+task - instead, I share some of my thoughts.}
+
+\bigskip
+
+Neither the SIS grammar nor the language specification restricts the
+number of statements in a SIS program, but I shall restrict my view to those SIS
+programs which can be expressed finitely. Under this assumption, a SIS program
+is nonterminating only if it contains an infinite loop.
+
+\medskip
+
+Because the computational range of SIS is limited to whatever can be expressed
+in three 32-bit variables, SIS is obviously \emph{not} Turing-complete, so a
+cheap proof of undecidability by Rice's theorem is unfortunately out of the
+question ;)
+
+\smallskip
+
+On the contrary, because there is no limit to the number of nested loops in a
+SIS program, and thus no limit to the number of live loop variables at any given
+time, the amount of memory required to run a SIS program is unbounded - for this
+reason, it is not possible to simulate the program, checking for repeated memory
+states on a realizable machine with bounded memory.
+
+\paragraph{Termination for a single loop with no nested loops}~\smallskip
+
+Termination is decidable for a program if it only contains singularly nested
+loops. This is because if a loop does not contain nested loops, then it can only
+contain increment and decrement statements, and because we assume SIS programs
+to be finitely expressed, there can only be a finite number of such statements
+in any loop body. 
+
+\medskip
+
+A finite sequence of statements can be counted in finite time, and hence the
+change in value of any variable between the start and end of the loop can be
+determined in finite time. As an example, for a loop with loop variable \ms{i},
+lower bound $\ms a$ and upper bound \ms b, a loop terminates if there exists an
+integer $k \geq 0$ such that:
+
+
+\begin{align}
+\ms a_0 + k \ms i_\Delta \;\equiv\; \ms b_0 + k  \ms
+  b_\Delta \quad(\text{mod } 2^{32})\label{termination_single_loop}
+\end{align}
+
+where $\ms x_0$ is the value of variable \ms x \emph{before} the loop and $\ms
+x_\Delta$ is the change in value of variable \ms x across a single loop
+iteration. If such a $k$ exists, then $k$ is also the number of iterations of
+the loop. Equation (\ref{termination_single_loop}) can be solved in finite time.
+Note that the equation does not consider $\ms a_\Delta$; this is because under
+the restrictions on loops, we know that the loop will terminate if $\ms i = \ms
+a$ at the end of a loop iteration.
+
+\medskip
+
+Under the assumption that the program contains only singularly nested lists, we
+can determine the values of $\ms a_0$ and $\ms b_0$ in similar fashion by
+counting the number of decrements and increments leading up to the beginning of
+the loop, and given $k$, we can compute the values of $\ms a_n$ and $\ms b_n$,
+where $\ms x_n$ is the value of some global variable $\ms x$ after a
+particular loop.
+
+\bigskip
+
+However, this method does not generalize to nested loops, since we cannot infer
+$\ms x_0$ nor  $\ms x_n$ in a nest of loops; we might abstract these away in
+variables in a system of equations whilst keeping track of net change in value
+of any global variable at any point in the program, but these equations become
+messy and, by my intuition, unsolvable once we consider the fact that a nested
+loop can have a variable amount of iterations across iterations of its enclosing
+loop.
+
+\smallskip
+
+By this reasoning - however lackluster - I posit that SIS is undecidable.
+
+\Sectend

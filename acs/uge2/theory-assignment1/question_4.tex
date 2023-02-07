@@ -1,0 +1,108 @@
+\newpage
+\section{Question 4: Optimistic Concurrency Control}
+
+\subsection{Notes on my answers}
+
+\subsubsection{Test formulation}
+
+For each of the three scenarios, at least one of the three tests (as described
+in eg. the lecture 4 slides) must hold. Since in each schedule we consider three
+transactions, and are only concerned with validating the third transactions, I
+use the following specialized formulations of the validation tests:
+
+\paragraph{Test 1}~\smallskip
+For $i \in \{1, 2\}$, $T_i$ must complete before $T_3$ starts.
+
+\paragraph{Test 2}~\smallskip
+For $i \in \{1, 2\}$, $T_i$ must complete before $T_3$ begins its write phase
+\textbf{and} the intersection between WriteSet($T_i$) and ReadSet($T_j$) must be
+empty.
+
+\paragraph{Test 3}~\smallskip
+For each $i \in \{1, 2\}$, $T_i$ must complete its read phase before $T_3$
+completes its own \textbf{and} the intersection of WriteSet($T_i$) and
+ReadSet($T_3$) must be empty \textbf{and} the intersection of WriteSet($T_i$)
+and WriteSet($T_j$) must be empty.
+
+\subsubsection{Ambiguities in the given schedules}
+
+The assignment text is very ambiguous - in particular with respect to statements
+such as ``$T_i$ completes before $T_j$ begins with its write phase``. In this particular
+case, it is for example not possible to argue whether $T_i$ finishes its read
+phase before $T_j$ does.
+
+Whenever there is such ambiguity, I will \textit{pessimistically} assume that
+$T_i$ finishes as late as possible.
+
+
+\subsection{Schedule 1}
+\begin{minted}{text}
+  T1: RS(T1) = {}, WS(T1) = {3},
+    T1 completes before T3 starts.
+
+  T2: RS(T2) = {2, 3, 4, 6}, WS(T2) = {4, 5},
+    T2 completes before T3 begins with its write phase.
+
+  T3: RS(T3) = {3, 4, 6}, WS(T3) = {3}
+\end{minted}
+
+$T_1$ completes before $T_3$ starts, but $T_2$ completes \textit{after} $T_3$
+starts, and so \textbf{test 1 fails}. \medskip
+
+\textbf{Test 2 fails} because the intersection of WriteSet($T_1$) and ReadSet($T_3$)
+is the non-empty set $\{3\}$. \medskip
+
+\textbf{Test 3 fails} for the same reason that test 2 failed (the write set of $T_1$
+overlaps with the read set of $T_3$). \bigskip
+
+All three tests failed, and so $T_3$ must be rolled back.
+
+\subsection{Schedule 2}
+
+\begin{minted}{text}
+  T1: RS(T1) = {5, 6, 7}, WS(T1) = {8},
+    T1 completes read phase before T3 does.
+
+  T2: RS(T2) = {1, 2, 3}, WS(T2) = {5},
+    T2 completes before T3 begins with its write phase.
+
+  T3: RS(T3) = {3, 4, 5, 6}, WS(T3) = {3}
+\end{minted}
+
+\textbf{Test 1 fails} since both $T_1$ and $T_2$ end \textit{after} $T_3$ starts.
+\medskip
+
+$T_2$ completes before $T_3$ begins its write phase, but it is not stated
+whether $T_1$ does. I assume it does not, and thus \textbf{test 2 fails}.
+\medskip
+
+$T_1$ completes its read phase before $T_3$ does, but it is \textit{not} stated
+whether $T_2$ also does. I assume it does not, and thus \textbf{test 3 also
+fails}.
+
+Again, all three tests fail, so $T_3$ must be rolled back.
+
+\subsection{Schedule 3}
+
+\begin{minted}{text}
+T1: RS(T1) = {5, 6, 7}, WS(T1) = {8},
+  T1 completes read phase before T3 does.
+
+T2: RS(T2) = {1, 2, 3}, WS(T2) = {5},
+  T2 completes before T3 begins with its write phase.
+
+T3: RS(T3) = {3, 4, 5, 6}, WS(T3) = {3}
+\end{minted}
+
+\textbf{Test 1 fails} since both $T_1$ and $T_2$ end \textit{after} $T_3$ starts.
+\medskip
+
+\textbf{Test 2 fails} since under the specifications, $T_1$ does not necessarily finish
+before $T_3$ begins its write phase. \medskip
+
+\textbf{Test 3 fails} since under the specifications, $T_2$ does not necessarily finish
+its read phase before $T_3$. \medskip
+
+Once again, all three tests fail, so $T_3$ must be rolled back.
+
+\tykstreg

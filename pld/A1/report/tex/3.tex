@@ -1,0 +1,68 @@
+\newpage
+\section{A1.3) Postfix expressions using queues}
+
+\subsection{A.1.3.a)}
+
+\begin{itemize}
+    \item \emph{Describe pseudocode for translating fully parenthesized infix
+      expressions to queue postfix expressions.}
+\end{itemize}
+
+I take the hint given in the assignment, of processing infix expressions one at
+a time, outputting numbers and operators, while re-queueing subexpressions.
+
+\begin{minted}{python}
+infix_to_queue_expression(exp):
+
+  out  = new empty stack # will hold the output queue expression.
+
+  exps = new empty queue # will hold unprocessed (sub-)expressions,
+  exps.enqueue(exp)      # starting with the entire infix expression.
+
+  while exps is non-empty:
+    case exps.dequeue() of
+      (number x) ->      # if next in queue is a number, simply push to out.
+        out.push(x)
+
+      # if next in queue is a binop, push its operator
+      # to out and enqueue its two subexpression operands.
+      (subexp_1, operator, subexp_2) ->
+        out.push(operator)
+
+        exps.enqueue(subexp_2)
+        exps.enqueue(subexp_1)
+
+  return out
+\end{minted}
+
+
+\newpage
+
+\subsection{A.1.3.b)}
+\begin{itemize}
+  \item \emph{Show the queue and (partial) output during translation of \ms{((1
+    + 3) - (5 * 7))} to \ms{1 3 5 7 + * -}.}
+\end{itemize}
+\begin{minted}[linenos=false]{text}
+step | exps queue       | dequeuing     | output  | comment
+0    | [((1+3)-(5*7))]  |               |         | init exps queue
+
+1    | []               | ((1+3)-(5*7)) |         | dequeue expression
+2    | [(1+3), (5*7)]   |               | -       | output op; queue subexps
+3    | [(1+3)]          | (5*7)         | -       | dequeue expression
+4    | [5, 7, (1+3)]    |               | *-      | output op; queue subexps
+5    | [5, 7]           | (1+3)         | *-      | dequeue expression
+6    | [1, 3, 5, 7]     |               | +*-     | output op; queue subexps
+
+7    | [1, 3, 5]        | 7             | +*-     | dequeue expression
+8    | [1, 3, 5]        |               | 7+*-    | output value
+9    | [1, 3]           | 5             | 7+*-    | dequeue expression
+10   | [1, 3]           |               | 57+*-   | output value
+11   | [1]              | 3             | 57+*-   | dequeue expression
+12   | [1]              |               | 357+*-  | output value
+13   | []               | 1             | 357+*-  | dequeue expression
+14   | []               |               | 1357+*- | output value
+
+15   | []               |               | 1357+*- | queue empty; terminate
+\end{minted}
+

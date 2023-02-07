@@ -1,0 +1,63 @@
+\newpage
+\section{Recovery Concepts}
+
+\begin{itemize}
+  \item \textit{1. In a force/steal system, is it necessary to implement
+    a scheme for redo?}
+\end{itemize}
+
+If pages are forced to disk before a transaction is allowed to commit, rather
+than flushing when it is convenient, then there is never a need to redo
+transactions that have already committed.
+
+
+\begin{itemize}
+  \item \textit{What about undo?}
+\end{itemize}
+
+With \textit{steal}, transactions might push pages to disk which have not been
+committed yet; if this is the case, then this must be undone.
+
+\streg
+
+\begin{itemize}
+  \item \textit{2. What is the difference between volatile and non-volatile
+    storage, and what types of failures are survived by each?}
+\end{itemize}
+
+Put shortly, volatile storage is only active when powered on, whereas
+non-volatile storage retains its state when the power is on. Examples are main
+memory and disk memory, respectively. \medskip
+
+Volatile storage is lost on crashes, whereas non-volatile storage is not;
+however, both are vulnerable to hardware failure (bit flipping, regular wear and
+tear, etc). Especially harddisks with moving parts are vulnerable to failures
+from wear and tear.
+
+\streg
+
+\begin{itemize}
+  \item \textit{3. In WAL, which are the two situations in which the log tail is
+    forced to disk?}
+\end{itemize}
+
+First, when pages are updated, a log record for that update is forced to disk before
+the page is actually modified in memory.\smallskip
+
+Second, before a given transaction is allowed to commit, all log records for
+that transaction must be forced to disk.
+
+
+\begin{itemize}
+  \item \textit{Why are log forces necessary, and why are they sufficient for
+    durability?}
+\end{itemize}
+
+One big reason they are necessary is the no-force policy, since the log may be
+the only record of certain committed transactions having even taken place.
+
+They are sufficient for durability because they record all \textit{intended}
+mutations before they are carried out, and that is all that is needed for
+redo/undo during recovery.
+
+\tykstreg

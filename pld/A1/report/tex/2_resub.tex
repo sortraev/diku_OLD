@@ -1,0 +1,64 @@
+\newpage
+\section{A1.2) Rosetta 2 \textcolor{red}{- resubmission}}
+
+\subsection{A.1.2.b) \textcolor{red}{- resubmission}}
+
+\begin{itemize}
+    \item \emph{Discuss advantages and disadvantages of this approach over
+      recompiling source code to run on ARM.}
+\end{itemize}
+
+\textcolor{red}{In my feedback, I was asked about the overall running time as
+compared to simply executing ARM. The newly added answers are in red.}
+
+
+\paragraph{Advantages}~\smallskip
+
+The main advantage is of course portability. With Rosetta 2, users can run
+programs written for x86 on their ARM machines. This means that users can
+purchase a new Mac machine without having to let go of their old software
+written for x86.
+
+\medskip
+
+This is of course also a huge benefit for the developers, since they do not have
+to target two different architectures when they want their software to run on
+both new and older machines, but instead simply target x86 and then let users
+with newer machines run through Rosetta.
+
+\paragraph{Disadvantages}~\smallskip
+
+the JIT compiler is prone to making bad decisions. It might AOT-compile code
+which is not run sufficiently many times to amortize the cost of compilation, or
+it might neglect to AOT-compile parts of the code which \emph{is} in fact run
+often, potentially producing a bottleneck where there shouldn't be one.
+
+\medskip
+
+In addition, there is some memory overhead in the JIT-compiler, since to
+function it essentially needs to keep the interpreter running, whilst
+occasionally invoking the compiler. This overhead can be significant if the input
+program is small.
+
+\paragraph{\textcolor{red}{Performance implications}}~\smallskip
+
+\textcolor{red}{Running a program through Rosetta obviously has an effect on the
+overall running time of that program. In the \emph{very best} case, using Rosetta
+can improve running time - but this only happens when the most demanding parts
+of the code are AOT-compiled early and when the less used parts of the code is
+never AOT-compiled.}
+
+\smallskip
+
+\textcolor{red}{In the worst case, Rosetta will first execute the program
+through the interpreter a number of times before eventually having compiled the
+entire program - in this case, the running time will be roughly as large as if
+the program had originally been compiled to ARM and run, \textbf{plus} whatever
+time was spent interpreting the program in the first place.}
+
+\smallskip
+
+\textcolor{red}{Compared to simply running ARM and ignoring the time it takes to
+AOT-compile to ARM, the running time is significantly larger.}
+
+\Sectend

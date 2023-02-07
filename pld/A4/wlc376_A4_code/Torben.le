@@ -1,0 +1,115 @@
+
+(define seed 42)
+(define rnd
+  (lambda (n) (% (if (define seed (% (+ (* seed 69069) 131) 0x7FFFFFC3))
+                 (/ (if (< seed 0) (- seed) seed) 2))
+                 n)
+  )
+)
+
+(define car (lambda ((x . xs)) x))
+
+(define list (lambda l l))
+
+(define reverse
+  (lambda (as)          (reverse as ())
+          (()       bs) bs
+          ((a . as) bs) (reverse as (cons a bs))))
+
+
+(define troll (lambda (e) (eval e ())
+                      (0 e) ()(n e) (cons (eval e ()) (troll (- n 1) e))))
+
+(define eval
+  (lambda
+    (('d e) rho) (list (+ 1 (rnd (car (eval e rho)))))
+
+    ((e1 'd e2) rho) (repeat (car (eval e1 rho)) (list 'd e2) rho)
+
+    ((e1 '# e2) rho) (repeat (car (eval e1 rho)) e2 rho)
+
+    ((e1 '+ e2) rho) (list (+ (car (eval e1 rho)) (car (eval e2 rho))))
+
+    ((e1 '- e2) rho) (list ( (car (eval e1 rho)) (car (eval e2 rho))))
+
+    ((e1 '< e2) rho) (less (car (eval e1 rho)) (eval e2 rho))
+
+    ((e1 '> e2) rho) (greater (car (eval e1 rho)) (eval e2 rho))
+
+    (('sum e) rho) (list (apply + (eval e rho)))
+
+    (('count e) rho) (list (length (eval e rho)))
+
+    (('{ e '}) rho) (eval e rho)
+
+    (('{ e1 ', . es) rho) (merge (eval e1 rho) (eval (cons '{ es) rho))
+
+    (('min e) rho) (list (car (eval e rho)))
+
+    (('max e) rho) (list (car (reverse (eval e rho))))
+
+    (('least e1 e2) rho) (take (car (eval e1 rho)) (eval e2 rho))
+
+    (('largest e1 e2) rho) (reverse (take (car (eval e1 rho)) (reverse (eval e2 rho))))
+
+    (('choose e) rho) (list (choose (eval e rho)))
+
+    ((x ':= e1 '; e2) rho) (eval e2 (bind x (eval e1 rho) rho))
+
+    (('accumulate x ':= e1 'while e2) rho) (accumulate x e1 e2 rho)
+
+    (x rho) (if (number? x) (list x) (lookup x rho))
+  )
+)
+
+
+(define repeat
+  (lambda (0 e rho) ()
+          (n e rho) (merge (eval e rho) (repeat (- n 1) e rho))
+          )
+  )
+
+(define less (lambda (m ()) ()
+                     (m (n . ns)) (if (< m n) (cons n (less m ns)) (less m ns))
+                     )
+  )
+
+(define greater (lambda (m ()) ()
+                        (m (n . ns)) (if (> m n) (cons n (less m ns)) (greater m ns))
+                        )
+  )
+
+(define merge
+  (lambda (() ns) ns
+          (ms ()) ms 
+          ((m . ms) (n . ns)) (if (< m n) (cons m (merge ms (cons n ns)))
+                                          (cons n (merge (cons m ms) ns)))
+          )
+  )
+
+(define take
+  (lambda (0 ns) ()
+          (m (n . ns)) (cons n (take (- m 1) ns))
+  )
+)
+
+(define choose (lambda (ns) (choose (length ns) ns)
+                       (m (n . ns)) (if (= 0 (rnd m)) n (choose (- m 1) ns))
+               )
+)
+
+(define accumulate
+  (lambda
+    (x e1 e2 rho) ((lambda (v) (if (eval e2 (bind x v rho))
+                                   (merge v (accumulate x e1 e2 rho))
+                                   v)
+                   ) (eval e1 rho))
+  )
+)
+
+(define bind (lambda (x v rho) (cons (cons x v) rho)))
+
+(define lookup (lambda (x ((x . v) . rho)) v
+                       (x ((y . v) . rho)) (lookup x rho)
+               )
+)

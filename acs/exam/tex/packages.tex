@@ -1,0 +1,30 @@
+\usepackage{amsmath,amsthm,amssymb} % flere matematikkommandoer
+
+\usepackage{hyperref} % \url
+\usepackage{cleveref} % \cref
+\usepackage{graphicx} % \inputgraphics
+
+\everymath{\displaystyle} % force display style for inline math. why though?
+
+\usepackage[]{xcolor}
+\definecolor{gray}{RGB}{235, 230, 222}
+\definecolor{myRed}{RGB}{173, 20, 0}
+\definecolor{myGreen}{RGB}{45, 150, 0}
+\newcommand{\gray}[1]{{\setlength{\fboxsep}{0pt}\colorbox{gray}{#1}}}
+
+\usepackage{minted}    % code snippets
+\usemintedstyle{trac}
+
+\setminted{fontsize=\scriptsize, highlightcolor=gray, linenos, frame=lines, framesep=10pt}
+
+% more appropriate figure and table caption font sizes.
+\usepackage{caption}
+\usepackage{subcaption}
+
+\captionsetup[figure]{font=footnotesize, labelfont=footnotesize}
+\captionsetup[table]{font=footnotesize, labelfont=footnotesize}
+
+% appendix using \appendix
+\usepackage[toc,header]{appendix}
+
+\bibliographystyle{plain}

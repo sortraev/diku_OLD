@@ -1,0 +1,34 @@
+
+\newpage
+\section{A3.5}
+
+\begin{itemize}
+  \item \emph{Extend the type rules of the functional language (as presented in
+    the lectures) with rules for the new \ms{private .. within} expression.}
+\end{itemize}
+
+
+I extend the type rules with the below rule:
+
+\begin{gather*}
+  \frac{
+    \begin{aligned}
+      \tau          &\vdash e_1 \; :\ t_1\\
+      \tau[x \mapsto t_1] &\vdash e_2 \; :\ t_2
+    \end{aligned}
+  }{\tau \vdash \ms{private }\ x = e_1\ \ms{within } \ e_2\ :\ t_2}
+\end{gather*}
+
+
+The rule states that:
+\begin{itemize}
+  \item if $e_1$ has the type $t_1$ in the type environment $\tau$, and
+  \item if, after extending $\tau$ with the type binding $x : t_1$, the
+    expression $e_2$ has type $t_2$,
+  \item then $\ms{private }\ x = e_1\ \ms{within } \ e_2$ has type $t_2$
+\end{itemize}
+
+Interestingly, the \ms{private .. within} expression is simply a renaming of the
+more well-known \ms{let .. in} expression from the ML family of languages.
+
+\Sectend

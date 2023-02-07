@@ -1,0 +1,208 @@
+\newpage
+\section{\underline{A4.4}}
+
+\subsection{A4.4.a}
+
+\begin{itemize}
+  \item \emph{Define a subtype ordering $\ltt$ on interval types and
+    prove that it is a partial order.}
+\end{itemize}
+
+
+Let \ms{A} and \ms{B} be interval types given by:
+
+\begin{align*}
+  \text{type } \ms{A} &= a \twodots b\\
+  \text{type } \ms{B} &= c \twodots d.
+\end{align*}
+
+Then the subtype ordering $\ltt$ on interval types is given by:
+
+\begin{align}
+  \ms A \ltt \ms B \iff a \geq c \land b \leq d\, . \label{subtype_ordering}
+\end{align}
+
+We put no restriction on the relationship between \ms a and \ms b or between \ms
+c and \ms d. \emph{Why}? Because if \ms a $>$ \ms b then \ms A is an empty
+interval type, and then \ms A is trivially a subtype of any other interval type,
+and if \ms c $>$ \ms d, then we have:
+
+\begin{align*}
+  c > d\ \land\ \ms A\; \ltt\; \ms B \; &\implies \; a > b\\
+  &\implies \; \ms A \text{ and } \ms B \text{ are both empty interval
+  types.}
+\end{align*}
+
+% With this knowledge we can comfortably reformulate definition
+% (\ref{subtype_ordering}) to use integer set notation:
+%
+% \begin{align}
+%   \ms A \ltt \ms B \iff \{a \twodots b\} \subseteq \{c \twodots
+%   d\}\label{subtype_ordering2}
+% \end{align}
+
+\subsubsection{Showing $\ltt$ is a partial order}
+
+For the interval type ordering to be a partial order, it must be a reflexive,
+antisymmetric, and transitive relation.
+
+\paragraph{Reflexivity}~\smallskip
+
+Let's start with reflexivity. Our subtype ordering is reflexive if an interval
+type \ms A is a subtype of itself, ie. that:
+
+\begin{align}
+  \ms A \ltt \ms A \iff a \geq a \;\land\; b \leq b \label{eq1}
+\end{align}
+
+
+The RHS of expression (\ref{eq1}) is true by reflexivity of the ``less/greater
+than or equal to'' relations on numbers. Our subtype ordering is reflexive - so
+far, so good.
+
+\paragraph{Antisymmetry}~\smallskip
+
+Next, we want to show that $\ltt$ is antisymmetric. This is the case if:
+
+$$
+\ms A \ltt \ms B\; \land\; \ms B \ltt \ms A \quad\implies\quad \ms A = \ms B
+$$
+
+In other words, our subtype ordering is antisymmetric if two interval types can
+only be subtypes of each other if they are equal. I intend to show antisymmetry
+by contradiction.
+
+
+Assume first that $\ms A \ltt \ms B$ and $\ms B \ltt \ms A$. Then we have:
+
+\begin{align*}
+  \ms A \ltt \ms B \; \land \; \ms B \ltt \ms A
+  \quad \iff \quad
+    \underbrace{(a \geq c \; \land \; b \leq d)}_{\text{by } \ms A\; \ltt\; \texttt B}\;
+      \land \;
+    \underbrace{(a \leq c \; \land \; b \geq d)}_{\text{by } \texttt B\; \ltt\;
+    \texttt A}
+\end{align*}
+
+From the RHS of above expression, we derive the following:
+
+\begin{align*}
+  a \leq c\; \land \; c \leq a &\iff a = c,\\[4pt]
+  b \leq d\; \land \; d \leq b &\iff b = d
+\end{align*}
+
+
+Assume now, for contradiction, that \ms A and \ms B are \emph{not} equal:
+
+\begin{align}
+  \ms A \neq \ms B \quad\iff\quad a \neq c \; \lor \; b \neq d
+\end{align}
+
+However, this immediately contradicts our previous assumption, from which we
+derived $a = c$ and $b = d$, since \ms A $\neq$ \ms B requires at least one of
+these to be false; hence two types cannot be subtypes of each other if they are
+also not equal, and our subtype ordering is shown to be antisymmetric.
+
+\paragraph{Transitivity}~\smallskip
+
+Assume \ms A $\ltt$ \ms B and \ms B $\ltt$ \ms C for some third interval type
+\ms C given by:
+
+$$\text{type } \ms C = e \twodots f.$$
+
+To show transitivity, we must show that this implies \ms A $\ltt$ \ms C.
+Starting from our assumptions:
+
+\begin{align*}
+  \ms A \ltt \ms B \quad&\iff\quad a \geq c \; \land \; b \leq d,\\[4pt]
+  \ms B \ltt \ms C \quad&\iff\quad c \geq e \; \land \; d \leq f
+\end{align*}
+
+
+If we reorder the right-hand sides of above expressions and use transitivity of
+the ``less/greater than or equal to'' relations on numbers, we have:
+
+\begin{align*}
+  a \geq c \geq e \quad&\implies\quad a \geq e  \text{, and }\\[4pt]
+  b \leq d \leq f \quad&\implies\quad b \leq f.
+\end{align*}
+
+As such \ms A is a subtype of \ms C. In addition to reflexivity and
+antisymmetry, our subtype ordering has now also been shown to be transitive, and
+with that it is also shown to be a partial order.
+
+\sectend
+
+\newpage
+\subsection{A4.4.b}
+
+\begin{itemize}
+  \item \emph{Should the \emph{\ms{Association}} constructor be covariant or
+    contravariant in its first type parameter wrt. the subtype ordering
+    $\sqsubseteq$ (as it was defined in the previous task)? And what about its
+    second parameter?}
+\end{itemize}
+
+For brevity, let \ms A and \ms B be arbitrary instances of the association type
+given by:
+
+\begin{align*}
+  \ms A &= \ms{Association(T1, T2)},\\[4pt]
+  \ms B &= \ms{Association(T3, T4)}.
+\end{align*}
+
+Where \ms{T1}, \ms{T2}, \ms{T3}, and \ms{T4} are interval types.
+
+A value of type \ms{A} is a list of tuples which map values of
+type \ms{T1} to values of type \ms{T2}, and because all first elements of the
+list of pairs are required to be distinct, we might even be so bold as to call
+it a \emph{mapping} from \ms{T1} to \ms{T2} ;)
+
+\smallskip
+
+Since a mapping is essentially a function, it is reasonable to assume that the
+\ms{Association} type constructor should be \emph{contravariant in its first
+parameter} and \emph{covariant in its second parameter}, and then we would have:
+
+\begin{align}
+  \ms{A} \ltt \ms{B}
+  \quad\iff\quad
+  \ms{T1} \sqsupseteq \ms{T3} \;\land\; \ms{T2} \ltt \ms{T4},
+  \label{assocsubtype}
+\end{align}
+
+but we would do well to justify this assumption.
+
+
+\paragraph{``Proof''}~\smallskip
+
+I will not pursue a formal proof as to why it must be so, but rather show the
+intuition.
+
+\medskip
+
+Assume \ms A $\ltt$ \ms B. For our association subtype ordering as defined in
+(\ref{assocsubtype}) to be correct, we must be able to swap in a value of type
+\ms A wherever we would otherwise have a value of type \ms B.
+
+\medskip
+
+Assume, for contradiction, that our association type constructor is instead
+\emph{covariant} in its \emph{first parameter}. Then \ms{T1} is at best \emph{as
+expressive} in the range of values as \ms{T3}, but in the most cases it would be
+more restrictive and thus we cannot assume that the value of type \ms A is
+sufficient. Thus our association subtype ordering must be contravariant in the
+first parameter.
+
+\medskip
+
+Assume then, once again for contradiction, that our association type constructor
+is \emph{contravariant} in its \emph{second parameter}. Then \ms{T2} is as
+expressive \emph{or more} expressive in the range of possible values than
+\ms{T4} is. If this is the case then we have a problem whenever we lookup an
+association and expect a value in \ms{T4}, but get back a value that is in
+\ms{T2} but not in \ms{T4}. We must restrict the interval type \ms{T2} to
+describe a \emph{sub}set of what is described by \ms{T4}, and hence we make our
+association type constructor \emph{covariant} in its second parameter.
+
+\Sectend

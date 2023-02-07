@@ -1,0 +1,117 @@
+\newpage
+\section{Data Processing}
+
+\subsection{Selection}
+
+
+\begin{itemize}
+  \item \textbf{Selection, 7.1.1}
+\end{itemize}
+
+Since there is no indexing, there is nothing to do but to use a sequential
+search algorithm. This costs $N$ I/O's, where $N$ is the number of pages - in
+this case the Orders table is 25,000 pages large, so the number of I/O's is
+25,000.
+\medskip
+
+(The search can of course be parallelized, but we still need to examine all
+25,000 pages).
+
+\begin{itemize}
+  \item \textbf{Selection, 7.1.2}
+\end{itemize}
+
+When the index is non-clustered, there is a risk of random I/O's since the index
+may not lie in the same order as the actual records in storage. In the worst
+case, the number of I/O's can be equal to the actual number of records
+requested.
+\smallskip
+
+This means that in this case the worst case number of I/O's is 50,000, whereas
+with the sequential scan the worst case number of I/O's is 25,000, since that is
+the number of pages.
+\medskip
+
+For this reason the sequential scan is \emph{very likely} to be better in this
+case.
+
+\sectend
+
+\subsection{Join and Aggregate}
+
+\begin{itemize}
+  \item \textbf{Join and Aggregate, 7.2.1:}
+        \textit{What is the most efficient algorithm to perform the join, and
+        what is its I/O cost?}
+\end{itemize}
+
+\emph{In the following I will assume that 1 buffer page can hold 1 page of Orders or
+Shipments.}
+
+The most efficient algorithm is hybrid hash-join. If $R$ and $S$ are relations;
+$B(R)$ is the number of buffer pages needed to hold $R$, and we have $B(S) \leq
+B(R)R$, then the general formula for the number of I/O's for hybrid hash-join is :
+
+\begin{align*}
+  \left(3 - \frac{2M}{B(S)}\right)\cdot (B(R) + B(S))
+\end{align*}
+
+
+In our case, we have $M := 150$, and because $B(Shipments) < B(Orders) \equiv 1500 <
+25000$, we set $S := Shipments\, , R := Orders$, and the number of I/O's needed
+for a hybrid hash-join in this case becomes:
+
+\begin{align*}
+  \left(3 - \frac{2 * 150}{1500}\right) \cdot (25000 + 1500) = 74200
+\end{align*}
+
+This is not a big improvement over regular hash-join, which would need: 
+
+\begin{align*}
+  3 \cdot (25000 + 1500) = 74200
+\end{align*}
+
+79500 I/O's in this case. However, this could be improved with more main memory.
+
+
+\begin{itemize}
+  \item \textbf{Join and Aggregate, 7.2.2:}
+        \textit{If the server could be upgraded with more main memory, is there
+        a better choice of algorithm?}
+\end{itemize}
+
+If main memory can be increased \emph{arbitrarily}, then the best we can do in
+terms of the number of I/O's is to simply load the smaller of the two relations
+into main memory once, and then to load the larger relation in as needed. This
+could eg. be done using block-based nested-loop join, and in this case, the
+number of I/O's would simply be $B(R) + B(S)$, while the minimum amount of
+memory needed would be $\text{min}(B(R)\, , B(S))$ for some two relations $R$ and
+$S$.
+\medskip
+
+In this case, we have $B(Shipments) = 1500$, so we would need $M \geq 1500$
+
+
+\begin{itemize}
+  \item \textbf{Join and Aggregate, 7.2.3:}
+        \textit{Describe the most efficient algorithm to group and sort the
+        result from the previous step when this contains 100,000 pages and there
+      are now 500 available buffer pages.}
+\end{itemize}
+
+If we know that we need the output sorted, we can use a sorting-based
+grouping/aggregation operator, which takes $3 B(R)$ disk I/O's. This has the
+benefit that the result is already sorted by productID; however, it requires
+$B(R) \leq M^2$ memory.
+\medskip
+
+Now that we have beefed up the number of available buffer pages to 500, we have
+enough main memory, since $100,000 < 500^2 = 250,000$. The number of I/O's
+needed to perform the group+aggregate+sort is thus: $3 * 100,000 = 300,000$.
+
+
+\begin{itemize}
+  \item \textbf{Join and Aggregate, 7.2.4}
+\end{itemize}
+
+Blank.

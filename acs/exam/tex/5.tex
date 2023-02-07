@@ -1,0 +1,130 @@
+
+\newpage
+\section{Reliabilty}
+
+\subsection{Lamport and Vector Clock}
+
+\begin{itemize}
+  \item \textbf{Lamport and Vector Clock, 5.1.1:}
+        \textit{Write the Lamport logical clock of each event.}
+\end{itemize}
+
+\begin{minted}{text}
+e1  = 1
+e2  = 2
+e3  = 2
+e4  = 3
+e5  = 3
+e6  = 3
+e7  = 4
+e8  = 4
+e9  = 5
+e10 = 6
+e11 = 5
+\end{minted}
+
+
+\begin{itemize}
+  \item \textbf{Lamport and Vector Clock, 5.1.2:}
+        \textit{Write the vector clock of each event.}
+\end{itemize}
+
+\begin{minted}{text}
+e1  = (1, 0, 0)
+e2  = (1, 1, 0)
+e3  = (2, 0, 0)
+e4  = (2, 0, 1)
+e5  = (3, 1, 0)
+e6  = (2, 2, 0)
+e7  = (4, 1, 0)
+e8  = (2, 0, 2)
+e9  = (5, 2, 0)
+e10 = (6, 2, 1)
+e11 = (4, 1, 3)
+\end{minted}
+
+
+\begin{itemize}
+  \item \textbf{Lamport and Vector Clock, 5.1.3:}
+        \textit{Can P1 tell that the message received at e10 was actually sent
+        before the one received at e9 using either Lamport or vector clock?}
+\end{itemize}
+
+
+\paragraph{Using Lamport timestamps}~\smallskip
+
+If in real time some event $e_i$ happened before another event $e_j$, then
+$\text{LC}(e_i) < \text{LC}(e_j)$, where $\text{LC}(e)$ is the Lamport clock of
+some event $e$. However, the implication does not go the other way!
+\smallskip
+
+Hence, P1 cannot use the Lamport timestamps to tell that $e4$ happened before
+$e6$, only that $e9$ happened before $e10$.
+
+
+\paragraph{Using vector timestamps}~\smallskip
+
+Yes! P1 can use ector timestamps to tell that $e4$ happened before $e6$.
+\smallskip
+
+This is because with vector clocks, the aforementioned implication \emph{does}
+holds the other way - ie. if $\text{VC}(e_i) < \text{VC}(e_j)$, where
+$\text{VC}(e)$ is the vector clock for event $e$, then $e_i$ happened before
+$e_j$ in real time.
+
+
+
+\begin{itemize}
+  \item \textbf{Lamport and Vector Clock, 5.1.4:}
+        \textit{What are the correct responses of Shipment to the two NewOrder
+        messages, and how can Shipment enforce these responses?}
+\end{itemize}
+
+Upon receiving the two NewOrder messages for the same OrderID, Shipment should
+respond that this order has already been cancelled. Shipment can enforce this
+response by keeping track of cancelled orders, even if those orders have not
+been seen by Shipment yet (this of course assumes that Order never repeats
+OrderIDs).
+
+
+\sectend
+
+\subsection{Replication}
+
+\begin{itemize}
+  \item \textbf{Replication, 5.2.1:}
+        \textit{Compare pros and cons of synchronous and asynchronous
+        replication for replicating Shipment.}
+\end{itemize}
+
+\emph{In the following I will assume that the replicas are only used to backup
+state and receive messages, and that only the main Shipment server sends
+back messages, since the exam text does not state otherwise.} \medskip
+
+Asynchronous replication, of course, has the advantage over synchronous
+replication in that it requires significantly less bandwidth, which might be
+useful if replicas reside far away from the main Shipment server. However,
+synchronous replication has the immense benefit that fail-over is much faster in
+case of main Shipment server failure.
+
+\begin{itemize}
+  \item \textbf{Replication, 5.2.2:}
+        \textit{Would a write quorum of 3 and a read quorum of 2 be problematic
+        for 5 replicas of Shipment?}
+\end{itemize}
+
+$Q_w = 3$ is ideal, since $3 > 5/2$; in other words, only one
+transaction can write a time. \smallskip
+
+However, if $Q_w = 3$, then $Q_r$ needs to also be at least 3, since otherwise
+two transactions can read and write at the same time. So yes, this setup is
+problematic!
+
+
+\begin{itemize}
+  \item \textbf{Replication, 5.2.3}
+\end{itemize}
+
+Blank.
+
+\Sectend

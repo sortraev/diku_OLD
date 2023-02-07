@@ -1,0 +1,111 @@
+\newpage
+\section{A3.4 \resub{- resubmission}}
+
+\begin{itemize}
+  \item \emph{Extend the operational semantics of the imperative language (as
+    presented in the lectures) with transition rules for the \emph{\ms{repeat}}
+    loop statement.}
+\end{itemize}
+
+\st{\texttt{repeat s until x} iterates its loop body \texttt{s} until the condition \texttt{x}
+becomes non-zero - as such, it is equivalent to a \texttt{do { } while (!x)}
+loop, and its loop body is executed at least once.}
+
+\medskip
+
+\resub{In the feedback to my hand-in, I was told that I had mistaken the
+semantics of the \texttt{repeat} loop. My understanding was that the loop body
+\texttt{s} would execute until \texttt{x} became \emph{non-zero}, but \texttt{s}
+is actually executed until \texttt{s} is \emph{non-zero}}.
+
+
+\medskip
+
+This would imply that a \ms{repeat} loop always modifies the store $\sigma$.
+Consider the below transition rule for the case where \ms{x} is \st{non-zero}
+\resub{zero}:
+
+
+\begin{gather*}
+  \frac{
+    \begin{gathered}
+      \sigma          \vdash \, \ms{s} \leadsto \sigma'\\
+      \cancel{\sigma''(\ms{x}) \neq 0}\\
+      \resub{\sigma''(\ms{x}) = 0}\\
+    \end{gathered}
+  }{\sigma \vdash \, \ms{repeat s until x} \, \leadsto \, \sigma'}
+\end{gather*}
+
+The transition rule states that:
+
+\begin{itemize}
+  \item if executing the loop body \ms{s} modifies the current store $\sigma$ to
+    some modified store $\sigma'$, and 
+
+  \item if under $\sigma'$, the loop condition \ms{x} evaluates to \st{a
+    non-zero value} \resub{zero},
+
+  \item then the entire loop statement results in a transition from $\sigma$ to
+    $\sigma'$ .
+\end{itemize}
+
+
+\noindent In other words, the store is only modified by the first (guaranteed)
+iteration. Consider now the transition rule for the case where \ms{x} is
+\st{zero} \resub{non-zero}:
+
+\begin{gather*}
+  \frac{
+    \begin{gathered}
+      \sigma   \vdash \, \ms{s} \, \leadsto \, \sigma''\\
+      \cancel{\sigma''(\ms{x}) = 0}\\
+      \resub{\sigma''(\ms{x}) \neq 0}\\
+      \sigma'' \vdash \, \ms{repeat s until x} \, \leadsto \, \sigma'
+    \end{gathered}
+    }{\sigma \vdash \, \ms{repeat s until x} \, \leadsto \, \sigma'}
+\end{gather*}
+
+
+This rule states that:
+
+\begin{itemize}
+  \item if executing the loop body \ms{s} modifies the current store $\sigma$ to
+    some modified store $\sigma''$, and
+  \item if under $\sigma''$, the loop condition \ms{x} evaluates to
+    \st{zero} \resub{a non-zero value}, and
+  \item if under $\sigma''$, the loop statement modifies $\sigma''$ to some new,
+    modified store $\sigma'$,
+  \item then executing the entire loop statement results in a transition from
+    $\sigma$ to $\sigma'$.
+\end{itemize}
+
+\emph{Note that the loop condition \emph{\ms{x}} is evaluated under the store
+$\sigma''$ arrived at after the first iteration.} This is important! ;)
+
+
+\Sectend
+
+
+
+
+\iffalse{
+\begin{minted}[frame=none, linenos=false]{text}
+
+repeat true
+
+
+  sigma |- s \/-> sigma'
+-----------------------------------------
+  sigma |- repeat s until x \/-> sigma'
+    where sigma'(x) != 0
+
+
+repeat false
+
+  sigma |- s \/-> sigma''   sigma'' |- repeat s until x \/-> sigma'
+--------------------------------------------------------------------
+  sigma |- repeat s until x \/-> sigma'
+    where sigma''(x) == 0
+
+\end{minted}
+}\fi

@@ -1,0 +1,160 @@
+\newpage
+\section{\underline{A4.2}}
+
+\subsection{A4.2.a}
+
+\begin{itemize}
+  \item \emph{Write the sequence of lines executed in the program given in the
+    assignment text. Also, what is the value of \emph{\texttt{n}} printed?}
+\end{itemize}
+
+
+\emph{Note: it is ambiguous whether \emph{``CBreak''} should be printed whenever
+the \emph{\texttt{if}}-condition is evaluated \emph{\textbf{or}} only when the
+\emph{\texttt{break}} statement is actually reached.} For this reason, I answer
+for both cases.
+
+\smallskip
+
+First, assuming ``CBreak'' is printed each time the  \ms{if}-condition if
+evaluated:
+
+\paragraph{Assuming ``CBreak''}
+\begin{minted}[linenos=false]{text}
+Init
+Test
+CBreak
+IDecr
+NIncr
+Test
+CBreak
+IDecr
+NIncr
+Test
+CBreak
+Print
+\end{minted}
+
+Second, assuming ``CBreak'' is only printed when the \ms{break} statement is
+reached:
+
+\begin{minted}[linenos=false]{text}
+Init
+Test
+IDecr
+NIncr
+Test
+IDecr
+NIncr
+Test
+CBreak
+Print
+\end{minted}
+
+In any case, the value of \ms{n} printed is 2, since \ms{i} becomes 8 after two
+iterations and, and on the third iteration the loop is broken since \texttt{i \%
+j == 8 \% 4 == 0}.
+
+\sectend
+
+\subsection{A4.2.b}
+
+\begin{itemize}
+  \item \emph{Eliminate the \emph{\ms{break}} statement in the while-loop
+    without using \emph{\ms{goto}} or \emph{\ms{continue}} statements.}
+\end{itemize}
+
+Since the conditional \ms{break} statement is nested directly inside the
+\ms{while} loop, we can move the break condition up into the loop condition.
+This is because looping until \ms{(i > j)} and then breaking the loop if
+\texttt{(i \% j == 0)} is equivalent to simply looping until \texttt{(i > j \&\&
+i \% j != 0)}.
+
+\begin{minted}[highlightlines={2},linenos=false]{c}
+int i = 10, j = 4, n = 0;
+while (i > j && i % j != 0) {
+  i--;
+  n++;
+}
+printf("%d\n", n);
+\end{minted}
+
+
+\newpage
+\subsection{A4.2.c}
+
+\begin{itemize}
+  \item \emph{Describe a general method for eliminating \emph{\texttt{break}}
+    statements without introducing \emph{\texttt{goto}} statements.}
+\end{itemize}
+
+Consider the below C-like pseudocode containing a while loop with a \ms{break}
+statement at some arbitrary position in the loop body:
+
+\begin{minted}[linenos=false]{c}
+// arbitrary code preceding the loop.
+while(loop_cond()) { // loop_cond() is any function and may have side effects.
+
+  ... // arbitrary code preceding the break.
+    ...
+      ...
+
+      // the break statement may be arbitrarily nested.
+      break;
+
+      ...
+    ... 
+  ... // arbitrary code following the break.
+}
+\end{minted}
+
+We wish to eliminate the \ms{break} statement but preserve semantics.
+
+If we are disallowed from using gotos and break statements, then the only way to
+manipulate control flow out of a loop is for the loop condition to somehow
+become zero, causing the loop to end. This can be done like so:
+
+\begin{itemize}
+
+  \item declare a new variable \ms{foo} and initialize to a non-zero value
+    before entering the loop;
+
+  \item if the original loop condition is \ms{loop_cond()}, then replace this
+    with \ms{foo && loop_cond()}. To preserve semantics, it is important that we
+    place \ms{foo} as the first operand to the logical \ms{AND}, since
+    \ms{loop_cond()} might have side effects;
+
+  \item finally, replace all occurrences of ``\ms{break}'' in the loop body
+    with:\\ ``\texttt{foo = 0; continue;}''
+
+\end{itemize}
+
+\newpage
+\noindent The resulting code looks like so:
+
+\begin{minted}[linenos=false]{c}
+// arbitrary code preceding the loop.
+int foo = 1;
+while(foo &&          // important that we short-circuit on foo
+      loop_cond()) {  // in case loop_cond() has side effects!
+  ...
+    ... // arbitrary code preceding the break.
+      ...
+
+      // set foo to zero and jump to loop head.
+      foo = 0;
+      continue;
+
+      ...
+    ... // arbitrary code following the break.
+  ...
+}
+\end{minted}
+
+In summary, whenever control reaches the point in the program where previously
+there was a \ms{break} statement, the code will now set \ms{foo = 0}; jump to
+the head of the loop; evaluate the logical \ms{AND} expression and, because
+\ms{foo} is zero, short-circuit and exit the loop without evaluating
+\ms{loop_cond()} that extra time. Thus semantics of the loop is preserved.
+
+\Sectend

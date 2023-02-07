@@ -1,0 +1,51 @@
+\subsection{A.2.2.a)}
+If we assume that that in the final statement, the two addition operations are
+evaluated left to right, then the program prints "17" under all three parameter
+passing methods.
+
+\smallskip
+
+\textbf{Why?}
+
+\medskip
+
+If the two additions are evaluated left to right, then the temporary result of
+\ms{u + v} will be stored in a temporary variable, which is not going to be
+modified by the call to \ms{f} (when call-by-reference or call-by-value-result
+is used; under call-by-value all of this is irrelevant). \smallskip
+
+\ms{f(u, v)} is, of course, always equal to \ms{f(4, -2) = 15} (since, as
+explained, \ms{u} and \ms{v} are only modified inside \ms{f}). Thus the final
+print statement is always equivalent to: \ms{print(4 + (-2) + f(4, -2))}, which
+is equivalent to \ms{print(17)}.
+
+\sectend
+
+\subsection{A.2.2.b)}
+
+
+\begin{itemize}
+  \item \textit{i. What are the results of \ms{f(1)} and \ms{g(1)} as a function
+    of \ms{n} under call by need and call by name?}
+\end{itemize}
+
+\begin{minted}{text}
+f(1) under call-by-need: 2^(n + 1)
+f(1) under call-by-name: 2^(n + 1)
+g(1) under call-by-need: 2^(n + 1)
+g(1) under call-by-name: 2^(n + 1)
+\end{minted}
+
+
+\begin{itemize}
+  \item \textit{ii. In each of the four cases, how many additions are executed?}
+\end{itemize}
+
+\begin{minted}{text}
+f(1) call by need: n + 1 additions
+f(1) call by name: n + 1 additions
+g(1) call by need: n + 1 additions
+g(1) call by name: 2^(n + 1) - 1
+\end{minted}
+
+\Sectend

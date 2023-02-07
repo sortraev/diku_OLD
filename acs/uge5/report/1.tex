@@ -1,0 +1,177 @@
+\newpage
+\section{Implementation}
+
+I implement all the specifications given in the assignment text. I omit it from
+the report since it is not specified to include documentation in the report, and
+I don't want to go too much over the page count.
+\medskip
+
+In any case, my implementation is attached to the hand-out, and the source code
+is self-documenting via appropriate code comments.
+
+\tykstreg
+
+
+\newpage
+\section{Experiment setup}
+
+\begin{itemize}
+  \item \textit{Describe in detail the setup you have created for your
+    experiments.}
+\end{itemize}
+
+\paragraph{Sample data generation}~
+\smallskip
+
+When generating random sets of \ms{ImmutableStockBook}s, I of course want to
+generate books with different properties (title, price, number of sales misses,
+and so on). \medskip
+
+I write a function that generates a single \ms{StockBook}. The function randomly
+generates each of the parameters to the \ms{ImmutableStockBook} constructor
+except for the ISBN, which is passed as a parameter to the function. This is to
+more easily generate sets of books with all unique ISBNs.
+
+\begin{minted}{java}
+public StockBook nextStockBook(int isbn) {
+  String title  = "title_"  + isbn; // suffix books with ISBN to guarantee unique names.
+  String author = "author_" + isbn;
+
+  float price   = rand.nextFloat() * 50 + 0.1f;  // price from 0 to 50.
+  int numCopies = rand.nextInt(61) + 20;         // 20 to 80 copies.
+
+
+  long numSaleMisses = rand.nextInt(11);         // 0 to 10 sales misses.
+  long numTimesRated = rand.nextInt(41);         // 0 to 40 times rated.
+  long averageRating = rand.nextInt(6) + 1;      // average rating between 1 and 5.
+  long totalRating = numTimesRated * averageRating;
+
+  // one third of books is an editor pick.
+  boolean isEditorPicked = rand.nextInt() % 3 == 0;
+
+  return new ImmutableStockBook(isbn, title, author,
+          price, numCopies, numSaleMisses,
+          numTimesRated, totalRating, isEditorPicked);
+}
+\end{minted}
+
+\ms{nextSetOfStockBooks()} then calls this in a loop over a pre-generated set of
+unique ISBNs. \medskip
+
+\textit{Note that the title is simply the word ''\ms{title_}'' suffixed with the ISBN.
+ISBNs are always chosen in the inclusive integer range $\{1,..., 10^9\}$ (to
+avoid collisions during generation), so titles are between 7 and 16 characters
+long. Author fields are generated in the same fashion, which means author
+strings are between 8 and 17 characters long.}
+
+\paragraph{Workload configuration}~\smallskip
+
+When testing with large numbers of worker thread (>100), I found that the
+success rate would sometimes drop as low as 95\%. To counter this, I modified
+some of the workload configuration parameters in the \ms{WorkloadConfiguration}
+class. \medskip
+
+Below snippet shows those configuration parameters that I changed:
+
+\begin{minted}{java}
+client.workloads.WorkloadConfiguration.numEditorPicksToGet: 20 -> 10
+client.workloads.WorkloadConfiguration.numAddCopies:        20 -> 8
+client.workloads.WorkloadConfiguration.numBooksToAdd:       10 -> 4
+\end{minted}
+
+With these changes, I never experienced failing interactions. \medskip
+
+No other configuration parameters are changed, meaning tests are still run 500
+times (following 100 warm up runs).
+
+
+\paragraph{Hardware and hyperparameters}~\smallskip
+
+All experiments (local and otherwise) are run on my local machine, featuring an
+intel i7-7700hq 2.8GHz CPU. My machine also has 8GB of RAM, which might be
+useful when the number of worker threads become large\footnote{To be honest, I
+am not familiar with how or whether JVMs utilize 64-bit memory address spaces.}.
+\medskip
+
+To test a varying number of worker threads, I have changed various
+hyperparameters in the source code to allow more simultaneous worker threads and
+HTTP proxy clients. Specifically, I have made the following changes:
+
+\begin{minted}{java}
+client.BookStoreClientConstants.CLIENT_MAX_THREADSPOOL_THREADS: 250 -> 512
+
+server.BookStoreHTTPSERVER.MIN_THREADPOOL_SIZE: 10  -> 1
+server.BookStoreHTTPSERVER.MAX_THREADPOOL_SIZE: 100 -> 512
+
+utils.BookStoreConstants.BINARY_SERIALIZATION: false -> true
+\end{minted}
+
+Notice that I have also chosen binary serialization. This decision was made in
+an effort to speed up non-local tests, which quickly became excruciatingly slow
+for larger worker thread counts (> 100).
+
+\streg
+
+\section{Experiment execution}
+
+I want to measure throughput and latency of the \ms{CertainWorkload}. I want to
+benchmark using various numbers of worker threads (hereby denoted by $N$), and
+for this I have chosen $N = 2^i$ for $i \in \{0, ..., 9\}$, ie. all powers of
+$2$ from $1$ to $512$. \medskip
+
+I execute all tests both locally and non-locally. \medskip
+
+All tests are run on the hardware and under the circumstances described above.
+
+\section{Experiment results}
+
+\paragraph{Throughput}~\smallskip
+
+Plot 1 shows the measured throughput:
+
+\pic{certainbookstore_thruput.png}
+
+\textit{Please note that the plot is logarithmic.}\medskip
+
+The highest throughputs are measured for $N = 256$ and 512 for the local and
+non-local tests, respectively. As expected, throughput grows with $N$, but
+whereas there is a peak at $N = 256$ for local tests, the maximum throughput for
+non-local execution may require even larger $N$. \medskip
+
+Not surprisingly, the local execution reaches throughput many orders of
+magnitude bigger than the non-local tests - this of course due to the immense
+overhead in RPC calls and the fact that here, the book store is run on an
+entirely different JVM.
+
+\paragraph{Latency}~\smallskip
+
+Plot 2 shows the measured latency:
+
+\pic{certainbookstore_latency.png}
+
+\textit{Please note that the plot is logarithmic.}\medskip
+
+Latency grows very quickly as $N$ increases for the non-local runs, whereas the
+latency is relatively steady for $N \leq 32$ for the local runs, before it, too,
+begings to grow linearly in $N$ (the measured latencies grow exponentially, but
+so do the values of $N$). \medskip
+
+Interestingly, but expectedly, latency is lower the smaller $N$ becomes (with
+only few exceptions, which may or may not be due to errors in measurement); this
+is of course due to the lessened traffic.
+
+\streg
+
+\newpage
+
+\section{Reliability of results}
+
+The experiments are not particularly exhausting of the actual performance of the
+book store. Only one type of randomly generated books were used, and only one
+set of workload configuration parameters were used. I used parameters that would
+mostly produce rather \textit{small} interactions. For example, customers only
+ever buy 3 book copies at a time, and stock managers only ever add 4 new books
+at a time, and so on. Ideally, I would also have run a test with a large number
+of books manipulated per interaction.
+
+\tykstreg

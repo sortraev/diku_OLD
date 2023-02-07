@@ -1,0 +1,155 @@
+\newpage
+
+\section{A2.5}
+
+\subsection{A2.5.a}
+
+\begin{itemize}
+  \item \emph{What should T be in the example given in the assignment text?}
+\end{itemize}
+
+\ms{T} should be a function type from int to int, ie. \ms{int -> int}, since the
+input array is an int array and the function operates on each element and writes
+back to the original array.
+
+\begin{itemize}
+  \item \emph{Suggest new type constructs that we should add to the type system
+    for C in order to achieve higher order functions.}
+\end{itemize}
+
+This task is \emph{highly} ambiguous because everything that is discussed in the
+assignment text is \textbf{already supported} by the C type system, and any
+(reasonable) C compiler (eg. gcc or clang) would, in fact, reject the program if
+\ms{myarray} was anything but an integer array.
+
+\medskip
+
+All this aside, there is undoubtedly \textbf{a lot} of room for improvement in
+the C type system for function types. In the following, I will discuss some
+features/constructs that would benefit the C type system.
+
+\paragraph{Safety}~\smallskip
+
+For one, a lot of unsafety arises from the fact that C only supports function
+\textit{pointers} and the fact that in C, any pointer can be typecast to a
+pointer of any different type. For this reason, it would be important to
+implement a distinct function type construct.
+
+
+\paragraph{Facilitating optimization}~\smallskip
+
+Secondly, since one of the main benefits of programming in C is efficient memory
+utilization, it might be beneficial for the function type construct to include
+information about whether a particular function accesses global memory or not,
+and whether it both reads and writes or simply reads - in other words, whether
+or not the function can have side effects outside its own scope - as this would
+\emph{significantly} increase the possibilities for automatic (memory)
+optimizations.
+
+
+\paragraph{Ease of expression}~\smallskip
+
+As is, the syntactic side of the C function (pointer) type construct is baffling
+to say the least. As an example, consider the below Haskell program:
+
+\begin{minted}{haskell}
+h :: Int -> Int -> Int -> Int
+h a b c = a + b * c
+
+g :: Int -> Int -> Int -> (Int -> Int)
+g a b c = h a (b + c)
+
+f :: Int -> Int -> (Int -> Int -> (Int -> Int))
+f a b = g (a + b)
+\end{minted}
+
+Here, \ms{f} has the type \ms{Int -> Int -> (Int -> Int -> (Int -> Int))}.
+%\footnote{\emph{A function which takes two ints and returns a function which
+%takes two ints and returns a function which takes one int and returns an int.}}
+This is a rather obscure function type, but nevertheless it is not a
+particular complex type signature to discern for a human programmer.
+
+\medskip
+
+In C function type notation, however, \ms{f} has the type signature:
+
+\begin{minted}[linenos=false, frame=none]{c}
+int (* (* (*)(int, int))(int, int))(int)
+\end{minted}
+
+These kinds of ridiculous function type signatures make it very hard to
+implement and reason about higher-order functions in C. It would be a very good
+idea to design a more concise, expressive function type construct for the C type
+system, perhaps similar to that of Haskell. 
+
+\smallskip
+
+However, unlike Haskell, C does not support partial application (or currying),
+and we should make this distinction clear in the syntax for the new function
+types. In general, the type signature for some function \ms{g} of $n$ parameters
+should in the source code be declared by:
+
+\begin{minted}[linenos=false, frame=none]{c}
+  foo :: (t_0, t_1, ..., t_n) -> t_return
+\end{minted}
+
+In the case of the function \ms{f} as described above, the type signature would
+in this system be:
+
+\begin{minted}[linenos=false, frame=none]{c}
+  f :: (int, int) -> ((int, int) -> ((int) -> int))
+\end{minted}
+
+As such, the new syntax has some redundant parenthesization, but it is arguably
+a more concise syntax than the current syntax for function pointer types.
+
+\sectend
+
+\newpage
+
+\subsection{A2.5.b}
+
+\begin{itemize}
+  \item \emph{Suggest how we should type check function declarations and
+    function calls if we extend C with the previously discussed construct. The
+    extend type system should handle cases such as the one presented in the
+    assignment text.}
+\end{itemize}
+
+This question is a little ambiguous. It is not stated whether \ms{T1, ...,  T7}
+are all known at compile-time (as is required in C), or if the type system
+should support type inference. In the former case the answer is easy, because
+the C type system already supports everything necessary to type check the
+examples ;)
+
+\smallskip
+
+In the latter case, however, we would simply need to implement some sort of type
+inference system, since if the type signature of each function in a program can
+be inferred, then it must be well-typed.
+
+\bigskip
+
+In any case, we could type check functions as follows:
+
+\smallskip
+
+Given a function $f$ with $m$ parameters $(p_0,\ \dots,\ p_{m - 1})$ and function body
+$f_{\text{body}}$, we first look up its type signature in the type environment.
+If we find its type signature to be $f\; ::\; (t_0,\ ...,\ t_{n_1}) \to
+t_{\text{ret}}$ for some $n$ (which may or may not be equal to $m$), then we type check
+the function $f$ using the following steps (in order):
+
+\begin{enumerate}
+  \item type check function arity (ie. that the function takes as many
+  parameters as the type signature states): assert that $n = m$.
+
+  \item type check function parameters: assert that $p_i = t_i$ for $i \in \{0,
+    \dots, n\}$.
+
+  \item type check $f_\text{body}$: for each branch in the function body, assert
+    that the value of this branch is $t_\text{ret}$.
+\end{enumerate}
+
+
+\Sectend

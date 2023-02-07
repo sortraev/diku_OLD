@@ -1,0 +1,109 @@
+(define assertEqual
+  (lambda
+    (x x)        'testSuccess
+    anythingElse 'testFailure
+  )
+)
+
+
+(define testList (list 98 3 63 12 44 13 3 82 66 3 49 42 25 43 18 27 75))
+(define testEnv  (lambda any (bind 'foo testList ())))
+\; use same seed for all tests.
+(define testEval (lambda (e) (if (define seed 42) (eval e (testEnv)))))
+
+
+\; assert constants are wrapped in singleton collections.
+(assertEqual (testEval '(42)) '(42))
+\; assert singleton collections stay singleton.
+(assertEqual (testEval '((42))) '(42))
+
+\; arithmetic operators.
+(assertEqual (testEval '((3) + (4))) '(7))
+(assertEqual (testEval '((3) + 4))   '(7))
+(assertEqual (testEval '(3   + (4))) '(7))
+(assertEqual (testEval '(3   + 4))   '(7))
+(assertEqual (testEval '((3) - (4))) '(-1))
+(assertEqual (testEval '((3) - 4))   '(-1))
+(assertEqual (testEval '(3   - (4))) '(-1))
+(assertEqual (testEval '(3   - 4))   '(-1))
+(assertEqual (testEval '((3) * (4))) '(12))
+(assertEqual (testEval '((3) * 4))   '(12))
+(assertEqual (testEval '(3   * (4))) '(12))
+(assertEqual (testEval '(3   * 4))   '(12))
+
+
+\; less/greater than filter operators.
+(assertEqual (testEval '(50 < foo))  '(98 63 82 66 75))
+(assertEqual (testEval '(50 > foo))  '(3 12 44 13 3 3 49 42 25 43 18 27))
+
+
+\; sampling.
+(assertEqual (testEval '(7 # 8))  '(8 8 8 8 8 8 8))
+
+\; invalid number of samples.
+(assertEqual (testEval '(0 # 8))    '())
+(assertEqual (testEval '(-19 # 8))  '())
+
+\; assert that result of sample is a flattened list.
+(assertEqual (testEval '(3 # (1 , 3 , 5))) '(1 3 5 1 3 5 1 3 5))
+
+
+\; list union.
+(assertEqual (testEval '(3 , 2 , 1 , 5))  '(3 2 1 5))
+\; nested list union. assert that output is a flattened list.
+(assertEqual (testEval '(3 , (1 ,(3),(37 ,(42)), 1 , 5) , -9))  '(3 1 3 37 42 1 5 -9))
+\; empty list union.
+(assertEqual (testEval ()) ())
+
+
+\; variable binding.
+(assertEqual (testEval '(bar := (9 * 4) ; (bar + 42)))  '(78))
+\; unknown variable.
+(assertEqual (testEval '(x := 42 ; (x + z))) ())
+\; variable overshadowing.
+(assertEqual (testEval '(x := 3 ; (y := 4 ; (x := -3 ; (y + x))))) '(1))
+
+\; correct scoping. should evaluate to () since x is unknown in the right operand.
+(assertEqual (testEval '((x := 3 ; x) + (y := 4 ; y + x))) ())
+      
+               
+
+
+
+\; variable lookup.
+(assertEqual (testEval '(foo))  testList)
+(assertEqual (testEval '(bar))  ()) \; unknown variable
+
+
+\; count.
+(assertEqual (testEval '(count (1337 d (d 5004))))  '(1337))
+\; count of empty list.
+(assertEqual (testEval '(count ()))  '(0))
+
+
+\; sum, min, and max.
+(assertEqual (testEval '(sum foo))  '(666)) \; computed using online Troll interpreter.
+(assertEqual (testEval '(min foo))  '(3))
+(assertEqual (testEval '(max foo))  '(98))
+
+
+\; least and largest.
+(assertEqual (testEval '(least 9 foo))    '(3 3 3 12 13 18 25 27 42))
+(assertEqual (testEval '(largest 9 foo))  '(98 82 75 66 63 49 44 43 42))
+
+
+\; it doesn't make much sense to test accumulate without randomness, since we need
+\; a condition that is always true - but it is nevertheless an interesting test.
+\; the expression used here is the example given in the assignment text, but
+\; without the randomness.
+(assertEqual (testEval '(sum (least 20
+                                (accumulate x := (1 , 9 , -100 , 50)
+                                            while (800 < (sum (largest 19 x)))))))
+             '(-40)) \; computed using online Troll interpreter.
+
+
+\; even if we cannot test randomness, we can at least test some interesting
+\; properties - eg. that 5 d 19 == {d19, d19, d19, d19, d19} == 5 # 1 d 19.
+\; (note that the same seed is used for all testEval calls)
+(assertEqual (testEval '(5 d 19))  (testEval '((d 19),(d 19),(d 19),(d 19),(d 19))))
+(assertEqual (testEval '(5 d 19))  (testEval '(5 # (1 d 19))))

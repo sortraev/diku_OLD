@@ -1,0 +1,192 @@
+\newpage
+\section{A3.2}
+
+Consider the below function written in SML
+
+\begin{minted}[linenos=false]{sml}
+  fun dingo (x, nil)   = false
+    | dingo (x, y::ys) = x = y orelse dingo (x, ys);
+
+\end{minted}
+
+\subsection{A3.2.a}
+
+\begin{itemize}
+  \item \emph{Explain what the function does.}
+\end{itemize}
+
+Given a list \ms{ys} and an element \ms{x}, a call to \ms{dingo (x, ys)} returns
+\ms{true} if \ms{x} exists in \ms{ys}; else \ms{false}.
+
+\medskip
+
+This is because: The first function clause states that if \ms{ys} is \ms{nil}
+(the empty list), then surely \ms{x} is not a member of it, whereas the second
+function clause returns \ms{true} if \ms{x} is equal to the head of the list
+\ms{ys}; else a recursive call to examine the tail of the list is made.
+
+\sectend
+
+
+\subsection{A3.2.b}
+
+\begin{itemize}
+  \item \emph{Use the Hindley-Milner algorithm to infer the type of
+    \emph{\ms{dingo}}.}
+\end{itemize}
+
+%
+% I start by rewriting the function definition to have just one clause with a
+% \ms{case} expression matching on the second parameter:
+%
+% \begin{minted}{sml}
+% fun dingo (x, ys) =
+%   case ys of
+%     nil    => false
+%   | y::ys' => x = y orelse dingo (x, ys')
+% \end{minted}
+%
+% and argue that this definition of the function is equivalent to the original.
+
+\medskip
+
+\noindent I first initialize a type environment $\rho_0$ (corresponding to the
+first function clause) with type variables for the first function clause of
+\ms{dingo} with parameters \ms{x} and \ms{nil}, as well as an empty set of
+global type bindings $\sigma$:
+
+\begin{align*}
+  \rho_0 &= [\ms{dingo} \mapsto ((A * B) \to C), x \mapsto A, nil \mapsto
+  B]\\[4pt]
+  \sigma &= [\ ]
+\end{align*}
+
+Now, I wish to infer the type of the function body in the new type environment
+$\rho_0$.
+
+\medskip
+
+I first wish to unify $B$ with the actual type of \ms{nil}. Since \ms{nil} is a
+null list literal, I know its type to be $\text{list } D$ for some new type
+variable $D$, and I must then compute $\text{unify}(B,\ \text{list } D)$.
+
+\smallskip
+
+$B$ is an unbound type variable, so the unification is successful if $\text{list
+} D$ does not contain $B$. The occurs check passes since $D$ does \emph{not}
+contain $B$; thus unification is successful, and I add the binding $B
+\mapsto \text{list } D$ to $\sigma$:
+
+$$
+\sigma := \sigma[B \mapsto \text{list } D]
+$$
+
+I also infer this function clause to have type \ms{bool}, since the return value
+\ms{false} is a boolean literal. Since in $\rho_0$, the return type of \ms{dingo}
+is the type variable $C$, I now need to compute $\text{unify}(C,\ \ms{bool})$.
+
+\smallskip
+
+Since $C$ is an unbound type variable, the unification is successful if $C$ does
+not contain $\ms{bool}$, but this is trivially true since $\ms{bool}$ is a type
+constructor with zero parameters. Thus I add the binding $(C \mapsto \ms{bool})$
+to $\sigma$:
+
+\begin{align*}
+  \sigma := \sigma[C \mapsto \ms{bool}]
+\end{align*}
+
+
+Now, I want to infer the type of the second function clause given the bindings
+acquired in the first. I continue with the type environment $\rho_0$, and at this
+point, the set of global bindings $\sigma$ is:
+
+$$
+\sigma = [B \mapsto \text{list } D,\ C \mapsto \ms{bool}]
+$$
+
+Consider now the second function clause. Since the second parameter is matched
+against a head/tail list pattern, I should add \ms{y} to $\rho_0$, creating a
+new type environment $\rho_1$ given by:
+
+\begin{align*}
+  \rho_1 := \rho_0[\ms{y} \mapsto D]\\[4pt]
+\end{align*}
+
+Since \ms{ys} maps to $\text{list } D$.
+
+\medskip
+
+I now want to infer the type of function clause body. Since it consists simply
+of a logical OR expression, I know that the type of the body is \ms{bool}.
+Unifying $C$ (the return type of \ms{dingo}) with \ms{bool} is successful since
+there exists a mapping from $C$ to \ms{bool} in $\sigma$.
+
+\medskip
+
+However, to successfully infer the type of the function body, the logical OR
+expression must also be well-formed - it is well-formed if both of its operands
+are of \ms{bool} type.
+
+\medskip
+
+I start with the left-hand operand \ms{x = y}. This equality is well-typed if
+its operands are of the same type. To find this out, I compute the unification
+of the types of \ms{x} and \ms{y} which I have given in the local type
+environment:
+
+\begin{align*}
+  \text{unify}(\rho(\ms{x}),\ \rho(\ms{y})) &= \text{unify}(A,\ D)\\[4pt]
+\end{align*}
+
+The unification is determined using unification rule 4 (as given in the lecture
+notes) - this holds because $A$ is an unbound type variable and $D$ does not
+contain $A$. $D$ is shown to not contain $A$ by the fact that $D$ is itself an
+unbound type variable different from $A$.
+
+\medskip
+
+As such $\text{unify}(A,\ D)$ holds - a new type variable $E$ is added to the
+set of global bindings $\sigma$:
+
+$$
+\sigma := \sigma[D \mapsto A]
+$$
+
+This also updates the mapping of $B$ to $\text{list } A$.
+
+\bigskip
+
+Since unification of \ms{x} and \ms{y} was successful, we only need the second
+operand of the logical OR expression to be well-typed. This is the case if it is
+also a \ms{bool} type. Since it is a recursive call to \ms{dingo}, which we know
+from the local type environment to have return type \ms{bool}, this also holds.
+As such unification of the two function clauses is successful.
+
+\bigskip
+
+The entire function has been type inferred, and the resulting set of type
+bindings is:
+
+$$
+\sigma = [B \mapsto \text{list } A, C \mapsto \ms{bool}, D \mapsto A]
+$$
+
+The type of the function is then:
+
+$$
+\ms{dingo}\ :\ (A * \text{list } A) \to \ms{bool}
+$$
+
+
+By replacing unbound type variables (there is only $A$) with type parameters,
+the type is generalized and its type schema is then:
+
+
+$$
+\ms{dingo}\ :\ \forall \alpha\ .\ (\alpha * \text{list } \alpha) \to \ms{bool}
+$$
+
+
+
+\Sectend

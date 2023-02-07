@@ -1,0 +1,78 @@
+(define list (lambda l l))
+
+(define eval
+  (lambda
+    ((e1 '+ e2)) (+ (eval e1) (eval e2))
+    ((e1 '- e2)) (- (eval e1) (eval e2))
+    ((e1 '* e2)) (* (eval e1) (eval e2))
+    ((e))        (eval e)
+    (x)          (if (number? x) x 'evalErrorNAN)
+  )
+)
+
+
+(define parse
+  (lambda
+    (e) (parseE0 e)
+  )
+)
+
+\; n + n * n $
+(define parseE0
+  (lambda
+    ((e . es)) (if (or ((number? e) (= e '{)))
+                  'parseError)
+    (('{ . s)) (list (parseE1 (cons '{ s)) (parseAddE (cons '{ s)))
+    ((n  . s)) (if   (number? n)  'parseError)
+    any 'parseError
+  )
+)
+
+
+\ (define or
+\   (lambda
+\     (x y) (if x x y) \; (if y y))
+\     any   ()
+\   )
+\ )
+
+(define or
+  (lambda
+    (b . bs) (if b b (or bs))
+    any      ()
+  )
+)
+
+
+
+\;       | n | + | * | ( | ) | $ |
+\; ------|---|---|---|---|---|---|
+\; E0    | 1 |   |   | 1 |   |   |
+\; ------|---|---|---|---|---|---|
+\; AddE  |   | 3 | 2 |   | 2 | 2 |
+\; ------|---|---|---|---|---|---|
+\; E1    | 4 |   |   | 4 |   |   |
+\; ------|---|---|---|---|---|---|
+\; MultE |   | 5 | 6 |   | 5 | 5 |
+\; ------|---|---|---|---|---|---|
+\; Term  | 7 |   |   | 8 |   |   | 
+
+
+\ 1 E0     :=  E1 AddE
+\ 2 AddE   :=  NULL
+\ 3 AddE   :=  + E0
+\ 4 E1     :=  Term MultE
+\ 5 MultE  :=  NULL
+\ 6 MultE  :=  * E1
+\ 7 Term   :=  n
+\ 8 Term   :=  ( E0 )
+
+
+
+
+\ E -> E0
+\ T -> E1
+\ R -> AddE
+\ S -> MultE
+\ F -> Term
+\ eps -> NULL

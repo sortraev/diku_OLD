@@ -1,0 +1,267 @@
+\; the API. usage: `troll n e` or `troll e`, where `n` is a number greater than zero
+\; and `e` is an expression in the embedded syntax.
+(define troll
+  (lambda (n e) (if (number? n) (if (> n 0) (evalMany n e ())))
+          (e)   (eval e ())
+  )
+)
+
+
+(define eval
+  (lambda
+
+    \; arithmetic operations of type (singleton -> singleton -> singleton).
+    ((e1 '+ e2) env)  (binop + (evalST e1 env) (evalST e2 env))
+    ((e1 '* e2) env)  (binop * (evalST e1 env) (evalST e2 env))
+    ((e1 '- e2) env)  (binop - (evalST e1 env) (evalST e2 env))
+
+
+    \; filtering operations of type (singleton -> collection -> collection).
+    ((e1 '< e2) env)  (filter (lambda (x) (< (evalST e1 env) x)) (eval e2 env))
+    ((e1 '> e2) env)  (filter (lambda (x) (> (evalST e1 env) x)) (eval e2 env))
+
+    \; sampling of type (positive singleton -> collection -> collection).
+    \; e2 is left unevaluated such that it can be evaluated `e1` times.
+    ((e1 '# e2) env)  (sample (evalSTPos e1 env) e2 env)
+
+    \; dice rolling. all parameters must be positive singletons.
+    (('d e)     env)  (roll 1 (evalSTPos e env))
+    ((e1 'd e2) env)  (roll (evalSTPos e1 env) (evalSTPos e2 env))
+
+
+    \; variable binding. v must be a symbol; e1 and e2 are arbitrary exps.
+    ((v ':= e1 '; e2) env) (if (symbol? v)
+                               (eval e2 (bind v (eval e1 env) env)))
+
+
+    \; operations of type (collection -> singleton)
+    (('count  e) env)  (len     (eval e env))
+    (('sum    e) env)  (sum     (eval e env))
+    (('min    e) env)  (min     (eval e env))
+    (('max    e) env)  (max     (eval e env))
+    (('choose e) env)  (choose  (eval e env))
+
+
+    \; {e1, ..., en}: this production assumes n >= 1; to create an empty collection,
+    \; simply give an empty list. for example, '(count ()) evaluates to (0).
+    ((e ', . es) env)  (flatten (cons (eval e env) (eval es env)))
+
+
+    \; least and largest: the first parameter must be a positive singleton.
+    (('least   e1 e2) env)  (least   (evalSTPos e1 env) (eval e2 env))
+    (('largest e1 e2) env)  (largest (evalSTPos e1 env) (eval e2 env))
+
+
+    \; accumulate: the variable must be a symbol, and the final value
+    \; of the accumulator is flattened into a single collection.
+    (('accumulate v ':= e1 'while e2) env) 
+      (if (symbol? v) (flatten (accumulate v e1 e2 env)))
+
+
+    \; singleton list. is either a redundantly parenthesized expression, or
+    \; a singleton collection.
+    ((e) env)  (eval e env)
+
+    \; scalar expression. symbols are assumed to be variables, while
+    \; singleton collections are created from scalar numeric values.
+    (x env)  (if (symbol? x) (lookup x env) (if (number? x) (list x)))
+  )
+)
+
+
+\; evaluate an expression which is expected to evaluate to a singleton collection.
+\; if result is not a singleton collection, return empty list.
+(define evalST (lambda (e env) (singleton (eval e env))))
+(define singleton (lambda ((x)) (number? x) any ()))
+
+\; like evalST, but the result is expected to be a postive number.
+(define evalSTPos (lambda (e env) (> (evalST e env) 0)))
+
+\; if x and y are both numbers, wrap result in a collection; else return empty list.
+\; this is necessary such that we never get the result `(())`.
+(define binop (lambda (op x y) (if (number? x) (if (number? y) (list (op x y))))))
+
+
+\; helper function for the sample operator. assumes that `n` is a positive number
+\; (this is satisfied if called by `eval`).
+(define sample (lambda (n e env) (flatten (evalMany n e env))))
+
+\; given `n`, an unevaluated expression `e` and an environment `env`; evaluates `e`
+\; under `env` some `n` number of times into a *nested* list, which must be later
+\; flattened. used by `sample`.
+(define evalMany
+  (lambda (0 e env) ()
+          (n e env) (if (number? n) (cons (eval e env) (evalMany (- n 1) e env)))
+  )
+)
+
+
+
+\; given two numbers n amd m; rolls n m-sided dice and returns these in a
+\; collection (list). assumes that n and m are positive numbers (this is
+\; satisfied if called by `eval`).
+(define roll
+  (lambda
+    (0 m) ()
+    (n m) (if (number? n) (if (number? m) (cons (+ (rnd m) 1) (roll (- n 1) m))))
+  )
+)
+
+
+
+\; helper function for the `choose` operation.
+\; given a list xs; picks a random number between 0 .. length xs-1,
+\; then uses this number to index xs.
+(define choose
+  (lambda (xs) (choose xs (rnd (length xs)))
+
+          (() n)       ()
+          ((x . xs) 0) (list x) \; return choice as a singleton collection.
+          ((x . xs) n) (if (number? n) (choose xs (- n 1)))
+  )
+)
+
+
+
+\; given a number n and a collection xs, sorts xs and takes the first
+\; MIN(n, length xs) numbers.
+(define least   (lambda (n xs) (take (minOp n (length xs)) (qsort xs))))
+
+\; like `least`, but sorts xs descendingly.
+(define largest (lambda (n xs) (take (minOp n (length xs)) (qsortDesc xs))))
+
+
+
+\; given a symbol v, two expressions e1 and e2, and an environment env:
+\; * evaluate e1 under env and bind result to e1_res (PLD-LISP variable).
+\; * evaluate e2 under env[v -> e1_res].
+\; * accumulate e1_res, and recurse if e2 is a non-empty collection.
+(define accumulate
+  (lambda
+    (v e1 e2 env)
+    \; to avoid evaluating e1 twice, I bind it to tmp first. This requires
+    \; sequencing expressions, which (as far as I know) is best done with
+    \; the `if` construct.
+    (if (define e1Res (eval e1 env))
+      (cons e1Res (if (eval e2 (bind v e1Res env)) (accumulate v e1 e2 env)))
+    )
+  )
+)
+
+
+\(define accumulate
+\  (lambda (v e1 e2 env)
+\    ((lambda (x) (cons x (if (eval e2 (bind v x env)) (accumulate v e1 e2 env))))
+\     (eval e1 env))
+\  )
+\)
+
+\; binding and lookup of variables to/in a variable environment.
+(define bind (lambda (v x env) (cons (list v x) env)))
+(define lookup
+  (lambda
+    (foo ())           ()
+    (v ((v x) . foo))  x
+    (v (foo . vs))     (lookup v vs)
+  )
+)
+
+
+
+\;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+\;;                                                        ;;
+\;; Various operations on collections (ie. PLD-LISP lists) ;;
+\;;                                                        ;;
+\;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+\; list map, reduce, and filter.
+(define reduce
+  (lambda (f acc ()) (list acc)
+          (f acc (x . xs)) (reduce f (f acc x) xs)))
+(define map
+  (lambda (f ()) ()
+          (f (x . xs)) (cons (f x) (map f xs))))
+
+(define filter
+  (lambda (p (x . xs)) (if (p x) (cons x (filter p xs)) (filter p xs))
+          (p ())       ()))
+
+\; min and max operators for reduce. x and y must be numbers,
+\; else we would have for example `(maxOp () 3) = 3`, which is nonsensical.
+(define minOp (lambda (x y) (if (number? x) (if (number? y) (if (< x y) x y)))))
+(define maxOp (lambda (x y) (if (number? x) (if (number? y) (if (> x y) x y)))))
+
+
+\; min and max element in a list.
+(define min (lambda (xs) (reduce minOp  2147483647 xs)))
+(define max (lambda (xs) (reduce maxOp -2147483648 xs)))
+\; these definitions are rather inefficient compared to the built-in `length`
+\; and `apply +`, but I use them for consistency.
+(define sum (lambda (xs) (reduce + 0 xs)))
+(define len (lambda (xs) (reduce + 0 (map (lambda any 1) xs))))
+
+
+\; flattening of irregularly and arbitrarily nested lists.
+(define flatten
+  (lambda
+    (((x . xs) . ys)) (append (flatten (cons x xs)) (flatten ys))
+    ((x        . ys)) (cons x (flatten ys))
+    (())              ()
+  )
+)
+
+
+\; very simple quicksort (eg. not in-place). used for `least` and `largest`.
+(define qsortDesc (lambda (xs) (reverse (qsort xs))))
+(define qsort
+  (lambda (()) ()         
+          ((x . xs)) (append (qsort (filter (lambda (y) (<= y x)) xs))
+                             (cons x (qsort (filter (lambda (y) (< x y)) xs))))
+  )
+)
+
+\; take n first elements of xs (if n >= len xs; takes all of xs)
+(define take
+  (lambda (n ()) ()
+          (0 xs) ()
+          (n (x . xs)) (if (number? n) (cons x (take (- n 1) xs)))
+  )
+)
+
+
+
+
+\;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+\;;                                   ;;
+\;; From listfunctions.le and prng.le ;;
+\;;                                   ;;
+\;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(define list (lambda l l))
+(define cadr (lambda ((a ad . dd)) ad))
+(define length
+  (lambda (())       0
+          ((a . as)) (+ 1 (length as))))
+(define append
+   (lambda (()       bs) bs
+           ((a . as) bs) (cons a (append as bs))))
+(define reverse
+  (lambda (as)          (reverse as ())
+          (()       bs) bs
+          ((a . as) bs) (reverse as (cons a bs))))
+
+
+(define seed 42)
+\(define rnd
+\  (lambda (n) (% (if (define seed (% (+ (* seed 69069) 131) 0x7FFFFFC3))
+\                 (/ (if (< seed 0) (- seed) seed) 2))
+\                 n)
+\  )
+\)
+
+
+(define rnd
+  (lambda (n) (% (if (define seed (% (+ (* seed 69069) 131) 0x7FFFFFC3))
+                 (/ (if (< seed 0) (- seed) seed) 2))
+                 n)
+  )
+)

@@ -1,0 +1,20 @@
+  [SDef "foo" (Compr (Oper Div (Oper Times (Var "x") (Var "y")) (Var "z"))
+                     [
+                      CCFor "x" (Call "range" [Const (IntVal (-50)),
+                                               Const (IntVal 51)])
+                   
+  
+                     ,CCFor "y" (Call "range" [Const (IntVal 127),
+                                               Const (IntVal (-208)),
+                                               Const (IntVal (-24))])
+                      
+  
+                     ,CCIf (Oper Greater
+                             (Oper Mod (Oper Plus (Var "x") (Var "y")) (Const (IntVal 27)))
+                             (Oper Plus (Var "y") (Const (IntVal 13))))
+  
+  
+                     ,CCFor "z" (Call "range" [Const (IntVal 1), Const (IntVal 501), Const (IntVal 100)])
+                     ])
+  ,SExp (Call "print" [Const (StringVal "Result of this contrived comprehension is:")])
+  ,SExp (Call "print" [Const (StringVal ">>> "), Var "foo"])]

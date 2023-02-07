@@ -1,0 +1,72 @@
+\newpage
+\section{Performance}
+
+\subsection{Bottlenecks}
+
+\begin{itemize}
+  \item \textit{What are the performance bottlenecks in the two scenarios?}
+\end{itemize}
+
+One bottleneck that the first scenario exhibits is the case where the
+aggregation stage of the computation is as large as or larger than the
+computation stage. Consider for example squaring a list of numbers and then
+summing the results; the squaring would be assigned to the workers, while the
+summation would necessarily be done by the aggregator. Here, the longest path of
+execution is $O(n)$ long, since that is how long it takes the aggregator to sum
+$n$ numbers, and then the benefits of parallelization are possibly lost in the
+overhead of communication.
+\medskip
+
+The given example only holds for scenario 1, but the same problem is exhibited
+by scenario 2. A solution to this problem is have multiple aggregation steps,
+which can potentially reduce the time of aggregation from being \emph{linear} in
+the size of input to being \emph{logarithmic} in the size of the input. This is
+known as a reduction tree, and is largely what the architecture behind MapReduce
+is based on, so using MapReduce would also be a good solution.
+\bigskip
+
+Another bottleneck that impedes both systems is data skew. Consider the
+histogram example given in the text - if each worker is eg. given one file of
+text each, then one file may be 3 words long while another may be a million
+words long. The performance of such a system is bounded by the largest file,
+which may overshadow even the aggregation step.
+\smallskip
+
+This type of problem is actually the fault of the scheduler, and the solution to
+this is to have more clever data partitioning, such that all workers are given
+equal workload.
+\sectend
+
+\subsection{Performance Evaluation}
+
+\begin{itemize}
+  \item  \textit{How would you evaluate the performance of the above
+    architecture in both scenarios?}
+\end{itemize}
+
+First off I would want to compare the execution time with that of a single
+worker thread, in order to examine the overhead in parallelization. In this
+regard it would also be beneficial to evaluate the aggregation step in isolation
+to figure out where the bottleneck lies in the system.
+\medskip
+
+Wrt. performance metrics, I would first and foremost consider throughput. For
+most operations this is expected to increase as the number of workers increases,
+while for others the overhead of communication as well as the aggregation step
+might be dominant.
+\medskip
+
+Then, I would measure the amount of extra resources required for the
+parallelization and weigh it against the improve in throughput to determine
+whether parallelization is worth the cost.
+
+\begin{itemize}
+  \item \textit{Would you setup the experiments differently for the two
+    scenarios?}
+\end{itemize}
+
+No. I would perform the same experiments on both scenarios to better be able to
+compare the results, and in order to better determine which scenario the
+architecture handles better.
+
+\Sectend

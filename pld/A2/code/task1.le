@@ -1,0 +1,32 @@
+\; the value of this S-expression is 0.
+(if (define x 0) ((lambda (f x) (f)) (lambda y x) 1))
+    
+
+
+\; this S-expression is identical to the expression above, except the innermost
+\; 'lambda' has been changed to 'lambdaD'. the value of this S-expression is 1.
+(if (define x 0) ((lambda (f x) (f)) (lambdaD y x) 1))
+
+
+
+
+\; >>> TESTING
+
+(define assertEqual
+  (lambda (a a) 'testSuccess
+          (a b) 'testFailure)
+)
+
+
+\; assert that S-expression has value 1 when using 'lambdaD'
+(assertEqual
+  (if (define x 0) ((lambda (f x) (f)) (lambdaD y x) 1))
+  1
+)
+
+
+\; assert that S-expression has value 0 when using 'lambda'
+(assertEqual
+  (if (define x 0) ((lambda (f x) (f)) (lambda y x) 1))
+  0
+)

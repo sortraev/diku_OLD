@@ -1,0 +1,263 @@
+\newpage
+\section{A2.4}
+\subsection{A2.4a)}
+
+\begin{itemize}
+  \item \emph{Which consequences does the introduction of the \ms{return}
+    statement have for reasoning about LISP programs?}
+\end{itemize}
+
+
+The extension has typing implications, and can eg. make it harder to reason
+about the return type of functions.
+
+\medskip
+
+For example, consider the below function foo, which adds a number x to the head of a list:
+
+\begin{minted}{lisp}
+(define foo
+    (lambda (x myList)
+        (+ x (head myList))
+    )
+)      
+\end{minted}
+
+Using Haskell-like type notation, \ms{foo} has type \ms{Num -> [Num] -> Num},
+where \ms{Num} is a numerical type (meaning it takes a number and a list of
+number and returns a number). However, if we introduce a \ms{return} statement
+on \ms{myList} like so:
+
+\begin{minted}{lisp}
+(define foo
+    (lambda (x myList)
+        (+ x (head (return myList)))
+    )
+)      
+\end{minted}
+
+Then \ms{foo} now has type \ms{Num -> [Num] -> [Num]}, since \ms{myList} is returned.
+
+\smallskip
+
+In any case, the return value of any given lambda will, of course, still be
+deterministic and thus predictable, and since PLD LISP is dynamically typed the
+\ms{return} statement does not introduce any types of errors which are not
+entirely possible to make already - however, it might make it easier to screw
+up, especially when there are multiple \ms{return} statements inside a single
+\ms{lambda}, or when there are nested \ms{lambda}s.
+
+\newpage
+\begin{itemize}
+\item \emph{Before the extension, one could replace \ms{(+ x y)} with \ms{(+ y
+  x)} inside any PLD-LISP expression that evaluates to a number without
+    affecting semantics. Is this still the case after the introduction of the
+    \ms{return} statement?}
+\end{itemize}
+
+This question is ambiguous! In any case:
+
+\smallskip
+
+If \ms{x} and \ms{y} are variables, then this operation will \emph{still} be
+commutative, since \ms{x} and \ms{y} will be fully evaluated before the addition
+operation, and any \ms{return} statements encountered in evaluating \ms{x} and
+\ms{y} will not affect the addition operation.
+
+\medskip
+
+However, if we take \ms{x} and \ms{y} to be arbitrary expressions, then the
+\ms{return} statement can definitely change semantics - consider the below
+addition function:
+
+\begin{minted}{lisp}
+(lambda (x y) (+ (return x) y))
+\end{minted}
+
+Even though this function appears to be a wrapper for addition, which is a
+commutative operation, it is \emph{not} commutative, since its value will always
+be that of its first parameter.
+
+\sectend
+
+\newpage
+\subsection{A.2.4.b)}
+
+\begin{itemize}
+\item \emph{How would you implement \ms{return} in PLD-LISP?}
+\end{itemize}
+
+\emph{Note: I thought the task was to actually implement \ms{return}. The
+following section is probably a lot longer than it would have been if I had just
+described a sketch of the change; I hope the reader will bear with me.}
+
+\subsubsection{Disambiguating the \texttt{return} statement}
+
+There is some ambiguity in the specifications of the \ms{return} statement; in
+particular, the assignment text does not state the semantics of \ms{return}
+statements \emph{outside} of lambda expressions. I thus propose the following
+two disambiguations:
+
+\begin{itemize}
+  \item[Variant 1)] simply make \ms{return} statements outside of lambdas
+    illegal. When a \ms{return} statement is found outside a lambda, the
+    interpreter should raise an ``illegal return statement'' exception.
+
+  \item[Variant 2)] ignore \ms{return} statements outside of lambdas. When a
+    \ms{return} statement is encountered outside of a lambda, it is interpreted
+    as the identity function (in other words, \ms{(return x) = x} for any \ms{x}
+    when outside of a lambda).
+\end{itemize}
+
+I will attempt to implement both variants.
+
+\subsubsection{Implementing the two variants}
+
+I start by adding \ms{"return"} to the set of unary operators, since that it
+what it is, and such that it becomes a reserved keyword:
+
+\begin{minted}[linenos=false]{fsharp}
+let unops = ["number?"; "symbol?"; "return"]
+\end{minted}
+
+Next, I take the hint given in the assignment text and use F\# exceptions to
+implement the \ms{return} statement. I add a new exception type:
+
+\begin{minted}[linenos=false]{fsharp}
+exception ReturnStmException of Sexp
+\end{minted}
+
+The new exception type contains an \ms{Sexp}, which can be extracted and either
+returned or fed back into the \ms{eval} function based on which variant is used.
+
+
+\paragraph{Variant 1}~\smallskip
+
+The first variant is the simpler of the two. To implement it, I first extend
+\ms{applyUnop} with a case for the new unary operator:
+
+\begin{minted}{fsharp}
+and applyUnop x v =
+  match (x, v) with
+  | ("return", s) -> raise (ReturnStmException s)
+  ...
+\end{minted}
+
+When a \ms{return} statement is encountered, a ``return'' exception is thrown.
+This should of course be caught somewhere. If we are inside a \ms{lambda}, then
+it should be caught, and the \ms{s} inside should be evaluated. To do so, I
+simply modify the \ms{lambda} case in \ms{applyLambda}:
+
+\begin{minted}[highlightlines={7}]{fsharp}
+and applyLambda (fnc, pars, localEnv) =
+  match fnc with
+    | Closure (Cons (Symbol "lambda", rules), closureEnv) ->
+        try tryRules rules pars closureEnv
+        with 
+        | Lerror message -> ...
+        | ReturnStmException s -> eval s localEnv
+    ...
+\end{minted}
+
+and similarly for the \ms{lambdaD} case. Now, the value of a lambda containing a
+``\ms{return x}'' statement will simply be whatever \ms{x} evaluates to.
+
+\bigskip
+
+If we are \emph{not} inside a lambda, then we need to discard the entire
+expression currently being evaluated and report a ``Return statement outside
+lambda'' error. To do so, I catch the return exception at the top level of the
+REPL like so:
+
+\begin{minted}[highlightlines={8}]{fsharp}
+and repl infile () =
+  ...
+  match readFromStream infile "" with
+  | Success (e, p) ->
+     if p=0 then
+       (try printf ...
+        with
+        | ReturnStmException foo -> printf "! Return statement outside lambda!\n"
+        | Lerror message -> ... )
+     ...
+\end{minted}
+
+\paragraph{Variant 2}~\smallskip
+
+Variant 2 is a little more tricky. Since the \ms{return} statement must now have
+different behavior based on the context in which it occurs, we need some way to
+keep track of whether or not we are currently inside a lambda.
+
+\smallskip
+
+I am not a very skilled F\# programmer and do not know how to efficiently
+implement state in F\#, so instead I simply extend all relevant functions with
+an ``\ms{inLambda}'' flag which is true when evaluation is currently inside a
+lambda expression; else false.
+
+\medskip
+
+The return case for \ms{applyUnop} is then modified to only thrown the return
+exception when inside a lambda, and otherwise just treat the \ms{return}
+operator as an identity function:
+
+\begin{minted}{fsharp}
+and applyUnop inLambda x v =
+  match (x, v) with
+  | ("return", s) -> if inLambda then raise (ReturnStmException s) else s
+  ...
+\end{minted}
+
+Below snippet then shows how \ms{inLambda} is set to \ms{true} when a lambda is
+evaluated, and how it is set to \ms{false} at the beginning of evaluating an
+S-expression (relevant lines highlighted):
+
+\begin{minted}[highlightlines={4, 5, 12}]{fsharp}
+and applyFun inLambda (fnc, pars, localEnv) =
+  match fnc with
+    ...
+    | Closure (Cons (Symbol "lambda", _), _) -> applyLambda true (fnc, pars, localEnv)
+    | Cons (Symbol "lambdaD", _)             -> applyLambda true (fnc, pars, localEnv)
+
+...
+
+and repl infile () =
+   ...
+       (try
+          printf "= %s\n" (showSexpIndent (eval false e []) 2 2)
+        with 
+        | Lerror message -> ...)
+        ...
+\end{minted}
+
+This is of course a very tedious and hacky solution, since it involves extending
+every function declaration that is mutually recursive to \ms{applyUnop}, as well
+as all calls to these functions, but it works nonetheless.
+
+\newpage
+
+\subsubsection{Testing the \texttt{return} statement implementations}
+
+I write two very simple test cases to test my implementation:
+
+\begin{minted}{fsharp}
+((lambda (x y) (+ x (return y))) 42 1337)
+
+((lambda (x y) (+ x (return y))) (return 42) 1337)
+\end{minted}
+
+The first test case should return 1337 for both variants, since the \ms{return}
+statement is valid for both variants.
+
+\smallskip
+
+The second test case should fail for variant 1 (with a ``\emph{Return statement
+outside lambda!}'' error message) since it contains a return outside of a
+lambda, and return 1337 for variant 2.
+
+\medskip
+
+All tests are successful. To reproduce, run \ms{make task4} while inside my code
+hand-in.
+
+\Sectend

@@ -1,0 +1,156 @@
+\newpage
+\section{\underline{A4.5}}
+
+\begin{itemize}
+  \item \emph{Formulate big-step semantic rules for the new \emph{\ms{for}} loop
+    construct.}
+\end{itemize}
+
+
+\subsection{Disambiguating the specifications}
+
+The assignment text is ambiguous in a number of ways. First off, it states that
+``\emph{[...]the loop body s is executed, if $n_2 > n_1$}''. However, I argue
+that it is more correct to say that the loop body is executed if $\ms x < \ms
+n_2$. \footnote{Hans agrees on this, as per his reply to this post on the
+course's Absalon forum:
+\url{https://absalon.ku.dk/courses/47084/discussion_topics/351077}}
+
+Second, it is not entirely clear whether \ms n$_1$ and \ms n$_2$ are constants
+or variables (ie. modifiable in \ms s), or whether \ms x is modifiable in \ms s
+(not counting the increment immediately following \ms s).
+
+\medskip
+
+\noindent I resolve the ambiguities by making the following assumptions:
+
+\begin{enumerate}
+
+  \item the loop condition is $\ms x < \ms n_2$, not $\ms n_1 < \ms n_2$;
+
+  \item \ms n$_1$ and \ms n$_2$ are constants and are thus never modified in
+    \ms s;
+
+  \item \ms x is a variable as any other, and can thus be modified in \ms s (in
+    addition to the increment immediately following \ms s).
+
+\end{enumerate}
+
+I also make the following assumption on the loop construct, since nothing was
+stated explicitly in the text:
+
+\begin{itemize}
+  \item[4.] the assignment \ms{x := n}$_1$ is made \emph{exactly} once - right
+    before the first evaluation of the loop condition, and the state $\sigma$ is modified
+    to reflect this assignment even if \ms s is executed zero times;
+\end{itemize}
+
+
+\subsection{Desugaring the \texttt{for} loop syntax}
+
+
+
+From the lectures on loops and control flow, we know that \ms{for} loops are
+(typically) syntactic sugar for equivalent \ms{while} loops. Using assumptions 4 and 1 as given above, a \ms{for} loop construct can be
+desugared into a semantically equivalent \ms{while} loop as such:
+
+\begin{align*}
+  \ms{for x := n}_1 \ms{ to n}_2 \ms{ do s}
+  \quad\equiv\quad
+  \ms{x := n}_1\ms{; while (x < n}_2\ms{) {s; x++;}},
+\end{align*}
+
+where $\equiv$ is semantic equivalence of statements. \emph{But why desugar in
+the first place?} Answer: In devising the new semantic rule(s), I suspect that I
+will need to be able to distinguish between the first iteration of a \ms{for}
+loop, which involves initialization of \ms x, and subsequent iterations, which
+do not. I suspect this is better expressed by desugaring.
+
+
+\subsection{New semantic rules}
+
+I formulate the following three semantic rules for the new \ms{for} loop
+construct:
+
+
+\begin{align}
+  \frac{ \begin{gathered}
+    \sigma[\ms x \mapsto \ms n_1] \;\vdash\; \ms{while (x < n}_2\ms{) do { s; x++; }}
+    \;\rightsquigarrow\; \sigma'
+    \end{gathered}
+    }
+    {
+      \sigma\;\vdash\;\ms{for x := to n}_1\ms{ to n}_2 \ms{ do s}\;
+      \rightsquigarrow\; \sigma'
+    }\label{desugaring_rule}\\[24pt]
+  \frac{
+      \sigma(\ms x) < \ms n \qquad
+      \sigma  \;\vdash\; \ms s    \rightsquigarrow \sigma' \qquad
+      \sigma' \;\vdash\; \ms{x++} \rightsquigarrow \sigma'[\ms x \mapsto
+      \sigma(\ms x) + 1] = \sigma''
+    }
+    {
+      \begin{aligned}
+      \sigma\;\vdash\; \ms{while (x < n) do { s; x++; }}
+        \;\rightsquigarrow\; \sigma''
+      \end{aligned}
+    }\label{while_true}\\[6pt]
+  \frac{
+    \begin{gathered}
+      \sigma(\ms x) \geq \ms n\\
+    \end{gathered}
+    }
+    {
+      \sigma\;\vdash\; \ms{while (x < n) do { s; x++; }} \;\rightsquigarrow\; \sigma
+    }\label{while_false}
+\end{align}
+
+% Consider below semantic rule (\ref{desugaring_rule}), which describes how a \ms{for}
+% loop is desugared into an equivalent \ms{while}-loop:
+
+Rule (\ref{desugaring_rule}) is the desugaring rule, states that the change in
+the store of a \ms{for} loop is equivalent to that of the change in the store of
+an equivalent \ms{while} loop under $\sigma$ extended with the initialized loop
+variable. \emph{One could then define semantic rules for generic \ms{while}
+loops and use these to derive \ms{for} loop semantics - but for the sake of
+cementing the new \ms{for} loop, I define rules specifically for the desugared
+loop.}
+
+\bigskip
+
+Rule (\ref{while_true}) describes the case where the loop condition is true, and
+states that:
+
+\begin{itemize}
+  \item if \ms{x < n} under $\sigma$, and
+  \item if under $\sigma$, executing the \ms{for} loop body \ms s provokes a
+    change in state to some modified state $\sigma'$, and
+  \item if under $\sigma'$ following an execution of \ms s, the final increment
+    of \ms x further modifies the state from $\sigma'$ to some final state
+    $\sigma'' = \sigma'[\ms x \mapsto \sigma'(\ms x) + 1]$,
+  \item then the semantics of the \ms{while} loop is a change in state from
+    $\sigma$ to $\sigma''$.
+\end{itemize}
+
+\newpage
+
+Finally, rule (\ref{while_false}) describes how, if the loop condition is false,
+then the desugared \ms{while}-loop leaves the state unmodified (ie. \ms s is
+never executed)
+
+\bigskip
+
+Notice that:
+
+\begin{itemize}
+  \item while not immediately obvious from rule (\ref{desugaring_rule}), the
+    store $\sigma$ is always modified by executing a \ms{for} loop, since even
+    if the loop body \ms s is never executed (ie. if $\ms n_1 \geq \ms n_2$),
+    then the semantics is a chagne in state from $\sigma$ to $\sigma[\ms x
+    \mapsto \ms n_1]$.
+  \item rule (\ref{while_true}) explicitly separates the loop body \ms s from
+    the following increment of \ms x as to make the distinction that \ms x can
+    also be modified in \ms s.
+\end{itemize}
+
+\Sectend

@@ -1,0 +1,132 @@
+\newpage
+
+\section{A2.3}
+
+\begin{itemize}
+  \item \textit{For each of the three functions \ms{concat}, \ms{subtract}, and
+    \ms{altSum}, determine whether this function is a map homomorphism, a
+    homormorphism, or not a homomorphism.}
+\end{itemize}
+
+
+In classifying the functions, I will first check for map homomorphisms, then
+regular homomorphisms, and if both tests fail, then simply declare that the
+function is neither.
+
+\subsection{A2.3.a - \texttt{concat}}
+
+\ms{concat} is a \textbf{map homomorphism}. To show this, I need to show the
+following three properties:
+
+\begin{align*}
+  \text{concat}\ (x \concat y) &= \text{concat} x  \concat \text{concat} y \\[4pt]
+  \text{concat}\ [x]      &= g(x)\\[4pt]
+  \text{concat}\ []       &= e
+\end{align*}
+
+where $g(x)$ is some function and $e$ is the neutral element for list
+concatenation. The latter is easy, since I know from PLDI that the neutral
+element for list concatenation is the empty list, ie. $e = []$.
+
+\medskip
+
+Since $\text{concat}\ [x] = x$, the second property is satisfied by setting $g =
+\text{id}$ (the identity function).
+
+\medskip
+
+Thirdly, I need to show the first property. This one is a little more tricky.
+I intend to show the property by intuition and argue that it is sufficient.
+
+\smallskip
+
+Let \ms{x} and \ms{y} be 2D lists of some element type (which may or may not in
+itself be a composite type); then \ms{(x ++ y)} is a list containing \ms{x}'s
+sublists followed by \ms{y}'s sublists, and then \ms{concat (x ++ y)} is a
+list containing the elements of \ms{x}'s sublists followed by the elements of
+\ms{y}'s sublists.
+
+\medskip
+
+On the left hand side, \ms{concat x} and \ms{concat y} are two lists containing
+the elements of \ms{x}'s sublists, and \ms{y}'s sublists, respectively.
+Concatenating these with \ms{(++)} yields a list containing the elements of
+\ms{x}'s followed by the elements of \ms{y}'s sublists.
+
+\medskip
+
+We see that the two are equal. All three properties are satisfied, and thus
+\ms{concat} is a map homomorphism.
+
+\sectend
+
+
+\subsection{A2.3.b - \texttt{subtract}}
+
+\ms{subtract} is \emph{not} a map homomorphism, because it has type \ms{[int] ->
+int} and is thus not a function from lists to lists.
+
+\medskip
+
+It is also disqualified from being a regular list homomorphism as there exists
+no binary operator $\odot$ which satisfies:
+
+\begin{align*}
+\text{subtract}\,(x \concat y) = \text{subtract}\,(x) \ \odot \ \text{subtract}\, (y)
+\end{align*}
+
+
+In conclusion, \ms{subtract} is neither a map homomorphism nor a regular
+homomorphism.
+
+\sectend
+
+\subsection{A2.3.c - \texttt{altSum}}
+
+\ms{altSum} is also \emph{not} a map homomorphism, since it has type \ms{[int]
+-> (int -> int)} (ie. takes a list of ints and returns a function which takes an
+int and returns an int).
+
+\medskip
+
+It is, however, a regular list homomorphism. If we set $g$ to be \ms{altSum}
+itself, $\odot$ to be function composition, and $e$ to be the identity function
+(since that is the neutral element for function composition), then the
+properties for a regular homomorphism are satisfied. Let's see how!
+
+\bigskip
+
+Consider the case where $n$ is even. Then $\text{altSum} [x_1, \dots, x_n]$
+returns the function:
+
+$$
+f(y) = x_1 - x_2 + x_3 - ... - x_n + y
+$$
+
+Let then $f_1$ and $f_2$ be two functions given by:
+
+\begin{align*}
+  f_1(y) &= x_1 - x_2 + ... + x_{i - 1} - x_i + y\\[4pt]
+  f_2(y) &= x_{i + 1} - x_{i + 2} + ... + x_{n-1} - x_n + y
+\end{align*}
+
+where $i$ is some even integer between $1$ and $n$. Then the composition of $f_1$
+and $f_2$ is precisely $f$, as seen below:
+
+\begin{align*}
+  (f_1 \circ f_2)(y) &= x_1 - x_2 + \dots + x_{i - 1} - x_i + (x_{i + 1} - x_{i + 2}
+  + \dots + x_{n-1} - x_n + y)\\[4pt]
+                   &= f(y)
+\end{align*}
+
+Here I have only showed it for the case where both $n$ and $i$ are even, but the
+same also holds when both numbers are odd and when one is odd and one is even.
+
+\medskip
+
+In conclusion, by setting $\odot = \circ$ (function composition), $g =
+\ms{altSum}$, and $e = \text{id}$ (identity function; neutral element for
+function composition), the properties for a regular list homomorphism are
+satisfied.
+
+\Sectend

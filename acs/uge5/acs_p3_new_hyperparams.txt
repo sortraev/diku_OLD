@@ -1,0 +1,4 @@
+utils.BookStoreConstants.BINARY SERIALIZATION: false -> true
+client.BookStoreClientConstants.CLIENT_MAX_THREADSPOOL_THREADS: 250 -> 512
+server.BookStoreHTTPServer.MIN_THREADPOOL_SIZE: 10  -> 1
+server.BookStoreHTTPServer.MAX_THREADPOOL_SIZE: 100 -> 512

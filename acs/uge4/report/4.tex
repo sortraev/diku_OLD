@@ -1,0 +1,115 @@
+\newpage
+\section{ARIES}
+
+\begin{itemize}
+  \item \textit{1. The transaction and dirty page tables after the analysis
+    phase.}
+\end{itemize}
+
+
+\begin{minted}{text}
+/-----------------------------\
+|      Transaction Table      |
+|-----------------------------|
+| xact id | status | last_LSN |
+|---------+--------+----------|
+| T1      | U      | 9        |
+\-----------------------------/
+
+/--------------------\
+|  Dirty Page Table  |
+|--------------------|
+| page id | rec_LSN  |
+|---------|----------|
+| P2      | 3        |
+| P1      | 4        |
+| P5      | 5        |
+\--------------------/
+\end{minted}
+
+The last log record for \ms{T2} was a commit, so it would have been temporarily
+inserted into the transaction table during the analysis phase, but afterwards it
+would have been removed and an \ms{end} record written to the log.
+\streg
+
+\begin{itemize}
+  \item \textit{2. The sets of winner and loser transactions.}
+\end{itemize}
+
+The set of winner transaction is simply the singleton set \ms{{T3}}, while the
+loser transactions is \ms{{T1, T2}}, since these were still active at the time
+of crash.
+
+\streg
+
+\begin{itemize}
+  \item \textit{3. The LSNs for the start of the redo phase and the end of the
+    undo phase.}
+\end{itemize}
+
+The redo phase starts at \ms{LSN = 3}, since this is the smallest \ms{recLSN} in
+the dirty page table, and thus the earliest log record which could possibly have
+to be redone.
+\smallskip
+
+The undo phase also ends at \ms{LSN = 3}, since in undoing transaction \ms{T1}
+this is the earliest \ms{LSN} we will encounter.
+
+\streg
+
+\begin{itemize}
+  \item \textit{4. The set of log records that may cause pages to be rewritten
+    during the redo phase.}
+\end{itemize}
+
+The set in question is \ms{{3, 4, 5, 9}}.
+\medskip
+
+To find this set, we first consider the set of \textit{all} update log records:
+this is \ms{{3, 4, 5, 6, 9}}. We then remove the record with \ms{LSN = 6}, since
+the affected page exists in the DPT with \ms{recLSN = 5}, which is lower than
+\ms{6}.
+
+\begin{itemize}
+  \item \textit{5. The set of log records undone during the undo phase.}
+\end{itemize}
+
+The complete set of log records undone during the undo phase is \ms{{9, 4, 3}}
+(in that order).
+\medskip
+
+Here's why: Starting with the \ms{lastLSN}s for \ms{T1} (given by the
+transaction table), the undo phase traces log records backwards in time via the
+\ms{prevLSN}s and \ms{undoNextLSN}s of update records and CLRs.
+\streg
+
+\begin{itemize}
+  \item \textit{6. The contents of the log after the recovery procedure
+    completes.}
+\end{itemize}
+
+\begin{minted}{text}
+LSN | prevLSN  | Xact_ID | Type       | pageId   | undoNextLSN
+----+----------+---------+------------+----------+------------
+1   | -        | -       | begin CKPT | -        | -
+2   | -        | -       | end CKPT   | -        | -
+3   | NULL     | T1      | update     | P2       | -
+4   | 3        | T1      | update     | P1       | -
+5   | NULL     | T2      | update     | P5       | -
+6   | NULL     | T3      | update     | P5       | -
+7   | 6        | T3      | commit     | -        | -
+8   | 5        | T2      | commit     | -        | -
+9   | 4        | T1      | update     | P5       | -
+10  | 7        | T3      | end        | -        | -
+----------------------CRASH AND RESTART-----------------------
+11  | 8        | T2      | end        | -        | -
+12  | 9        | T1      | CLR        | P5       | 4
+13  | 12       | T1      | CLR        | P1       | 3
+14  | 13       | T1      | CLR        | P2       | NULL
+15  | 14       | T1      | end        | -        | -
+\end{minted}
+
+Notice the \ms{end} record for \ms{T2}, which was written during the analysis
+phase.
+
+\tykstreg

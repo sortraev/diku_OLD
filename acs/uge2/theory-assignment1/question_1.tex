@@ -1,0 +1,40 @@
+\newpage
+\section{Question 1: Techniques for Performance}
+
+
+\begin{itemize}
+\item \textit{1. Explain the difference between concurrency and parallelism in three sentences.}
+\end{itemize}
+
+Concurrency means two or more tasks whose execution times
+overlap, but which does not necessarily run at the same time, eg. if the tasks are
+being executed on a single processor. An example is an MMU serving requests concurrently,
+interleaving handling of requests to hide latencies.
+
+Parallelism simply means executing multiple tasks simultaneously on different processors/pipelines.
+An example of this is SIMD programming, in which multiple processors processes its own piece of
+a large collection of data simultaneously.
+
+\begin{itemize}
+    \item \textit{2. How does concurrency influence throughput?}
+\end{itemize}
+
+Concurrency can hide latencies in eg. memory requests, and in general has a
+positive effect on throughput. However, there are trade-offs. For example,
+context switches are expensive, and sometimes you waste a lot of time switching
+back and forth if the latency is unpredictable. There is of course also an
+immense overhead associated with managing concurrently executing tasks,
+especially if those tasks can possibly prompt other tasks to fail/restart.
+
+
+\begin{itemize}
+  \item \textit{3. Give an example of a fast path optimization and discuss its
+    drawbacks.}
+\end{itemize}
+
+A good example is the cache hierarchies in processor architectures. The idea
+here is to make often used values more easily accessible. However, it has the
+obvious drawback of adding complexity, and this is unnecessary overhead if a
+program has bad (or no) cache utilization.
+
+\tykstreg

@@ -1,0 +1,257 @@
+\section{Questions for discussion on architecture}
+
+\subsection{1. Short description of implementation and tests}
+
+\begin{itemize}
+    \item \textit{(a) How does your implementation and tests address the all-or-nothing semantics?}
+\end{itemize}
+
+\paragraph{All-or-nothing semantics in implementation}~\smallskip
+
+\noindent Of those methods that I have implemented for the purposes of this assignment,
+only\\ \ms{CertainBookStore.rateBooks()} needs explicit handling of all-or-nothing
+semantics. However, this is simply covered by iterating the entire input
+\ms{bookRatings} set, asserting that each \ms{BookRating} is valid, failing
+immediately when a rating isn't, and \textit{only then} registering the book
+ratings. \medskip
+
+In the below snippet, lines 11-19 show how each \ms{BookRating} is validated
+before ratings are registered in lines 22-26:
+
+
+\begin{minted}[highlightlines={11-19, 22-26}]{java}
+@Override
+public synchronized void rateBooks(Set<BookRating> bookRatings) throws BookStoreException {
+
+  // validate all ratings in bookRatings.
+  for (BookRating bookRating : bookRatings) {
+    int isbn   = bookRating.getISBN();
+    int rating = bookRating.getRating();
+
+    // a BookRating is valid if its isbn is valid and corresponds to an existing book,
+    // and if its rating is a number in the range 0..5.
+    if (BookStoreUtility.isInvalidISBN(isbn)) {
+      throw new BookStoreException(BookStoreConstants.ISBN + isbn + BookStoreConstants.INVALID);
+    }
+    else if (!bookMap.containsKey(isbn)) {
+      throw new BookStoreException(BookStoreConstants.ISBN + isbn + BookStoreConstants.NOT_AVAILABLE);
+    }
+    else if (BookStoreUtility.isInvalidRating(rating)) {
+      throw new BookStoreException(BookStoreConstants.RATING + rating + BookStoreConstants.INVALID);
+    }
+  }
+
+  for (BookRating bookRating : bookRatings) {
+
+    BookStoreBook book = bookMap.get(bookRating.getISBN()); // the actual existence of a book with
+    book.addRating(bookRating.getRating());                 // the given ISBN was checked earlier.
+
+  }
+}
+\end{minted}
+
+\newpage
+\paragraph{All-or-nothing semantics in testing}~\smallskip
+
+\noindent Below snippet is of the test case asserting all-or-nothing semantics of
+\ms{CertainBookStore}\\\ms{.rateBooks()}. An invalid \ms{BookRating} is created in line
+16 and registered in line 20, and in line 26 I assert that no book has received
+any rating.
+
+\begin{minted}[highlightlines={16, 20, 26}]{java}
+@Test
+public void testRateBooksAllOrNothing() throws BookStoreException {
+
+  // add a couple more default books.
+  initializeMoreBooks();
+
+  // assert that no book has been rated yet.
+  storeManager.getBooks().forEach(book -> assertEquals(0, book.getTotalRating()));
+
+  Set<BookRating> ratings = new HashSet<>();
+
+  // create one valid and one invalid BookRating.
+  int valid_rating   = 3;
+  int invalid_rating = -42;
+  ratings.add(new BookRating(TEST_ISBN,  valid_rating));
+  ratings.add(new BookRating(TEST_ISBN2, invalid_rating));
+
+  // register the new ratings. this fails, since the second rating is invalid.
+  try {
+    client.rateBooks(ratings);
+  }
+    catch (BookStoreException ignored) {
+  }
+
+  // assert all-or-nothing semantics by verifying that all books still have rating 0.
+  storeManager.getBooks().forEach(book -> assertEquals(0, book.getTotalRating()));
+}
+\end{minted}
+
+\begin{itemize}
+  \item \textit{(b) How did you test whether the service behaves according to the
+      interface regardless of use of RPCs or local calls?}
+\end{itemize}
+
+\noindent I simply executed my tests both locally and non-locally by setting the
+\ms{localTest} private field of each test class to \ms{true} and \ms{false},
+respectively, before running my test suites.
+
+\streg
+
+
+\newpage
+
+\subsection{2. Strong Modularity in the Architecture}
+
+\begin{itemize}
+  \item \textit{(a) In which sense is the architecture strongly modular?}
+\end{itemize}
+
+\noindent The architecture is for example modular in the sense that it allows different
+types of clients (and stock managers), as long as these adhere to the BookStore
+interface. In addition, the fact that the bookstore is implemented as a simple
+HTTP server means that clients do not even have to be Java threads, as long as
+they adhere to the RPC message format.
+
+\begin{itemize}
+  \item \textit{(b) What kind of isolation and protection does the architecture
+    provide between the two types of clients and the bookstore service?}
+\end{itemize}
+
+Blank.
+
+% The architecture places proxies (or rather, proxy interfaces) between clients
+% and the bookstore server. The bookstore expects RPC communication only, and the
+% client classes adhere to this protocol by using proxies to send RPCs over HTTP.
+
+\begin{itemize}
+  \item \textit{(c) How is enforced modularity affected when we run clients and
+    services locally in the same JVM, as possible through our test cases?}
+\end{itemize}
+
+\noindent When \ms{localTest} is set to \ms{true} in either test class, then the private
+fields \ms{storeManager} and \ms{client} are each set to the same instance of
+the \ms{CertainBookStore} class. If either the client or store manager fails,
+then the other fails aswell.
+
+\streg
+
+\newpage
+
+\subsection{3. Naming service in the architecture}
+
+\begin{itemize}
+  \item \textit{(a) Is there a naming service in the architecture? If so, what is its
+  functionality?}
+\end{itemize}
+
+\noindent I would say no - if I'm wrong, then either I can't find it or I'm unsure what
+is meant by ''naming service''.
+
+\begin{itemize}
+  \item \textit{(b) Describe the naming mechanism that allows clients to discover and
+  communicate with services.}
+\end{itemize}
+
+\noindent Blank :)
+
+% \textit{This question is a little ambiguous, as it can refer to both the
+% CertainBookStore clients/services, as well as clients and services in general. I
+% assume that the question pertains to the general case.}
+% \smallskip
+
+
+% UUUHH.
+
+\streg
+
+
+\subsection{4. RPC semantics in the architecture}
+
+\noindent \textit{Note: I should first say that I am not familiar with the behind-the-scenes of the
+various \ms{jetty} HTTP libraries we use.} \medskip
+
+I would argue that the architecture implements \textit{at-most-once} RPC
+semantics, since HTTP requests are never retried. This is a good idea for the
+book store, since a number of RPC's modify the book store in some way - we
+wouldn't want to accidentally too many copies of the same book, or to add
+duplicates of the same book to the store front.
+
+\streg
+
+
+\subsection{5. Web proxies}
+
+\begin{itemize}
+  \item \textit{(a) Is it safe to use web proxy servers with the architecture in
+  Figure 1?}
+\end{itemize}
+
+\noindent Yes.
+
+\begin{itemize}
+  \item \textit{(b) If so, explain why this is safe and describe in between which
+  components these proxy servers should be deployed. If not, why not?}
+\end{itemize}
+
+\noindent Proxy servers could be placed between clients and the book store server. This could
+alleviate incoming traffic to the book store server via eg. caching and traffic
+control. \smallskip
+
+I would argue that it is safe so long as the system is coherent. This would be a
+complex system to fault-secure, but would ultimately be a more secure, tolerant
+system than letting a single server receive all incoming requests in real-time.
+
+\streg
+
+\subsection{6. Bottlenecks in the architecture}
+\begin{itemize}
+  \item \textit{(a) Is/are there any scalability bottleneck/s in this architecture
+  with respect to the number of clients?}
+\end{itemize}
+
+\noindent Yes!
+
+\begin{itemize}
+  \item \textit{If so, where is/are the bottleneck/s? If not, why can we infinitely scale the
+number of clients accessing this service?}
+\end{itemize}
+
+\noindent There is a bottleneck in that for the moment, only a single BookStoreHTTPServer
+handles all clients. Infinitely scaling the number of clients would mean huge
+queues of incoming HTTP requests and very plausibly dropped requests.
+
+\streg
+
+\subsection{7. In the Event of CertainBookStore crashing}
+\begin{itemize}
+  \item \textit{(a) Would clients experience failures differently if web proxies were used in the
+architecture?}
+\end{itemize}
+
+\noindent Definitely. The result of all RPCs which have no side effects can be stored in
+these proxies, such that they can be served to users even when the main
+bookstore server is temporarily down.
+
+\begin{itemize}
+  \item \textit{(b) Could caching at the web proxies be employed as a way to mask failures from
+          clients?}
+\end{itemize}
+
+\noindent This depends on whether the proxy is able to cache requests and re-attempt
+forwarding to the CertainBookStore once it restarts. If we assume this is not
+possible, then caching would only be able to mask failure for those requests
+which only \textit{read} from the book store, such as getting the selection of
+books or the editor picks, but would not be able to serve eg. purchase requests
+before the CertainBookStore was back up and running.
+
+\begin{itemize}
+  \item \textit{(c) How would the use of web caching affect the semantics offered by
+  the bookstore service?}
+\end{itemize}
+
+\noindent Blank.
+
+\tykstreg
+

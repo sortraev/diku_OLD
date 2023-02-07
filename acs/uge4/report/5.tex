@@ -1,0 +1,108 @@
+\newpage
+\section{More ARIES}
+
+\begin{itemize}
+  \item \textit{1. Map the placeholders \ms{A-D} to the correct \ms{LSN}s.}
+\end{itemize}
+
+\ms{A = 5}, since this \ms{CLR} is for the \ms{update} record with \ms{LSN = 6}.
+\smallskip
+
+\ms{B = 4}, since this \ms{CLR} is for the \ms{update} record with \ms{LSN = 8}.
+\smallskip
+
+\ms{C = D = NULL}.
+
+\streg
+
+\begin{itemize}
+  \item \textit{2. What are the states of the transaction and dirty page tables
+    after the analysis phase?}
+\end{itemize}
+
+
+\begin{minted}{text}
+/-----------------------------\
+|      Transaction Table      |
+|-----------------------------|
+| xact id | status | last_LSN |
+|---------+--------+----------|
+| T1      | U      | 15       |
+| T2      | U      | 16       |
+\-----------------------------/
+
+/--------------------\
+|  Dirty Page Table  |
+|--------------------|
+| page id | rec_LSN  |
+|---------|----------|
+| P3      | 3        |
+| P1      | 4        |
+| P2      | 6        |
+| P4      | 8        |
+\--------------------/
+\end{minted}
+
+\ms{T3} is not in the transaction table after the analysis phase, since there
+exists an \ms{end} record for it. \ms{T1} and \ms{T2} are in the transaction
+table since, and their \ms{lastLSN}s are the last \ms{CLR} corresponding to their
+respective abort recoveries; their statuses are set to \ms{U} since they have
+not committed. \smallskip
+
+The dirty page table contains all four pages and their earliest associated
+\ms{LSN}s after the last checkpoint.
+
+\streg
+
+\begin{itemize}
+  \item \textit{3. Show the contents of the log after the crash recovery
+    completes.}
+\end{itemize}
+
+\begin{minted}{text}
+LSN | PREV_LSN | XACT_ID | TYPE       | PAGE_ID | UNDONEXTLSN | toUndo after step
+----+----------+---------+------------+---------+-------------+
+1   | -        | -       | begin CKPT | -       | -           |
+2   | -        | -       | end CKPT   | -       | -           |
+3   | NULL     | T1      | update     | P3      | -           |
+4   | 3        | T1      | update     | P1      | -           |
+5   | NULL     | T2      | update     | P1      | -           |
+6   | 5        | T2      | update     | P2      | -           |
+7   | NULL     | T3      | update     | P2      | -           |
+8   | 4        | T1      | update     | P4      | -           |
+9   | 7        | T3      | commit     | -       | -           |
+10  | 8        | T1      | abort      | -       | -           |
+11  | 6        | T2      | abort      | -       | -           |
+12  | 11       | T2      | CLR        | P2      | 5           |
+13  | 9        | T3      | end        | -       | -           |
+14  | 10       | T1      | CLR        | P4      | 4           |
+15  | 14       | T1      | CLR        | P1      | NULL        |
+16  | 12       | T2      | CLR        | P1      | NULL        |
+----------------------CRASH AND RESTART-----------------------|
+17  | 16       | T2      | CLR        | P1      | 12          |
+18  | 17       | T1      | CLR        | P1      | 14          |
+19  | 18       | T1      | CLR        | P4      | 10          |
+19  | 18       | T1      | CLR        | P1      | 11          |
+20  | 19       | T1      | CLR        | -       | 6           |
+21  | 20       | T1      | CLR        | -       | 8           |
+22  | 21       | T1      | CLR        | P4      | 4           |
+23  | 22       | T2      | CLR        | P2      | 5           |
+24  | 23       | T2      | CLR        | P1      | NULL        |
+25  | 24       | T1      | CLR        | P1      | 3           |
+26  | 25       | T1      | CLR        | P3      | NULL        |
+\end{minted}
+
+I'm pretty sure there is something wrong with my solution. Some tips or pointers
+would be much appreciated! I think there is something wrong with my understanding of how to backtrace
+\ms{CLR}s.
+
+
+\begin{itemize}
+  \item \textit{4a and 4b.}
+\end{itemize}
+
+I unfortunately did not have time to finish these.
+
+
+
+\tykstreg

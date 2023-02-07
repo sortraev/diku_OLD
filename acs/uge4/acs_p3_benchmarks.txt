@@ -1,0 +1,16 @@
+server.BookStoreHTTPServer.MIN_THREADPOOL_SIZE: 10 -> 1
+server.BookStoreHTTPServer.MIN_THREADPOOL_SIZE: 100 -> 512
+
+client.BookStoreClientConstants.CLIENT_MAX_THREADSPOOL_THREADS: 250 -> 512
+
+utils.BookStoreConstants.BINARY_SERIALIZATION: false -> true
+
+
+ns = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
+
+local_thruput    = [8542.36, 12224.90, 20144.85, 84987.71, 628257.13, 2666820.00, 2402244.75, 3433484.75, 5279553.00, 1634891.75]
+nonlocal_thruput = [ 129.54,   297.97,  1799.51,  2989.76,   7791.99,   13105.41,   29130.35,   43557.34,   29319.18,   93259.64]
+
+
+local_latency    = [0.12, 0.25, 0.53,  0.62,  0.35,  0.73,  5.89,  20.10,   51.94,  269.64]
+nonlocal_latency = [7.72, 9.98, 5.70, 12.42, 19.53, 39.60, 73.12, 189.43, 1128.74, 1412.24]

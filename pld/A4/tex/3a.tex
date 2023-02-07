@@ -1,0 +1,169 @@
+\newpage
+\section{\underline{A4.3}}
+
+\subsection{A4.3.a}
+
+\begin{itemize}
+  \item \emph{Describe how the syntax of each expression in the Troll grammar is
+    represented as embedded syntax in PLD LISP. Discuss nontrivial choices.}
+\end{itemize}
+
+
+\subsubsection{The embedded syntax}
+
+In this subsubsection, I discuss how the Troll syntax is embedded into the
+PLD-LISP language. Please note that I do not explain the embedding of each and
+every single constructor, but rather only discuss \emph{non-trivial} choices
+made - \textbf{where nothing else is stated, the embedded syntax can thus be assumed to
+resemble actual Troll syntax.}
+
+
+\paragraph{On parsing in PLD-LISP}~\smallskip
+
+With limited pattern matching in PLD-LISP (we can only match the first $n$
+elements and the tail of a list, not a recursive pattern eg. with ML-like
+datatypes), my first thought was that it might at least be possible to implement
+an LL1-parser for Troll. However, the parsing table very quickly became very
+large and contrived on paper and so I gave up.
+
+\smallskip
+
+I instead pursue implementing a simple evaluator for fully parenthesized Troll
+expressions (with the exception that parentheses can be omitted around
+single-symbol expressions).
+
+
+\paragraph{Embedding the Troll syntax}~\smallskip
+
+A Troll expression is represented as a single, nested list of PLD-LISP symbols
+and number constants. Troll operators and keywords (\ms d, \ms{accumulate},
+\ms{+}, \ms{count}, etc.) as well as variables are simply represented with
+symbols. Aside from one restriction and one deviation to the Troll syntax (which
+will be discussed momentarily), \emph{the only distinguishing factor is this
+enclosing PLD-LISP list.}
+
+
+\paragraph{Restrictions to the embedded syntax wrt. whitespace and
+parenthesization}~\smallskip
+
+As mentioned above, expressions must be parenthesized if they contain more
+than one symbol - this for example means that the singleton collection
+containing the number 43 can be represented as both the singleton list
+\ms{'(43)} and simply the constant ``\ms{43}'' (and similarly for variables),
+whereas a Troll expression such as \ms{d x d3} must be parenthesized as
+\ms{'(d(x d 3))}\footnote{Also, please note the explicit whitespace between the
+inner \texttt d and its second parameter \texttt 3, which is required since
+otherwise the two would be recognized as the single symbol ``\texttt{d3}'', much
+like how Troll itself requires whitespace between \texttt d and \texttt x.}.
+This is because evaluation of dice rolling is \emph{largely} implemented as
+such:
+
+\begin{minted}[linenos=false]{lisp}
+(define eval
+  (lambda (('d e))     (roll 1 (eval e))
+          ((e1 'd e2)) (roll (eval e1) (eval e2))
+          ...
+\end{minted}
+
+\emph{(Note that this snippet is pseudocode and not actual implementation
+\footnote{The actual evaluator is also parameterized with the current
+environment, and will for example assert that \texttt{eval e} is a singleton
+collection containing one positive number.}. More on this later.)}
+
+\smallskip
+
+Here, the \ms{('d e)} pattern matches \emph{precisely} one literal ``\ms d''
+followed by exactly one single value (a symbol or list or symbols), so we must
+parenthesize \ms{2 d x} since this consists of three distinct symbols. We
+\emph{could} rewrite the \ms{d e} pattern to use a head/tail pattern as such:
+
+\begin{minted}[linenos=false]{lisp}
+(define eval
+  (lambda (('d . es))    (roll 1 (eval es))
+          ((e1 'd . es)) (roll (eval e1) (eval es))
+          ...
+\end{minted}
+
+Using these patterns enables us to evaluate lists such as \ms{'(4 d d d 3 + 4)}
+- but this only works because the dice rolling operators are right-associative,
+and because the head of the head/tail pattern is matched \emph{exactly};
+unfortunately, this approach falls short for lists such as \ms{'(3 + 4 d d 5)},
+since the pattern \ms{e1} cannot match the three symbols constituting \ms{3 +
+4}.
+
+\smallskip
+
+Different problems arise with other operators with multiple parameters, in
+particular the \ms{accumulate} expression, which interleaves multiple keywords
+and expressions. Thus, to ease implementation, I give the restriction that any
+Troll operator which takes $n$ parameters will in the embedded syntax take
+exactly $n$ symbols or lists of symbols.
+
+\newpage
+
+All in all this makes for a great deal of redundant parenthesization in the
+embedded syntax. For a more contrived example, consider the Troll expression:
+
+$$\ms{sum least 20 accumulate x := d42 d d d1337 while 888 < sum largest 19 x}$$
+
+In the embedded syntax, this is represented by the nested PLD-LISP list:
+
+\begin{align*}
+  \ms{'(sum (least 20 (}&\ms{accumulate x := ((d 42) d (d (d 1337)))}\\
+  &\ms{while (800 < (sum (largest 19 x))))))}
+\end{align*}
+
+On the other hand one might argue that in some cases parenthesization benefits
+code legibility - because even if association and precedence is well-defiend for
+all Troll operators, it can sometimes be hard for a human programmer to decipher
+from a glance of the code, eg. as with the example given here.
+
+\subsubsection{Deviation in the embedded syntax wrt. union expressions}
+
+Aside from full parenthesization and some forced whitespace, my embedded syntax
+deviates from that of the given syntax in one other place: The union syntax,
+$\{\ms e_1,\; \dots,\; \ms e_n\}$, which, in Troll, is given by zero or more
+comma separated Troll expressions enclosed in curly braces. In the embedded
+syntax, a union is simply a PLD-LISP list containing zero or more comma
+separated expressions. As an example, the Troll expression \ms{{3 + 4, 4 d 19,
+choose {42, 43}}} is represented in the embedded syntax as:
+
+$$
+\ms{'((3 + 4), (4 d 19), (choose (42 , 43)))}
+$$
+
+Notice the explicit whitespace surrounding the last comma; as per usual,
+whitespace is not required around commas in the presence of parentheses, but
+\emph{is} required in all other cases since commas are merely PLD-LISP symbols,
+and other symbols are free to ``absorb'' those commas if there is no separating
+whitespace.
+
+\bigskip
+
+Question: \emph{Why not use curly braces as in the source syntax?}
+
+Answer: In order to use curly braces to denote unions in the embedded syntax,
+these would have to be represented as separate PLD-LISP symbols. This, I felt,
+overly complicated the embedded syntax, especially considering that to properly
+evaluate a union expression in the absence of a parser, the curly braces would
+have to be treated as any other symbol in terms of whitespace and
+parenthesization. For example, the Troll expression \ms{least 2 {1, 2, {3, 4}}}
+would necessarily be represented by the nested list:
+
+$$
+\ms{'(least 2 ({ 1 , 2 , ({ 3 , 4 }) }))}
+$$
+
+with whitespace even between the opening brace and first expression, as well as
+between the last expression and closing brace (again, unless these are
+parenthesized), whereas by using PLD-LISP lists to implement the syntax, this
+expression is simply:
+
+$$
+\ms{'(least 2 (1 , 2 , (3 , 4)))}
+$$
+
+To evaluate an empty union, simply give an empty PLD-LISP list ;)
+
+
+\sectend

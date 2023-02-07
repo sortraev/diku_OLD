@@ -1,0 +1,179 @@
+\newpage
+\section{Question 2: Fundamental Abstractions}
+
+
+\subsection{Name mapping scheme}
+
+\begin{itemize}
+  \item \textit{1. Explain your name mapping scheme.}
+\end{itemize}
+
+\paragraph{General design}~\smallskip
+
+My design is largely inspired by virtual memory and paging. Assume for
+simplicity that
+% $N$ is a multiple of 2, and that
+$K$ divides $N$. My idea is then to divide the address space evenly into $K$
+parts, which I will call \textit{pages}, each of which has its own, unique ID in
+the set $\{0, 1, ..., K-1\}$, and each of which holds $\frac{N}{K}$ addresses of
+memory. \medskip
+
+The $K$ machines can also be labelled with ID's in the set $\{0, 1, ..., K-1\}$.
+At any given time, each active machine is responsible for one of the $K$ pages,
+but machine $i$ is not necessarily responsible for page $i$ (eg. if page $i$ is
+not in use). \textit{In a more complex design, one machine could be made
+  responsible for multiple pages, if that machine has enough capacity or if the
+cumulative size of those pages is small enough.}
+\bigskip
+
+A single, centralized manager, which I will call the MMU (memory management
+unit), handles address translation and commucation with machines.
+
+Addresses from the single address space are first mapped to page ID's by the
+MMU. The MMU maintains a dynamically updated table of mappings from page ID's to
+machine ID's (or addresses) of machines currently maintaining those pages of
+memory.
+
+\paragraph{Efficiency of the design}~\smallskip
+
+Since the single address space is partitioned in $K$ segments of size
+$\frac{N}{K}$ (or $K-1$ segments of size $\frac{N}{K}$ and one segment of size
+$N \text{mod} K$ if $K$ does not divide $N$), the centralized MMU would
+translate addresses to page ID's with a simple integer division of the address
+by $K$. This, of course, takes constant time.
+\smallskip
+
+The MMU would then use a (hash) lookup table to store the mappings from page
+ID's to machine ID's. This yields constant time translation of page ID's to
+machine ID's. Put together, translation of addresses from the single address
+space to page ID's and then to machine ID's for the machine responsible for
+those pages of memory takes only constant time.
+\medskip
+
+\paragraph{Bottlenecks and tolerancy in the design}~\smallskip
+
+There is obviously one very big bottleneck in the design: the centralized MMU.
+The MMU is responsible for all client requests, name translations, and
+communication with machines. If the MMU fails, then everything fails.
+\medskip
+
+If a single machine fails, then all pages pertaining to that machine will be
+unavailable until the machine reboots (if ever). In a more complex design, each
+of the $K$ machine could employ a backup cache.
+
+\streg
+
+\subsection{Pseudocode}
+
+\begin{itemize}
+  \item \textit{2. Present API's and pseudocode for the READ and WRITE
+    functions}.
+\end{itemize}
+
+\paragraph{API's}~\smallskip
+
+The API's are simple. For a \ms{READ} request, all that is necessary is the read
+address \ms{addr}, while for \ms{WRITE} requests, an additional \ms{write_val}
+parameter is provided. \medskip
+
+
+Below is my proposed psuedocode for the API calls. I hope that the code comments
+speak for themselves.
+
+\begin{minted}{c}
+
+handle_request(request_type, addr, write_val) { 
+
+  if (request_type != read || request_type != write) {
+    // unrecognized request. report error to the user and exit.
+  }
+
+  else if (addr < 0 || addr >= N) {
+    // client is trying to access outside the address space.
+    // report this error to the user and exit.
+  }
+
+  // compute page id.
+  page_id = addr / K;
+
+  // lookup machine for this page.
+  machine_id = page_to_machine_map.lookup(page_id);
+
+  // if no machine handles this page, spawn one and associate it with this page.
+  // if this is a read request, then the client will be reading uninitialized 
+  // memory. assume that spawn_machine() has access to some global machine ID
+  // table.
+  if (machine_id == null) {
+    machine_id = spawn_machine();
+    page_to_machine_map.add(machine_id, page_id);
+  }
+
+  // make the request. In the case that the machine (or requested
+  // page on the machine) is locked, the call will simply block.
+  if (request_type == read) {
+    (status, read_val) = request_read(machine_id, addr);
+  }
+  else {
+    status   = request_write(machine_id, addr, write_val);
+    read_val = null;
+  }
+
+  if (status == SOME_ERROR) {
+    // some error has happened in either communication,
+    // or in the machine's handling of the request.
+    // report this error to the user and exit.
+  }
+
+  return (status, read_val);
+}
+
+READ(addr) {
+  return handle_request(read, addr, null);
+}
+
+WRITE(addr, write_val) {
+  // since WRITE has no return value, simply ignore result of handle_request().
+  handle_request(write, addr, write_val);
+}
+
+
+\end{minted}
+
+\subsection{Atomicity of READ/WRITE calls}
+
+\begin{itemize}
+  \item \textit{Should the READ and WRITE operations be atomic?}
+\end{itemize}
+
+Before-or-after atomicity is extremely important in such a memory management
+system once it starts to scale to multiple clients; without it, clients' read
+operations might be disrupted by other clients' write operations, or segments of
+memory might be written simultaneously by multiple clients.
+\medskip
+
+To implement before-or-after atomicity would incur considerable extra overhead
+in the system, especially if the system is to have the ability to recover from
+errors (and respect the golden rule of atomicity of never modifying the only
+copy of a file), since this would double the memory used, and potentially also
+double the total amount of available memory.
+\medskip
+
+However, it might also be necessary to implement a sort of locking system on the
+database. I propose multi-granularity locking, since this would allow clients to
+claim exclusive access to entire pages, or allow multiple clients to modify
+single addresses of individual pages simultaneously.
+
+\streg
+
+\subsection{Varying number of active machines}
+
+To accomodate the looser restrictions on the architecture, an implementation
+must be able to dynamically rename machines. With my solution, the pages that
+span the singular address space are statically indexed in the range $0..K-1$,
+but machines receive their ID only once they are spawned. A separate, internal
+message handler in the MMU would take care of machines despawning. \medskip
+
+As such, I would argue that my name \textit{does} allow machines to enter and
+leave.
+
+\tykstreg

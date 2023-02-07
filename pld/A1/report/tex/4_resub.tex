@@ -1,0 +1,58 @@
+
+
+\newpage
+\section{A1.4) Exercise 5.13}
+
+\begin{itemize}
+  \item \emph{Solve exercise 5.13 from the course compendium.}
+\end{itemize}
+
+\textcolor{red}{In my feedback, I was asked to name more advantages and
+disadvantages to using between using a heap vs. stack. The newly added answers
+are in red.}
+
+\medskip
+
+A frame contains parameters and (space for) local variables to the given
+function, as well as a return address for the function. Most functions will not
+have very many parameters and local variables - perhaps 3-6 and 5-15,
+respectively - and therefore most frames are relatively small. This plays well
+with generational collection, since in most cases the entire list of frames in
+play can fit in the first generation (or the first couple of generations), and
+can reduce the time taken for frame deallocation. \smallskip
+
+However, if a program exhibits many consecutive function calls, such as in the loop
+below:
+
+\begin{minted}[linenos=false]{c}
+for (i = 0; i < n; i++) {
+  acc = f(acc, input[i]);
+}
+\end{minted}
+
+then the lower generations of the heap may repeatedly be filled and consequently
+collected many times throughout the loop; in the worst case, the lower
+generations might be rendered entirely useless for the duration of the loop,
+since actual user data that is to stay alive throughout the loop is quickly
+being moved to higher generations to make room for frames in these lower
+generations. This may to some degree nullify the benefit from generational GC.
+
+\medskip
+
+\paragraph{\textcolor{red}{Other considerations}}~\smallskip
+
+\textcolor{red}{There are of course other things to consider besides the effects
+on (generational) garbage collection. For one, one very big disadvantage in
+allocating frames in the heap is the problem of fragmentation, which can never
+be a problem with stack allocated frames.}
+
+\medskip
+
+\textcolor{red}{On the other hand, allocating frames on the heap has the big
+advantage that whereas there is typically a static bound on the size of stack
+memory, the heap size is only bounded by the amount of available memory or by
+how much the operating system is willing to allocate for the program. This
+allows for potentially much deeper recursion, which may or may not be a benefit
+in some programs.}
+
+\Sectend

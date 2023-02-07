@@ -1,0 +1,3 @@
+[SExp (Call "print" [Const (StringVal "attempting to divide by zero ...")]),
+ SDef "result" (Oper Div (Const (IntVal 42)) (Const (IntVal 0))),
+ SExp (Call "print" [Const (StringVal "Successfully divided by zero :)")])]

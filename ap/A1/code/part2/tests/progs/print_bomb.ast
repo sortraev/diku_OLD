@@ -1,0 +1,10 @@
+[
+ SDef "foo" (Compr
+               (Call "print" [(Compr
+                                 (Const (StringVal "boooom"))
+                                 [CCFor "x" (Call "range" [Const (IntVal 100)])]
+                               )]
+               )
+               [CCFor "x" (Call "range" [Const (IntVal 100)])]
+            )
+]

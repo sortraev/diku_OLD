@@ -1,0 +1,6 @@
+[SDef "x" (Const (IntVal 42)),
+ SExp (Call "print" [Var "x"]),
+ SDef "y" (Const (IntVal (-1337))),
+ SExp (Call "print" [Var "y"]),
+ SDef "x" (Const (IntVal 4283)),
+ SExp (Call "print" [Var "x"])]

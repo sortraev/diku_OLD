@@ -1,0 +1,15 @@
+% big, fat, red TODO's. 
+\newcommand{\TODO}[1]{\textcolor{red}{TODO: #1}}
+
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}} % equation numbering for align*
+
+%% math related commands/operators.
+\DeclareMathOperator*{\argmin}{argmin}
+
+% neat section and subsection separators (but have to insert manually).
+\newcommand{\sectend}{\smallskip\noindent\makebox[\textwidth]{\rule{\textwidth}{0.4pt}}}
+\newcommand{\Sectend}{\medskip\noindent\makebox[\textwidth]{\rule{1.1\textwidth}{1pt}}}
+
+% easy monospace text for inline code. also,
+% no need to escape underscores as with \texttt.
+\newcommand{\ms}[1]{\mintinline[fontsize=\normalsize, breaklines, breakafter=_]{text}{#1}}

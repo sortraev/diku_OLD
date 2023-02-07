@@ -1,0 +1,43 @@
+\newpage
+\section{Atomicity}
+
+\begin{itemize}
+  \item  \textit{Give three flavors of atomicity.}
+\end{itemize}
+
+
+We have discussed many flavors, but three of them that I can recall are
+\emph{all or nothing atomicity}, \emph{before-or-after atomicity}, and
+\emph{durability atomicity}.
+\medskip
+
+
+\textbf{All-or-nothing atomicity} aims to ensure that from the point of view of
+the database, any given transaction is always either finished or not at all
+initiated, which is important since half-baked results can disturb other
+transactions. This can be hard to achieve since if transactions depend on each
+other (eg. if they access the same memory), then ensuring the property holds for
+one transaction is dependent on ensuring the property for other transaction,
+especially in the case of failure. One way of ensuring this flavor of atomicity
+is logging changes before the transactions commits such that they can be undone.
+\medskip
+
+\textbf{Before-or-after atomicity} is the idea of scheduling and executing
+transactions such that from the point of view of the invoker, the actions occur
+either completely before or completely after one another. This can be hard to
+achieve since it involves carefully analyzing the access patterns of
+transactions and devising a serializable schedule - this can be done with eg.
+two-phase locking. However, sometimes it is simply impossible to interleave
+transactions and still achieve a serializable schedule - in this case the only
+way to guarantee before-or-after atomicity is to literally run them
+sequentially.
+\medskip
+
+\textbf{Durability atomicity} is discussed with respect to crash recovery. It is
+the notion of storing objects in permanent stable storage such that they can
+always be access at any later point. This is hard to achieve since in practice
+there is no such thing as permanent storage - however, with eg. redundancy
+(RAID), stable storage can be \emph{approximated} (meaning it is practically
+indefinite).
+
+\Sectend

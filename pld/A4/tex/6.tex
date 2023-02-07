@@ -1,0 +1,120 @@
+
+\newpage
+\section{A3.6}
+
+% Consider below Prolog program
+%
+% \begin{minted}{prolog}
+% friend(a, b).
+% friend(b, c).
+% friend(c, d).
+%
+% knows(X, Y) :- knows(X, Z), knows(Z, Y).
+% knows(X, Y) :- friend(X, Y).
+% \end{minted}
+
+
+\subsection{A3.6.a and A3.6.b}
+
+\begin{itemize}
+  \item \emph{Explain by means of the query resolution algorithm why the query
+    \emph{\texttt{knows(a, d)}} fails to terminate.}
+\end{itemize}
+
+When \ms{knows(a, d)} is queried, the resolution algorithm will match the first
+\ms{knows/2} rule: and try to unify \ms{X} with \ms a, and \ms Y with \ms d.
+This is successful, since neither \ms{X} nor \ms{Y} is bound yet so we now have
+the list of substitutions $\Theta = \{\ms{X01 = a},\ \ms{Y01 = d}\}$, where
+\ms{X01} and \ms{Y01} are temporary variables.
+
+\medskip
+
+To solve this goal under $\Theta$, the algorithm will then attempt to solve
+\ms{knows(a, Z)}, which again matches the first \ms{knows/2} rule - the
+algorithm will unify \ms Y with \ms Z, which is successful, and the list of
+substitutions is now $\Theta = \{\ms{X01 = a},\ \ms{Y01 = d},\ \ms{Y02 =
+Z01}\}$. The algorithm recurses once again on solving \ms{knows(A, Z01)} (where
+\ms{Z01} is a newly bound temporary variable), and in fact goes into an infinite
+loop here.
+
+\medskip
+
+The infinite recursion happens because the resolution algorithm is always free
+to instantiate a new temporary variable for \ms{Z} and attempt solving the first
+\ms{knows/2} rule. The resolution tree looks like this:
+
+\begin{minted}[linenos=false, frame=none]{text}
+knows(a, d)
+   |
+   | X = a
+   |
+knows(a, Z01)
+   |
+   |
+knows(a, Z02)
+   |
+   |
+knows(a, Z03)
+   |
+  ...
+\end{minted}
+
+\newpage
+\begin{itemize}
+   \item \emph{Modify the program such that \ms{knows(a, d)} terminates
+      successfully and explain why the modification works.}
+\end{itemize}
+
+To solve the problem, we need to eliminate left recursion while still encoding
+the transitive closure of \ms{knows/2}. This is done by replacing the culprit
+left recursing \ms{knows(X, Z)} call with a call to \ms{friend(X, Z)}, like in
+the below snippet:
+
+\begin{minted}[linenos=false, highlightlines={5}]{prolog}
+friend(a, b).
+friend(b, c).
+friend(c, d).
+
+knows(X, Y) :- friend(X, Z), knows(Z, Y).
+knows(X, Y) :- friend(X, Y).
+\end{minted}
+
+Now, in solving the goal \ms{knows(X, Y)}, the resolution algorithm is forced to
+satisfy the goal \ms{friend(X, Z)}, and since our program has no recursive rules
+for \ms{friend/2} (in fact, it only has facts), we can guarantee progression
+towards solving the supergoal.
+
+\medskip
+
+Now, the resolution tree for \ms{knows(a, d)} looks like this (the algorithm
+makes a pre-order traversal):
+
+\begin{minted}[frame=none, linenos=false]{text}
+         knows(a, d)
+            |
+         friend(a, Z1)
+            |
+            | Z1 = b
+            |
+         knows(b, d)
+            |
+         friend(b, Z2)
+            |
+            | Z2 = c
+            |
+         knows(c, d)
+        /           \
+       /             \
+friend(c, Z3)        friend(c, d)
+    |                    |
+    | Z3 = d       this is a known fact.
+    |                  return true
+knows(d, d)
+    |
+friend(d, Z4)
+    |
+no possible instantiation
+  for Z4. return false
+\end{minted}
+
+\Sectend

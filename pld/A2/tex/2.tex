@@ -1,0 +1,102 @@
+\newpage
+
+\section{A2.2}
+
+\subsection{A2.2.a}
+
+\begin{itemize}
+  \item \emph{What does the program print under call-by-reference,
+    call-by-value, and call-by-value-result?}
+\end{itemize}
+
+\emph{In my answer, I will assume that that in the final \ms{print} statement, the
+operands to the two additions are evaluated \textbf{left to right}, and that the
+additions are also evaluated left-to-right.}
+
+\smallskip
+
+Under this assumption, the program prints ``17'' for \textbf{all three}
+parameter passing methods. Here is why:
+
+\medskip
+
+If the two additions are evaluated left to right, then the temporary result of
+\ms{u + v} will be stored in a temporary variable, which is not going to be
+modified by the call to \ms{f} (when call-by-reference or call-by-value-result
+is used; under call-by-value all of this is irrelevant). \smallskip
+
+\ms{f(u, v)} is, of course, always equal to \ms{f(4, -2) = 15} (since, as
+explained, \ms{u} and \ms{v} are only modified inside \ms{f}). Thus the final
+print statement is always equivalent to: \ms{print(4 + (-2) + f(4, -2))}, which
+is equivalent to \ms{print(17)}.
+
+\sectend
+
+\subsection{A.2.2.b)}
+
+
+\begin{itemize}
+  \item \textit{i. What are the results of \ms{f(1)} and \ms{g(1)} as a function
+    of \ms{n} under call by need and call by name?}
+\end{itemize}
+
+All four combinations of functions and parameter passing methods return the same
+value of $2^{n + 1}$:
+
+\begin{minted}[linenos=false]{text}
+f(1) under call-by-need: 2^(n + 1)
+f(1) under call-by-name: 2^(n + 1)
+g(1) under call-by-need: 2^(n + 1)
+g(1) under call-by-name: 2^(n + 1)
+\end{minted}
+
+This is as expected, since there can be no observable (ie. semantic) difference
+between call by name/need in a functional language without side effects.
+
+\newpage
+\begin{itemize}
+  \item \textit{ii. In each of the four cases, how many additions are executed?}
+\end{itemize}
+
+In the program there are \ms{(n + 1)} distinct additions - and this is the
+number of additions executed by \ms{f} under both parameter passing methods.
+
+\medskip
+
+At the same time, the function \ms{g} builds a binary recursion tree of height
+\ms{(n + 1)} - not simply \ms{n} because we also have the last layer of \ms{y =
+gn() + gn()}. However, we must subtract one to account for the root of the tree.
+Therefore, the number of additions
+
+\begin{minted}[linenos=false]{text}
+f(1) call by need: n + 1 additions
+f(1) call by name: n + 1 additions
+g(1) call by need: 2^(n + 1) - 1 additions
+g(1) call by name: 2^(n + 1) - 1 additions
+\end{minted}
+
+\emph{Why does call by need not decrease the number of additions to $O(n)$?}
+
+\smallskip
+
+Answer: call-by-need only applies to function parameters, and it is wrong to
+think of call-by-need as a sort of memoization. However, if we were to rewrite
+\ms{g} as such:
+
+\begin{minted}{haskell}
+double x = x + x
+
+g(x0) = let g1()  = x0 + x0         in
+        let g2()  = double (g1 ())  in
+        ...
+        let y     = double (gn ())
+        in  y
+\end{minted}
+
+Then the \ms{x} in \ms{double} would only be evaluated once per call to
+\ms{double}, even though it appears twice in the function body, and thus we
+would have the linear recursion tree and $O(n)$ complexity (whereas with
+call-by-name we would still have the binray recursion tree and exponential
+complexity).
+
+\Sectend

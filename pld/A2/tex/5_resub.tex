@@ -1,0 +1,144 @@
+\newpage
+
+\section{A2.5}
+
+\resub{Here comes my resub of 2.5.b. New stuff is written in red.}
+
+\subsection{A2.5.b \resub{- resubmission}}
+
+\begin{itemize}
+  \item \emph{Suggest how we should type check function declarations and
+    function calls if we extend C with the previously discussed construct. The
+    extend type system should handle cases such as the one presented in the
+    assignment text.}
+\end{itemize}
+
+This question is a little ambiguous. It is not stated whether \ms{T1, ...,  T7}
+are all known at compile-time (as is required in C), or if the type system
+should support type inference. In the former case the answer is easy, because
+the C type system already supports everything necessary to type check the
+examples ;)
+
+\smallskip
+
+In the latter case, however, we would simply need to implement some sort of type
+inference system, since if the type signature of each function in a program can
+be inferred, then it must be well-typed.
+
+\bigskip
+
+In any case, we could type check functions as follows:
+
+\smallskip
+
+Given a function $f$ with $m$ parameters $(p_0,\ \dots,\ p_{m - 1})$ and function body
+$f_{\text{body}}$, we first look up its type signature in the type environment.
+If we find its type signature to be $f\; ::\; (t_0,\ ...,\ t_{n_1}) \to
+t_{\text{ret}}$ for some $n$ (which may or may not be equal to $m$), then we type check
+the function $f$ using the following steps (in order):
+
+\begin{enumerate}
+  \item type check function arity (ie. that the function takes as many
+  parameters as the type signature states): assert that $n = m$.
+
+  \item type check function parameters: assert that $p_i = t_i$ for $i \in \{0,
+    \dots, n\}$.
+
+  \item type check $f_\text{body}$: for each branch in the function body, assert
+    that the value of this branch is $t_\text{ret}$.
+\end{enumerate}
+
+\resub{
+\begin{itemize}
+  \item In the feedback received I was asked to determine the types of T1, ...,
+T7, and to explain what must hold for these in order for the program to be
+well-typed.
+\end{itemize}
+}
+
+\medskip
+
+\resub{First, I write out the function types in Haskell-like type notation:}
+
+
+\begin{minted}[linenos=false]{haskell}
+f :: T2 -> T3 -> T1
+h :: T5 -> T4
+j :: T7 -> T6
+\end{minted}
+
+\resub{
+First off, from the definition of \ms{f}, I can infer that \ms{T2} is a function
+which takes a parameter of type \ms{T3} and returns a \ms{T1}, so I add the
+binding \ms{T2 = T3 -> T1}.
+}
+
+\medskip
+
+\resub{
+Secondly, from the definition of \ms{j}, I know that \ms{f(h, v) :: T6}, which
+gives me the type binding \ms{T6 = T1} since I know \ms{f} to have return type
+\ms{T1}.
+}
+
+\medskip
+
+\resub{
+Since \ms{h} and \ms{v} - which have types \ms{T5 -> T4} and \ms{T7},
+respectively - are passed as parameters to \ms{f}, which has type \ms{T2 -> T3
+-> T1}, I can also add the type bindings \ms{T2 = T5 -> T4} and \ms{T3 = T7}.
+}
+
+\medskip
+
+\resub{
+Lastly, since both \ms{T2 = T5 -> T4} and \ms{T2 = T3 -> T1}, I can infer that
+\ms{T5 = T3} and \ms{T4 = T1}.
+}
+
+\medskip
+
+\resub{
+In conclusion, I have inferred the following type bindings:
+}
+
+
+\begin{minted}[linenos=false]{haskell}
+T2 = T3 -> T1
+T2 = T5 -> T4
+T6 = T1
+T7 = T3
+T5 = T3
+T1 = T4
+\end{minted}
+
+\resub{
+which can be reduced to:
+}
+
+\begin{minted}[linenos=false]{haskell}
+T5 = T7 = T3
+T4 = T6 = T1
+T2 = T3 -> T1
+\end{minted}
+
+\resub{
+As such, for the program to be well-typed, these are the restrictions which must
+hold. The function types given earlier can be redeclared as:
+}
+
+\begin{minted}[linenos=false]{haskell}
+f :: T2 -> T3 -> T1
+h :: T3 -> T1
+j :: T3 -> T1
+\end{minted}
+
+\resub{
+In a language with currying, the function types could of course be given as:
+}
+
+\begin{minted}[linenos=false]{haskell}
+f :: T2 -> T2
+h :: T2
+j :: T2
+\end{minted}

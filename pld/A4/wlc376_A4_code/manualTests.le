@@ -1,0 +1,15 @@
+(troll '(d 400))    \; single die roll.
+(troll '(d 1))      \; single one-sided die roll.
+(troll '(d -12))    \; invalid single die roll.
+
+(troll '(23 d 400)) \; multi dice roll.
+(troll '(1 d 19))   \; multi dice roll, but just one die.
+(troll '(0 d 19))   \; no dice!
+
+(troll '(choose (1 , 2 , 3 , 4 , 5))) \; simple choose expression.
+(troll '(choose (1843 d 5000000)))    \; choose among many.
+(troll '(choose (d 1)))               \; choose from singleton collection.
+(troll '(choose (50 < (4 d 19))))      \; choose from empty collection.
+
+(troll '(accumulate x := (65 < (10 d 100))    \; simple accumulate expression
+                      while (1 < (count x)))) \; which runs for multiple iterations.

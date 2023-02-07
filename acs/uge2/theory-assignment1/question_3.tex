@@ -1,0 +1,102 @@
+\section{Question 3: Serializability and locking}
+
+In the following, I will use \ms{S(V)} and \ms{X(V)} to denote shared and
+exclusive locking of a variable \ms{V}, respectively. Since in the S2PL a commit
+incurs an implicit phase 2-transition and unlocking of all locks, I will omit
+phase 2-transitions and unlocks.
+
+\begin{itemize}
+\item \textit{Draw the precedence graph for each schedule. Are the schedules
+conflict-serializable?}
+
+\paragraph{Schedule 1}
+
+\begin{minted}{text}
+T1: W(Y)             R(X) R(Z) C
+T2:      W(Z) C
+T3:             R(X)             R(Z) W(Y) C
+\end{minted}
+
+T1 and T3 share a WR conflict on Y, producing a dependency (T1, T3).
+\smallskip
+
+T2 and T1 share a WR conflict on Z, producing a dependency (T2, T1).
+\smallskip
+
+T2 and T3 share a WR conflict on Z, producing a dependency (T2, T3).
+
+\pic{schedule_1_dependency_graph.png}
+
+The dependency graph has no cycles, so schedule 1 is conflict serializable.
+
+\paragraph{Schedule 2}
+
+\begin{minted}{text}
+T1: W(Z)      W(X) C
+T2:                  R(Y) R(Z) C
+T3:      R(X)                    W(Y) C
+\end{minted}
+
+T1 and T2 share a WR conflict on Z => T1 -> T2
+T3 and T1 share a RW conflict on X => T3 -> T1
+T2 and T3 share a RW conflict on Y => T2 -> T3
+
+\pic{schedule_2_dependency_graph.png}
+
+The dependency graph has a cycle in T1 -> T2 -> T3 -> T1, so schedule 2 is
+\textit{not} serializable.
+
+
+
+\paragraph{Schedule 1}~\smallskip
+
+Yes, schedule 1 could have been produced by an S2PL protocol, for example with
+the locking seen in the snippet below:
+
+\begin{minted}{text}
+    |time 0  |time 1 |time 2      |time 3    |time 4
+T1: |P1 X(Y) |W(Y)   |            |          |S(X) S(Z) R(X) R(Z) C
+T2: |P1      |       |X(Z) W(Z) C |          |
+T3: |P1      |       |            |S(X) R(X) |
+
+    |time 5
+T1: |
+T2: |
+T3: |S(Z) X(Y) R(Z) W(Y) C
+\end{minted}
+
+Explanation:
+
+\begin{itemize}
+\item[time 0] T1, T2, and T3 each enter P1. T1 X-locks Y.
+\item[time 1] T1 writes Y.
+\item[time 2] T2 X-locks Z; writes Z; commits and releases X-lock of Z.
+\item[time 3] T3 S-locks X; reads X.
+\item[time 4] T1 S-locks X and Z; reads X and Z; commits and releases S-locks
+  of X and Z.
+\item[time 5] T3 S-locks Z and X-locks Y; reads Z and writes Y; commits and
+  releases S-lock of Z and X-lock of Y.
+\end{itemize}
+
+
+\paragraph{Schedule 2}~\smallskip
+
+No, schedule 2 could \textit{not} have been produced by an S2PL protocol. As
+seen in the snippet below, there is an unavoidable deadlock:
+
+\begin{minted}{text}
+    |time 0       |time 1    |time 2
+T1: |P1 X(Z) W(Z) |          |DEADLOCK W(X) C
+T2: |P1           |          |                R(Y) R(Z) C
+T3: |P1           |S(X) R(X) |                            W(Y) C
+\end{minted}
+
+
+Time-step explanation:
+\begin{itemize}
+\item[time 0] T1, T2, and T3 each enter P1. T1 exclusive-locks Z and writes Z.
+\item[time 1] T3 share-locks X and reads X.
+\item[time 2] T1 wants to write X and thus needs an exclusive lock of X.
+              T3 still holds its shared lock of X and cannot release it until
+              it has commited. Deadlock!
+\end{itemize}

@@ -1,0 +1,27 @@
+\; 10 rolls of `d12+d8`
+(troll 10 '((d 12) + (d 8)))
+
+\; 10 rolls of `min 2d20`
+(troll 10 '(min (2 d 20)))
+
+\; 10 rolls of `max 2d20`
+(troll 10 '(max (2 d 20)))
+
+\; 10 rolls of `sum largest 3 4d6`
+(troll 10 '(sum (largest 3 (4 d 6))))
+
+\; 10 rolls of `count 7 < 10d10`
+(troll 10 '(count (7 < (10 d 10))))
+
+\; 10 rolls of: `choose {1, 3, 5}`
+(troll 10 '(choose (1 , 3 , 5)))
+
+\; 10 rolls of `accumulate x := d6 while x > 2`
+(troll 10 '(accumulate x := (d 6) while (x > 2)))
+
+\; 10 rolls of `x := 3d6 ; min x + max x`
+(troll 10 '(x := (3 d 6) ; ((min x) + (max x))))
+
+\; 7 rolls of the example discussed in the report wrt. parenthesization
+(troll 7 '(sum (least (19 + 1) (accumulate x := ((d 42) d (d (d 1337)))
+                               while (800 < (sum (largest 19 x)))))))

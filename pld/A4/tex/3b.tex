@@ -1,0 +1,231 @@
+\newpage
+\subsection{A4.3.b}
+
+\begin{itemize}
+  \item \emph{Implement the subset of Troll as presented in the assignment text.
+    Discuss non-trivial choices.}
+\end{itemize}
+
+\subsubsection{Implementation overview}
+
+I have (to the best of my knowledge) successfully implemented evaluation of
+every expression in the Troll subset as embedded syntax in the PLD-LISP
+interpreter. As explaiend ealier, I have not implemented any sort of parser, so
+the former only holds under the assumption of full parenthesization.
+
+\smallskip
+
+Aside from handling each constructor given in the grammar, my implementation
+handles:
+
+\begin{itemize}
+  \item specifying a number of isolated rolls, which are then returned as a
+    collection of collections;
+  \item correct variable binding, including dynamic scoping and variable
+    overshadowing;
+  \item flattening of arbitrarily nested collections of collections (with the
+    exception of specifying multiple rolls, where a single collection of flat
+    collections is returned).
+\end{itemize}
+
+I claim neither efficiency nor exhaustive correctness (I will, however, make an
+effort of testing later), but my implementation \emph{does} handle the following
+cases of run-time errors:
+
+\begin{itemize}
+  \item non-singleton collection used where singleton collection expected
+  \item (singleton collection containing a) non-positive value used where (singleton
+    collection containing a) positive value expected
+  \item unknown variable names
+\end{itemize}
+
+The implementation consists of one large evaluator function, \ms{eval}, and a
+number of helper functions. In the following subsubsection, I go into detail
+with most of the features mentioned above, as well as other interesting features
+of the code.
+
+\smallskip
+
+The code can be viewed in its entirety in the attached \ms{Troll.le} of the code
+hand-in directory.
+
+\subsubsection{Non-trivial implementation details}
+
+\paragraph{Randomness}~\smallskip
+
+My handling of randomness is entirely trivial, but I see it fit to mention that
+for the sampling and accumulation operators (which both evaluate some of their
+operand expressions multiple times, with different, random results each time),
+randomness is achieved by passing expressions \emph{unevaluated}, such that they
+can be re-evaluated with new random results.
+
+\paragraph{Variable environment}~\smallskip
+
+To implement dynamic scoping, I let my main evaluator function take an
+additional parameter \ms{env} holding the local variable environment.
+Unfortunately, this parameter must be passed explicitly, which has lead to
+cluttered code and, during implementation, a great deal of errors.
+
+\smallskip
+
+Troll variable binding and lookup expressions are handled as such:
+
+
+\begin{minted}[highlightlines={6, 10}]{lisp}
+(define eval
+  (lambda ...
+
+    ; variable binding. v must be a symbol; e1 and e2 are arbitrary exps.
+    ((v ':= e1 '; e2) env) (if (symbol? v)
+                               (eval e2 (bind v (eval e1 env) env)))
+    ...
+    ; scalar expression. symbols are assumed to be variables, while
+    ; singleton collections are created from scalar numeric values.
+    (x env)  (if (symbol? x) (lookup x env) (if (number? x) (list x)))
+  )
+)
+\end{minted}
+
+In line 6, the current \ms{env} is extended with a binding of \ms{v} to
+whichever value \ms{e1} evaluates to, before \ms{e2} is evaluated under this new
+environment. Line 10 shows how symbols are looked up as variables. Note that
+this is the bottom-most production of the \ms{eval} function.
+
+\medskip
+
+The actual variable environment \ms{env} is implemented as a list of two-element
+PLD-LISP lists whose first element is a symbol and whose second element is a
+fully evaluated collection. I omit the code for binding and lookup as it is
+entirely trivial, except to say that variable overshadowing is implemented by
+always prepending variables to the head of the environment list.
+
+\paragraph{Singleton collections}~\smallskip
+
+A number of Troll operators expect one or more singleton collections as
+operands; for example, the arithmetic operators and the multiple dice roll
+expects that \emph{both} operands are singleton, while the sample operator
+expects its first operand to be.
+Furthermore, we also have operators which expect singleton collections
+containing positive values - examples of this are dice rolls and
+\ms{least/largest}.
+
+\smallskip
+
+This is implemented using two wrappers for the main \ms{eval} function, called
+\ms{evalST} and \ms{evalSTPos} (for ``evaluate singleton [positive]''), which
+both evaluate its first argument expression and return empty lists (to signal
+failure) when the result is not a singleton collection or a singleton collection
+containing one positive value, respectively.
+
+\paragraph{Flattening collections}~\smallskip
+
+The Troll manual specifies that nested collections of collections are always
+flattened. This is relevant for the sampling, union, and accumulate
+expressions, which produce multiple, isolated collections before flattening into
+a single collection.
+
+Since collections are implemented as PLD-LISP lists, I write a generic function
+for the flattening of arbitrarily nested and arbitrarily irregular PLD-LISP
+lists (the function is called \ms{flatten} in the code hand-in), which can then
+be used to wrap the result of a sampling, accumulation, or union expression.
+
+\paragraph{Union expressions}~\smallskip
+
+An example of collection flattening is in the union expression $\{\ms e_1,
+\dots, \ms e_n\}$. 
+
+As explianed earlier, I use simply PLD-LISP lists to represent Troll unions. To
+evaluate arbitrarily long union expressions, I give \ms{eval} a head/tail
+pattern as seen below:
+
+\begin{minted}[highlightlines={6}]{lisp}
+(define eval
+  (lambda
+    ...
+    ; {e1, ..., en}: this production assumes n > 0; to create an empty collection,
+    ; simply give an empty list. for example, '(count ()) evaluates to (0).
+    ((e ', . es) env)  (flatten (cons (eval e env) (eval es env)))
+    ...
+\end{minted}
+
+Notice how the same \ms{env} is used for each expression, and how the resulting
+union is created using \ms{flatten}. The code comment explains the case of empty
+unions.
+
+
+% \paragraph{Collection (ie. list) operators}~\smallskip
+%
+% The implementation of \ms{sum}, \ms{min}, \ms{max}, \ms{count}, and the
+% filtering
+%
+% To implement the collection operators \ms{sum}, \ms{min}, \ms{max}, and
+% \ms{count}, I first implement generic list \ms{map} and \ms{reduce} functions.
+% The first three operators are then implemented as reductions using addition, and
+% binary min and max and their respective neutral elements. \ms{count} is
+% simply implemented using the built-in \ms{length}.
+%
+% \medskip
+%
+% Similarly, list filtering is implemented using a generic \ms{filter} function,
+% the code of which I shall also omit as it is trivial.
+
+
+\paragraph{\texttt{least} and \texttt{largest} expressions}~\smallskip
+
+\ms{least} and \ms{largest} are both implemented using a simple (ie. not
+in-place) quicksort. To pick the \ms n least elements of some collection
+\ms{xs}, the collection is first fully evaluated and sorted before the first
+$\ms{min(n, count xs)}$ elements are extracted; for the \ms n largest, the list
+is reversed after sorting.
+
+
+\paragraph{\texttt{accumulate} expression}~\smallskip
+
+Below snippet shows how \ms{accumulate} expressions are evaluated (interesting
+lines highlighted):
+
+\begin{minted}[highlightlines={4, 5, 12-14}]{lisp}
+(define eval
+  (lambda
+    ...
+    (('accumulate v ':= e1 'while e2) env) 
+      (if (symbol? v) (flatten (accumulate v e1 e2 env)))
+    ...
+  ...
+...
+
+(define accumulate
+  (lambda
+    (v e1 e2 env) (if (define x (eval e1 env))
+                      (cons x (if (eval e2 (bind v x env))
+                              (accumulate v e1 e2 env))))
+  )
+)
+\end{minted}
+
+Lines 4-5 show how \ms{accumulate} expressions are matched in the main evaluator
+function; if \ms{v} is a symbol, expressions \ms{e1} and \ms{e2} are passed
+\emph{unevaluated} to a helper function for accumulation expressions.
+
+\medskip
+
+Given a symbol \ms{v}, two \emph{unevaluated} expressions, and the current
+environment \ms{env}, the \ms{accumulate} helper function works as such:
+
+\begin{itemize}
+  \item evaluate \ms{e1} under \ms{env} and bind result to \ms{x} (PLD-LISP
+    variable);
+  \item evaluate \ms{e2} under the environment \ms{env[v -> x]};
+  \item accumulate \ms x, and, if \ms{e2} evaluates to a non-empty collection;
+    recurse with \ms{e1} and \ms{e2} again unevaluated, and using the original
+    \ms{env} (ie. without the binding of \ms{v -> x}).
+\end{itemize}
+
+Note the \ms{if}-expression beginning on line 12 of the snippet. This is to
+sequence the binding of \ms{eval e1 env} to the PLD-LISP variable \ms{x} before
+recursing, such that \ms{e1} is only evaluated once. This works because
+\ms{define} is always successful (which it is because \ms x is not a reserved
+name in PLD-LISP).
+
+\sectend
+

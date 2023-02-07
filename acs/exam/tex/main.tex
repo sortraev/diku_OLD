@@ -1,0 +1,39 @@
+
+\documentclass[12pt]{article}
+
+\usepackage[a4paper, margin=1in]{geometry}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead{Exam number 307}
+
+\author{Exam number 307}
+
+\title{ACS Exam 2021}
+
+\date{2020-01-22}
+
+
+\input{packages.tex}
+\input{commands.tex}
+\usepackage{pdfpages}
+
+\setcounter{tocdepth}{2} % include down to subsections in toc
+% \setcounter{section}{-1} % start section numbering at 0
+\setcounter{page}{0}
+
+\begin{document}
+
+\includepdf[pages=1]{ACS-exam.pdf}
+
+\maketitle
+
+\input{1.tex}
+\input{2.tex}
+\input{3.tex}
+\input{4.tex}
+\input{5.tex}
+\input{6.tex}
+\input{7.tex}
+
+
+\end{document}

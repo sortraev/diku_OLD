@@ -1,0 +1,96 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.31.2.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 48da441216efd28c1467ff9b8245a2ab497003801c11e1d360aecde9c0462490
+
+name:           apql
+version:        0.0.0
+build-type:     Simple
+
+library
+  exposed-modules:
+      Types
+      Parser
+      Preprocessor
+      Engine
+  other-modules:
+      Utils
+      ParserImpl
+      PreprocessorImpl
+      EngineImpl
+  hs-source-dirs:
+      src
+  build-depends:
+      base
+    , containers
+    , mtl
+    , parsec
+    , text
+  default-language: Haskell2010
+
+executable apql
+  main-is: Main.hs
+  other-modules:
+      Paths_apql
+  hs-source-dirs:
+      app
+  build-depends:
+      apql
+    , base
+    , containers
+    , mtl
+    , parsec
+    , text
+  default-language: Haskell2010
+
+test-suite other-test-suite1
+  type: exitcode-stdio-1.0
+  main-is: WhiteBox.hs
+  other-modules:
+      MyTestUtils
+      ParserTests
+      PreprocessorTests
+      Engine
+      EngineImpl
+      Parser
+      ParserImpl
+      Preprocessor
+      PreprocessorImpl
+      Types
+      Utils
+      Paths_apql
+  hs-source-dirs:
+      tests/suite1
+      src
+  build-depends:
+      base
+    , containers
+    , mtl
+    , parsec
+    , tasty
+    , tasty-hunit
+    , text
+  default-language: Haskell2010
+
+test-suite primary-test-suite
+  type: exitcode-stdio-1.0
+  main-is: BlackBox.hs
+  other-modules:
+      Paths_apql
+  hs-source-dirs:
+      tests
+  build-depends:
+      QuickCheck
+    , apql
+    , base
+    , containers
+    , mtl
+    , parsec
+    , tasty
+    , tasty-hunit
+    , tasty-quickcheck
+    , text
+  default-language: Haskell2010

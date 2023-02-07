@@ -1,0 +1,34 @@
+
+\newpage
+\section{A1.4) Exercise 5.13 \textcolor{red}{- resub}}
+
+\begin{itemize}
+  \item \emph{Solve exercise 5.13 from the course compendium.}
+\end{itemize}
+
+A frame contains parameters and (space for) local variables to the given
+function, as well as a return address for the function. Most functions will not
+have very many parameters and local variables - perhaps 3-6 and 5-15,
+respectively - and therefore most frames are relatively small. This plays well
+with generational collection, since in most cases the entire list of frames in
+play can fit in the first generation (or the first couple of generations), and
+can reduce the time taken for frame deallocation. \smallskip
+
+However, if a program exhibits many consecutive function calls, such as in the loop
+below:
+
+\begin{minted}[linenos=false]{c}
+for (i = 0; i < n; i++) {
+  acc = f(acc, input[i]);
+}
+\end{minted}
+
+then the lower generations of the heap may repeatedly be filled and consequently
+collected many times throughout the loop; in the worst case, the lower
+generations might be rendered entirely useless for the duration of the loop,
+since actual user data that is to stay alive throughout the loop is quickly
+being moved to higher generations to make room for frames in these lower
+generations. This may to some degree nullify the benefit from generational GC.
+
+
+\Sectend

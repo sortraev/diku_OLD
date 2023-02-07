@@ -1,0 +1,94 @@
+\newpage
+\section{Recovery}
+
+\subsection{The Missing Log}
+
+\begin{itemize}
+  \item \textit{Complete the log given in the exam text.}
+\end{itemize}
+
+Since my exam number is 307, the second page table entry is \ms{P307} and its
+\ms{recLSN} is 6. Below is the log:
+
+\begin{minted}[linenos=false]{text}
+LSN | PREV_LSN | XACT_ID | TYPE       | PAGE_ID | UNDONEXTLSN
+----+----------+---------+------------+---------+------------
+1   | -        | -       | begin CKPT | -       | -
+2   | -        | -       | end CKPT   | -       | -
+3   | NULL     | T3      | update     | P42     | -
+4   | 3        | T3      | commit     | -       | 3
+5   | NULL     | T1      | update     | P99     | -
+6   | NULL     | T2      | update     | P307    | -
+7   | 6        | T2      | abort      | -       | 6
+8   | 5        | T1      | update     | P99     | 5
++++ CRASH +++ CRASH +++ CRASH +++ CRASH +++ CRASH +++ CRASH +++
+\end{minted}
+
+\subsection{The Recovery}
+
+\begin{itemize}
+  \item \textit{Based on the log, complete the recovery procedure. Show the 5
+    items mentioned in the exam text.}
+\end{itemize}
+
+\paragraph{Set of winners and losers}~\smallskip
+
+The set of winners is $\{T3\}$, since T3 was the only transaction to commit
+before the crash. The set of losers is thus $\{T2, T1\}$.
+
+\paragraph{LSNs for start of redo and end of undo}~\smallskip
+
+The redo phase starts at LSN 3, since this is the smallest recLSN in the DPT.
+\smallskip
+
+Since initially, $\text{toUndo} = \{7, 8\}$, we will undo the transactions in the
+order 8, 7, 6, 5. The undo phase thus ends at LSN = 5.
+
+\paragraph{Set of log records that may cause pages to be rewritten during redo}~\smallskip
+
+The set of log records that may cause pages to be rewritten during redo is
+$\{3\, , 6\, , 8\}$. \textit{Notice that this set \textbf{does not} contain the update
+with LSN = 5; this is because its LSN is less than the recLSN for P99 (which is
+8).}
+
+
+\paragraph{Set of log records undone during undo}~\smallskip
+
+The set of log records undone during undo is $\{8, 7, 6, 5\}$. This is because
+intially, we have $\text{toUndo} = \{7, 8\}$, and during the undo phase we will
+we will first undo 8, which adds 6 to toUndo; next, we undo 7, which adds 6 to
+toUndo; then, we undo 6 and 5, neither of which add anything to toUndo, since
+their PREV\_LSN are NULL.
+
+\paragraph{Contents of the log after recovery completes}~\smallskip
+
+\begin{minted}{text}
+LSN | PREV_LSN | XACT_ID | TYPE       | PAGE_ID | UNDONEXTLSN
+----+----------+---------+------------+---------+------------
+1   | -        | -       | begin CKPT | -       | -
+2   | -        | -       | end CKPT   | -       | -
+3   | NULL     | T3      | update     | P42     | -
+4   | 3        | T3      | commit     | -       | 3
+5   | NULL     | T1      | update     | P99     | -
+6   | NULL     | T2      | update     | P307    | -
+7   | 6        | T2      | abort      | -       | 6
+8   | 5        | T1      | update     | P99     | 5
++++ CRASH +++ CRASH +++ CRASH +++ CRASH +++ CRASH +++ CRASH +++
+9   | 4        | T3      | end        | -       | -
+10  | 8        | T1      | CLR        | P99     | 5
+11  | 7        | T2      | abort      | -       | 6
+12  | 6        | T2      | CLR        | P307    | NULL
+13  | 12       | T2      | end        | -       | -
+14  | 5        | T1      | CLR        | P99     | NULL
+15  | 14       | T1      | end        | -       | -
+\end{minted}
+
+First, notice that since T3 had committed before the crash, an end record is
+written for T3 during analysis.
+\smallskip
+
+Then, undo commences, undoing log records in the order 8, 7, 6, and finally 5.
+Since T2 aborted at LSN = 7, this is re-recorded. Log records for T2 and T1 are
+written after they have been fully undone.
+
+\Sectend

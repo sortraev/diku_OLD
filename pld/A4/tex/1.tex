@@ -1,0 +1,219 @@
+\newpage
+\section{\underline{A4.1}}
+
+\subsection{A4.1.a}
+
+
+\begin{itemize}
+  \item \emph{Write a \textbf{SIS} program that starts with $a = n$, $b = 0$,
+    and $c = 0$, and which terminates with $a = n$, $b = 0$ and with $c$ equal
+    to the sum of all numbers from 1 to $n$}.
+\end{itemize}
+
+
+I am looking for a program which computes:
+
+\begin{align*}
+  \sum_{i = 1}^n\ i
+\end{align*}
+
+This sum can be rewritten as a nested sum in which the body of the inner
+summation is a constant 1, since the sum of $i$ ones is precisely $i$:
+
+\begin{align*}
+  \sum_{i = 1}^n\ i = \sum_{i = 1}^n\ \sum_{j = 1}^{i}\ 1
+\end{align*}
+
+This is helpful since we can accumulate constants using a finite sequence of
+variable increments - in this case, accumulating the number $1$ corresponds to a
+single SIS variable increment. However, before translating the math to SIS code,
+we shift the bounds of the inner loop down by one - this is legal because the
+summation maintains the same number of iterations, and we do not have to modify
+the body because it is constant in the value of $i$ (this shift will be
+convenient later):
+
+\begin{align}
+  \sum_{i = 1}^n\ \sum_{j = 1}^{i}\ 1 = \sum_{i = 1}^n\ \sum_{\blue{j =
+  0}}^{\blue{i - 1}}\ 1 \label{sum}
+\end{align}
+
+We, of course, cannot shift the outer loop since \emph{its} body is \emph{not}
+constant in $i$.
+
+At this point I want to formulate the mathematical expression in the SIS
+language. I use \ms{c} as accumulator for the result of the summation; then, for
+each $1$ in the body of the summation corresponds I want to increment \ms{c} by
+one. 
+
+\newpage
+
+The SIS code then becomes:
+
+\begin{minted}[frame=none, linenos=false]{c}
+for i = b to a {
+  i++;
+  for j = b to i {
+    c++;
+    j++;
+  };
+}
+\end{minted}
+
+As explained it was convenient to shift the inner summation bounds down by one -
+this was done so we could use \ms{b = 0} for the lower bound. Notice then that
+\ms{i} is incremented \emph{before} the inner loop of index \ms{j} rather than
+after; this is to achieve the outer loop going from $1$ to and \emph{including}
+$n$, rather than from $0$ to and including $(n - 1)$. As such we get $(k + 1)$
+iterations of the inner loop on the $k$'th iteration of the outer loop.
+
+\sectend
+
+\subsection{A4.1.b}
+
+\begin{itemize}
+  \item \emph{Show that SIS is a reversible language.}
+\end{itemize}
+
+The course notes state that ``\emph{A programming language is reversible if
+every operation it performs is reversible}'', and so I intend to show that SIS
+is a reversible language by showing how each of its operations is reversible. I
+do so by constructing reversal rules for each. First, here are my reversal
+rules:
+\begin{align*}
+  \textit{R}\, (\ms{A++})    \quad &= \quad \ms{A--}\\[4pt]
+  \textit{R}\, (\ms{A--})    \quad &= \quad \ms{A++}\\[4pt]
+  \textit{R}\, (\ms{S1; S2}) \quad &=
+      \quad \textit{R}\, (\ms{S2}) ;\ \textit{R}\, (\ms{S1})\\[4pt]
+  \textit{R}\, (\ms{for A = B to C { S }}) \quad &=
+      \quad \texttt{for A = C to B \{}\textit{R}\, (\ms{S})\texttt{\}}
+\end{align*}
+
+where $R(\ms{S})$ is the reversal of some statement \ms{S}, and where \ms{A},
+\ms{B}, and \ms{C} are program variables.
+
+\medskip
+
+The first two rules state that an increment is inversed by a decrement and vice
+versa.
+
+\medskip
+
+The third rule states that to reverse a sequence of two statements, we must
+reverse each statement individually and then execute the resulting statements in
+reverse order. Since reversing the order of statements is an associative
+operation, this reversal rule applies to arbitrary sequences of statements.
+
+\bigskip
+
+The fourth reversal rule is the interesting one. It states that to reverse a
+\ms{for} loop, we must swap the upper and lower bounds of the loop and apply
+reversal to the loop body \ms{S}. \emph{Why?}
+
+\smallskip
+
+If a program \emph{p} terminates without error, then any loop in \emph{p} must
+have executed a finite number of iterations \footnote{A program does not
+terminate if it executes indefinitely!}. A loop whose body is \ms{S} and which
+has terminated after $i$ iterations will have executed \ms{S} $i$ times, and is
+thus equivalent to the unrolled sequence of statements:
+
+$$
+\ms{S}_1 \ ;\ \ms{S}_2\ ;\ \dots\ ;\ \ms{S}_i
+$$
+
+\noindent We can apply reversal to this sequence of statements using rule three - of
+course here, all statements are identical, so we don't technically need to
+reverse the order of the sequence, but we \emph{do} recursively reverse each
+statement in the sequence. %
+
+\medskip
+
+\emph{Why swap the loop bounds?} Consider a loop in some program $p$ given by
+\ms{for i = a to b { S }} which executes $n$ times (where $n$ is finite such
+that the loop terminates). If we unroll the executed statements of the loop into
+the sequence $\ms{S}_1\ ;\  \dots \ ;\ \ms{S}_n$, then \ms{i} will have had
+value \ms{a} before executing $\ms{S}_1$ and value \ms{b} after executing
+$\ms{S}_n$.
+
+\smallskip
+
+In $p'$, the loop is reversed to a sequence of statements $\textit{R}(\ms{S}_n)\ ;\  \dots \
+;\ \textit{R}(\ms{S}_1)$. Here, the loop variable \ms{i} will have value \ms{b} before
+executing \textit{R}(\ms{S}$_n$), and we expect it to have value \ms{a} after executing
+\textit{R}(\ms{S}$_1$) - hence we swap the loop bounds.
+
+\sectend
+
+\newpage
+
+\begin{itemize}
+  \item \emph{Explain for the loop construct why (or why not) the restriction
+    described in the assignment text is required for reversibility.}
+\end{itemize}
+
+Yes, the restriction \emph{is} required for reversibility. To show why, let us
+\emph{lift the restriction on loops} - but first, let's introduce some
+assumptions to ease understanding. Let:
+
+
+\begin{itemize}
+  \item $p'$ = \textit{R}($p$) = \texttt{for i = b to a
+    \{}\textit{R}(\ms{S})\texttt{\}};
+  \item $\hat{\texttt{x}}$ denote the value of some global variable
+    \texttt{x} at the beginning of $p$ and before $p'$ terminates;
+  \item $\bar {\texttt{x}}$ denote the value of global variable \texttt{x} before
+    $p$ terminates and at the beginning of $p'$;
+  \item \ms{S'} = \textit{R}(\ms{S}), for brevity;
+  \item $\ms{S}_j$ and $\ms{S'}_j$ be the $j$'th execution of \ms{S} in $p$ and
+    \ms{S'} in $p'$, respectively - note that $\ms{S}_j = \textit{R}(\ms{S'}_j)$;
+  \item and $\ms{v}_j$ be the value of some program variable \ms{v} (global or
+    loop variable) after executing $\ms{S}_j$ in $p$; similarly, let $\ms{v'}_j$
+    be the value of \ms{v} after executing $\ms{S'}_{j}$ in $p'$.
+\end{itemize}
+
+Using this, I reformulate the property given in the assignment text:
+
+\begin{enumerate}
+
+  \item[(1)] if for any SIS program $p$ which starts with $\ms x =
+    \hat{\texttt{x}}$ and ends with $\ms x = \bar{\texttt{x}}$ for all global
+    variables \ms x, there exists a SIS program $p'$ which starts with $\ms x =
+    \bar{\texttt{x}}$ and ends with $\ms x = \hat{\texttt{x}}$ for all global
+    variables \ms x, then SIS is a reversible language.
+
+\end{enumerate}
+
+Let now $p$ be the program $\ms{for i = a to b { S }}$, and assume that $p$
+terminates after $n$ iterations of the loop.
+Since reversibility must hold for every subsequence of the program, I derive the
+following invariant for $p$:
+
+\begin{enumerate}
+  \item[(2)] $\ms{v}_j = \ms{v'}_{j + 1}$ for all $j < n$.
+\end{enumerate}
+
+Where \ms v is any SIS variable (global or loop variable). Notice that the case
+where $j = n$ is covered by property (1), since when $j = n$ the loop will have
+exited and only global variables are live.
+
+\bigskip
+
+Assume now that at some point in $p$ we have $\ms i_k = \ms a_k$ after executing
+a $k$'th iteration of the loop (with $1 \leq k < n$). Since we have lifted the
+restriction on loops, an error is \emph{not} thrown; the loop continues on
+executing for the remaining $n - k$ iterations, at which point it
+terminates with $\ms{i}_n = \hat{\texttt{b}}$, after which $p$ terminates
+\emph{without error} with $\hat{\texttt{x}}$ for all global variables $\ms{x}$.
+
+\medskip
+
+Now, we execute $p'$. Since $\ms i_k = \ms{i'}_{k + 1}$ and $\ms a_k =
+\ms{a'}_{k + 1}$ (by the invariant), and because we assumed $\ms i_k =
+a_k$, we will after iteration $(k + 1)$ of $p'$ have $\ms{i'}_{k + 1} =
+\ms{a'}_{k + 1}$. At this point the loop terminates, meaning $p'$ \emph{without
+error} with $\ms x = \ms{x'}_{k + 1}$ for all global variables \ms x. However,
+we cannot assume $\ms {x'}_{k + 1} = \hat{\texttt{x}}$ is true for any \ms x or
+$k$, and so invariant (2) is broken.
+
+\sectend
+

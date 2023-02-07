@@ -1,0 +1,114 @@
+
+\newpage
+
+\section{A2.7}
+
+\subsection{A2.7.a}
+
+\begin{itemize}
+  \item \emph{Give an example of a function that cannot be written because of
+    the requirement of array types, but which could still be written in C\#.}
+\end{itemize}
+
+A good example is the ``dynamic tables'' examples that we all know and love from
+CLRS, in which the size of an array is doubled whenever it is filled up. Fixed
+upper bounds on statically declared Pascal arrays means the array can only be
+doubled a certain number of times - however, Pascal also supports dynamic arrays
+which can be used here.
+
+\sectend
+
+\newpage
+\subsection{A2.7.b}
+
+\begin{itemize}
+  \item \emph{Suggest how to impose a bound on the length of arrays in C\# that
+    would be checked by the type system.}
+\end{itemize}
+
+The easiest solution is to create a new class for size-bounded arrays. In the
+snippet below I present a simple implementation for arrays of arbitrary number
+of dimensions:
+
+\begin{minted}[highlightlines={11-21}]{csharp}
+public class MyBoundedArray<T> {
+  private readonly int[] bounds;
+  private Array array;
+  
+  public MyBoundedArray(int[] bounds) {
+    this.bounds = bounds;
+    array = null;
+  }
+
+
+  public void initialize(int[] dims) {
+    if (dims.Rank != bounds.Rank) {
+      throw new ArgumentException("invalid dimensions");
+    }
+    for (int i = 0; i < bounds.Rank; i++) {
+      if (dims[i] > bounds[i]) {
+        throw new ArgumentException("Dimension " + i + " exceeds bound");
+      }
+    }
+    array = Array.CreateInstance(typeof(T), dims);
+  }
+  
+  public void set(int[] idxs, T val) { array.SetValue(val, idxs);       }
+  public T    get(int[] idxs)        { return (T) array.GetValue(idxs); }
+
+  public int[] getBounds()  { return bounds;       }
+  public int getRank()      { return array.Rank;   }
+
+}
+\end{minted}
+
+Given an array of upper bounds for each dimension, a new array is
+\emph{declared} (but not yet initialized) using the class constructor.
+
+The important function here is then \ms{initialize(dims)} (highlighted above),
+which (re-)initializes a new array in place of the old with the given dimensions
+\emph{if} they are within the declared bounds; if they are not, or if an invalid
+number of dimensions are given, an exception is thrown.
+
+\sectend
+
+\subsection{A2.7.c}
+
+\begin{itemize}
+  \item \emph{Are there good reasons why Pascal array types are the way they
+    are?}
+\end{itemize}
+
+Yes! In Pascal, statically sized arrays allows the programmer to use a different indexing base.
+
+\medskip
+
+To illustrate how this works and why it is useful, consider the problem of
+encoding a discrete two-dimensional real-valued function over a plane of
+discrete points centered around the origin (ie. the point $(0, 0)$). For the
+purposes of this example, consider the discrete plane of points $(i, j)$ which
+satisfy $-50 <= i, j <= 50$ \footnote{More formally the set $\{(i, j)\ :\ -50
+\leq i \leq 50 \land -50 \leq j \leq 50\}$.}.
+
+\smallskip
+
+In most programming languages, we would use an array of dimensions
+\ms{[101][101]}. The origin would have index \ms{[50][50]} in this 2D array,
+while an arbitrary point $(x, y)$ would have index \ms{[x + 50][y + 50]}.
+Working with this 2D plane quickly becomes tedious!
+
+\medskip
+
+However, using static Pascal arrays, we can declare the plane as such:
+
+\begin{minted}{pascal}
+myPlane: array [-50 .. 50, -50 .. 50] of Real
+\end{minted}
+
+This specifies \ms{myPlane} to be a $101 \times 101$ array (since the intervals
+are inclusive) of reals, and that its indices range from $-50$ to $+50$ in
+either direction, rather than from $0$ to $100$ as discussed above. Now, any
+given point $(x, y)$ in the plane (for which $-50 \leq x, y \leq 50$) has
+location \ms{myPlane[x][y]} - even for negative coordinates.
+
+\Sectend

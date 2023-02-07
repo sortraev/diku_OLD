@@ -1,0 +1,74 @@
+\newpage
+\section{A2.6}
+
+\begin{itemize}
+  \item \emph{Give (at least) one example of slack in your favorite statically
+    typed programming language that \emph{does not} involve conditional
+    statements or conditional expressions.}
+\end{itemize}
+
+My favorite statically typed programming language is, of course, C, and the kind
+of slack in the type system which I would like to discuss is that of dealing
+with different pointer types.
+
+\smallskip
+
+As we all know, C represents pointers as unsigned integers - when doing pointer
+arithmetic, the compiler uses the types of pointers to determine how much to add
+to a particular pointer (eg. if \ms{xp} has type \ms{int32_t*}, then the
+statement \ms{xp += 1} will actually increment \ms{xp} by 4 byte).
+
+\medskip
+
+
+Below snippet shows a dummy program computing the size of an allocation by
+subtracting the distance between two pointers created by \ms{malloc()}:
+
+
+\begin{minted}[highlightlines={15}]{c}
+#include <stdlib.h>
+#include <stdint.h>
+
+#define ABS(x) (((long) (x)) < 0 ? -(x) : (x))
+#define MAX(x, y) ((x) > (y) ? (x) : (y))
+
+int main() {
+
+  // first, let's allocate some memory ...
+  size_t   request_size = 256 * sizeof(int);
+  int      *my_int_arr  = malloc(request_size);
+  unsigned *my_uint_arr = malloc(request_size);
+
+  // compute the distance between the two allocations.
+  int difference = my_int_arr - my_uint_arr;
+  int distance   = ABS(difference);
+
+  // to verify success of one of the allocations, assert that the
+  // distance between the two arrays is at least the size of the request.
+  int allocation_successful = distance >= request_size;
+
+  return allocation_successful;
+}
+\end{minted}
+
+The program is \textbf{incorrect} for a number of reasons, but that is not the
+matter of this analysis, because the program actually fails to compile due to a
+type checking error caused by line 15 (highlighted above). The type checker
+complains about invalid operands to binary minus since \ms{my_int_arr} is an
+a signed int pointer, and \ms{my_uint_arr} is an unsigned int pointer.
+
+\medskip
+
+However, since both \ms{int} and \ms{unsigned} are both 32 bit large
+\footnote{Actually, \ms{int} and \ms{unsigned} are not guaranteed to be 32 bit,
+but they \textit{are} guaranteed to be of the same size on a given machine.},
+the subtraction cannot produce errors, and type checker should be able to
+discern this since it knows the sizes of both types.
+
+\medskip
+
+In any case, it is probably a good idea to be just a little conservative about
+pointer arithmetic - even for a language like C whose compilers does no take
+much responsibility for the programs they compile.
+
+\Sectend

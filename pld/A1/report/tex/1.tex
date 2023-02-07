@@ -1,0 +1,181 @@
+\section{A1.1) PLD Lisp}
+
+\subsection{A.1.1.a) \texttt{merge} and \texttt{add}}
+\label{merge_add}
+
+\begin{itemize}
+    \item \emph{Implement \texttt{merge} and \texttt{add} as specified in the
+        assignment text. Present the implementation in the report.}
+\end{itemize}
+
+Below listing contains my entire implementation of \ms{assignment1.le}, except
+for testing expressions (as will be discussed later).
+
+\begin{minted}[frame=none]{text}
+(define merge
+  (lambda
+    (xs ()) xs
+    (() ys) ys
+    ((x . xs) (y . ys)) (cons x (cons y (merge xs ys)))
+  )
+)
+
+(define add
+  (lambda
+    ((x . xs)) (+ (add x) (add xs))
+    (x)        (if (number? x) x 0)
+  )
+)
+\end{minted}
+
+\sectend
+
+\newpage
+\subsection{A.1.1.b) sample usage}
+
+As mentioned, my \ms{assignment1.le} contains a number of test S-expressions.
+Instead of copy+pasting a shell session, I instead include my test cases in the
+below snippet.
+
+\begin{minted}{text}
+(define assertEqual
+  (lambda (a a) 'testSuccess
+          (a b) 'testFailure
+  )
+)
+
+'(merge - both operands empty)
+(assertEqual (merge '() '())
+             '())
+
+'(merge - first operand empty)
+(assertEqual (merge '() '(4 5 6 7))
+             '(4 5 6 7))
+
+'(merge - second operand empty)
+(assertEqual (merge '(0 1 4 2) '())
+             '(0 1 4 2))
+
+'(merge - both operands non-empty)
+(assertEqual (merge '(1 2 3) '(4 5 6 7))
+             '(1 4 2 5 3 6 7))
+
+\; add tests
+'(add - empty sum)
+(assertEqual (add '())
+             0)
+
+'(add - 1D list of numbers)
+(assertEqual (add '(1 -42 4 +100 7 57 0))
+             127)
+
+'(add - list of only non-numbers)
+(assertEqual (add '(cons foo '(() 1be2)))
+             0)
+
+'(add - multiple layers of nesting)
+(assertEqual (add '(4 () '(5 '(-6 0 '(1 NULL -1)) 7 cons) 3 foo))
+             13)
+\end{minted}
+
+All of my test cases are successful. To reproduce, run \ms{make} from within my
+code hand-in.
+
+\sectend
+
+
+\newpage
+\subsection{A.1.1.c) implementation details and reflection}
+
+\begin{itemize}
+  \item \emph{Reflect on PLD-LISP. What was easy and what was hard? Did it take
+    long to learn the syntax, and was it difficult to express yourself in the
+    language?}
+\end{itemize}
+
+It did not take long for me to learn the syntax. The main reason for this is
+that I have prior experience in other languages with similar syntax and
+programming models, such as Haskell and Prolog. \smallskip
+
+Second, PLD-LISP came with very good documentation (in the provided
+\ms{PLD-LISP.pdf}), which answered \emph{almost} all of my questions.
+
+\bigskip
+
+The grammar of PLD-LISP, I would argue, is very clean - but this can probably be
+attributed to the fact that the language is very restrictive. As far as I was
+able to discern, PLD-LISP does for example not allow local variable bindings,
+and control flow is limited to pattern matching.
+
+\bigskip
+
+However, I did find the pattern matching of PLD-LISP to be quite useful in
+conjunction with the dynamic type system.
+
+\smallskip
+
+To illustrate why, let's look at implementing \ms{add} in a different language
+which has a similar programming model, but which is statically typed: Haskell.
+Since Haskell is statically typed we cannot express arbitrarily nested lists,
+and so the below code does not compile:
+
+\begin{minted}[frame=none]{haskell}
+add (x:xs) = add x + add xs
+add []     = 0
+add x      = x
+\end{minted}
+
+The compiler complains that it cannot construct the infinite type for \ms{xs}.
+To solve this problem, we have to introduce a recursive data type:
+
+\begin{minted}[frame=none]{haskell}
+data Element = Number Integer | Symbol String | List [Element]
+
+add :: Element -> Integer
+add (List (x:xs)) = add x + add (List xs)
+add (Number x)    = x
+add _             = 0
+\end{minted}
+
+As we saw in task A.1.1.a), this is more concisely expressed in PLD-LISP.
+
+\sectend
+
+\newpage
+\subsubsection{Problems in the language}
+
+As stated, implementation was mainly a breeze. However, I did have one
+significant problem with the language. It occured during implementation of
+\ms{merge}, and it had to do with list construction using \ms{cons}.
+
+\smallskip
+
+In PLD-LISP, a list can be head/tail pattern matched with the syntax \ms{(head .
+tail)}, similar to Haskell's \ms{(head : tail)}. However, whereas in Haskell
+this exact same syntax can also be used outside of pattern matching contexts to
+prepend elements to lists, in PLD-LISP the syntax \ms{(x . xs)} cannot be used
+to used to construct the list whose head is \ms{x} and whose tail is \ms{xs}.
+
+\medskip
+
+Instead, the \ms{cons} function is used to prepend elements to lists, and as a
+consequence, the recursive case of the \ms{merge} function in PLD-LISP is
+somewhat awkward:
+
+$$
+\ms{lambda (((x . xs) (y . ys)) (cons x (cons y (merge xs ys))))}
+$$
+
+\noindent as opposed to Haskell:
+
+$$
+\ms{merge (x:xs) (y:ys) = x : y : merge xs ys}
+$$
+
+I estimate that over half of the imlementation time for the entire coding task
+was spent trying to figure out why \ms{(x . (y . (merge xs ys)))} produced
+invalid expression errors - the interpreter was not very helpful with error
+messages either, stating simply for some general input \ms{(x . xs)} that \ms{x
+can not be applied as a function}.
+
+\Sectend

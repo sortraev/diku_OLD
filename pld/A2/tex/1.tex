@@ -1,0 +1,110 @@
+\section{A2.1)}
+
+
+\subsection{A2.1.a)}
+
+\begin{itemize}
+    \item \emph{Find an S-expression containing a \ms{lambda} which
+        evaluates to \ms{0}, but which, when changing that \ms{lambda} to
+        \ms{lambdaD}, evaluates to \ms{1}.}
+\end{itemize}
+
+
+Below is a snippet of \ms{task1.le} of my code hand-in, showing the S-expression
+I found, as well as the version with one \ms{lambda} changed to a \ms{lambdaD}:
+
+\begin{minted}{lisp}
+; the value of this S-expression is 0.
+(if (define x 0) ((lambda (f x) (f)) (lambda y x) 1))
+    
+; this S-expression is identical to the expression above, except the innermost
+; 'lambda' has been changed to 'lambdaD'. the value of this S-expression is 1.
+(if (define x 0) ((lambda (f x) (f)) (lambdaD y x) 1))
+\end{minted}
+
+
+\subsection{A2.1.b)}
+\begin{itemize}
+    \item \emph{Is it possible to find an S-expression as above but where the
+        \ms{lambda} in question is a closed lambda expression? If possible, give
+        an example; if not, argue why not.}
+\end{itemize}
+
+I would argue that it is impossible. Here is why:
+
+\smallskip
+
+If a particular lambda -- let's call it \ms{foo} -- is a closed lambda
+expression, then the value of any variable occuring in the \ms{foo}'s body
+\textbf{must} be associated with the corresponding lambda parameter variable -
+and thus a variable reference made within the body of \ms{foo} can never point
+to a variable outside of the scope of \ms{foo}. 
+
+\smallskip
+
+Since there is no difference between static and dynamic scoping
+when there is only one scope of reference, changing \ms{lambda} to \ms{lambdaD}
+can never change the value of a closed S-expression.
+
+\sectend
+
+\subsection{A2.1.c)}
+
+\begin{itemize}
+    \item \emph{Do dynamically scoped functions in PLD-LISP use shallow or deep
+        binding?}
+\end{itemize}
+
+Deep binding. Here is why:
+
+\smallskip
+
+When a pattern $p_i$ is matched to an expression $e_i$ in \ms{matchPattern}, each
+value in $e_i$ is bound to a variable (or pattern) in $p_i$ and these are pushed
+to the front of the environment (ie. variable stack). This is seen in the below
+snippet of \ms{RunLISP.fsx} (relevant line highlighted):
+
+\begin{minted}[highlightlines={5}]{fsharp}
+and tryRules rules pars localEnv =
+  match rules with
+  | Cons (p, Cons (e, rules1)) ->
+      match matchPattern p pars with
+      | Some env -> eval e (env @ localEnv)
+      ...
+  ...
+\end{minted}
+
+\newpage
+
+\subsection{A2.1.d)}
+
+\begin{itemize}
+    \item \emph{Does shallow vs. deep binding give any observable difference in
+        PLD-LISP?}
+\end{itemize}
+
+No, it does not. 
+
+\smallskip
+
+There are very rarely observable differences between using shallow and deep
+binding - according to PLDI, this can only occur when it is possible to take the
+address of a variable, and therefore also when using call-by-reference. However,
+this is irrelevant, since PLD-LISP uses pass-by-value as evidenced by the
+highlighted lines of code in the snippet below:
+
+\begin{minted}[highlightlines={5, 10}]{fsharp}
+let rec eval s localEnv =
+  match s with
+  ...
+  | Cons (e1, args) -> // function application
+      applyFun (eval e1 localEnv, evalList args localEnv, localEnv)
+...
+and evalList es localEnv =
+  match es with
+  ...
+  | Cons (e1, es1) -> Cons (eval e1 localEnv, evalList es1 localEnv)
+\end{minted}
+
+
+\Sectend

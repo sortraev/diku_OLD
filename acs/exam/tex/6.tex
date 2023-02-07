@@ -1,0 +1,86 @@
+\newpage
+\section{Distributed Transaction}
+
+\subsection{Basic Concepts of Distributed Transactions}
+
+
+\begin{itemize}
+  \item \textbf{Basic Concepts of Distributed Transactions, 6.1.1:}
+        \textit{Does the DanskeShop setup fulfill the atomicity property in case
+        of node failures? Use an example to explain why or why not.}
+\end{itemize}
+
+It does \emph{not}, since it only uses a one-phase commit. Consider this
+example: P1 sends a NewOrder message to both Payment and Shipment. Payment
+agrees and sends back an AckOrder message to P1. Meanwhile, there is a node
+failure at Shipment and so the NewOrder message is not even received at
+Shipment.
+\medskip
+
+Payment does not wait for a doCommit message from Order since that is not part
+of the protocol, but rather simply begins processing the request as if all is
+good. However, the order is never shipped, so the customer will be paying for
+nothing.
+
+\sectend
+
+\subsection{Two-Phase Commit}
+
+\begin{itemize}
+  \item \textbf{Two-Phase Commit, 6.2.1:}
+        \textit{Describe the 2PC commit procedure of a New Order transaction
+        when there is no failure. Write down the coordinator's log records.}
+\end{itemize}
+
+\begin{enumerate}
+  \item Coordinator writes "Prepare order" to log.
+  \item Coordinator sends \ms{canCommit?}-messages to all three modules.
+  \item Coordinator receives \ms{yes} from all three modues.
+  \item Coordinator writes "Commit order" to log.
+  \item Coordinator sends \ms{doCommit}-messages to all three modules.
+  \item Coordinator receives \ms{haveCommited} messages from all three modules.
+  \item Coordinator writes "End order" to log.
+\end{enumerate}
+
+
+\begin{itemize}
+  \item \textbf{Two-Phase Commit, 6.2.2:}
+        \textit{Describe a scenario in which Shipment and Payment can proceed to
+        complete the transaction.}
+\end{itemize}
+
+The exam text does not state what is meant by ``to complete the transaction''.
+\textit{I will assume that a transaction is completed if it is either commited
+or aborted.}
+\medskip
+
+Also, the text says that Order fails after the coordinator decides to abort and
+after the abort has been logged, but \emph{before} abort messages are sent out.
+\medskip
+
+Then Shipment and Payment can proceed to complete the transaction as such:
+
+\begin{enumerate}
+  \item having already logged the abort, the coordinator sends rollback messages
+    to all three modules. Payment and Shipment receive these.
+  \item Payment and Shipment each rollback the commits and send back
+    \ms{haveRolledBack}-messages to the coordinator, thus completing the
+    transaction with an abort (as per the assumption that a transaction is
+  completed when it is either committed or aborted).
+\end{enumerate}
+
+When Order comes back online, the coordinator can retry the transaction if it
+wishes.
+
+
+\begin{itemize}
+  \item \textbf{Two-Phase Commit, 6.2.3:}
+        \textit{Under the given scenario, describe what could happent to
+        Shipment if it has not received the abort message, and what could happen
+      to Order after it restarts from the failure.}
+\end{itemize}
+
+When Order restarts from failure, it will look for a commit message in its log.
+However, it will not find one and instead assume that it must have aborted.
+
+\Sectend
