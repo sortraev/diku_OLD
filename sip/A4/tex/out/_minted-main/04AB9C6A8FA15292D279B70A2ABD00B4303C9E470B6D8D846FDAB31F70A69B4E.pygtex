@@ -1,0 +1,5 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{} matches img\PYGZus{}src to img\PYGZus{}target\PYGZsq{}s cdf.}
+\PYG{k}{def} \PYG{n+nf}{hist\PYGZus{}match}\PYG{p}{(}\PYG{n}{img\PYGZus{}src}\PYG{p}{,} \PYG{n}{img\PYGZus{}target}\PYG{p}{):}
+    \PYG{k}{return} \PYG{n}{img\PYGZus{}pidf}\PYG{p}{(}\PYG{n}{img\PYGZus{}target}\PYG{p}{)(}\PYG{n}{cdf\PYGZus{}substitution}\PYG{p}{(}\PYG{n}{img\PYGZus{}src}\PYG{p}{))}
+\end{Verbatim}

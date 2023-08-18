@@ -1,0 +1,104 @@
+\newpage
+\newgeometry{top=4.5cm}
+% \vspace{-2cm}
+\section{Image reconstruction via backprojection}
+
+% \subsection{Reconstruction using the inverse Radon transform}
+
+As mentioned, Radon also described a method for reconstructing an object
+function based on its Radon transformation, and gave his formular for the
+inverse Radon transform. In image analysis the process of reconstructing images
+from projections using the (multiple invocations of) inverse Radon transform is
+aptly called \textit{backprojection}.
+
+\medskip
+
+The backprojection is performed by ``shooting'' projections back along the
+angles at which they were originally acquired during the forward transform, and
+is perhaps most easily expressed in terms of a 2D inverse Fourier transform of
+$F\{\mbf R_\theta\{f(u, v)\}\}$, the Fourier transform of the Radon transform of
+the object function:
+
+\begin{alignat}{3}
+  \hat f(x, y) &= \infint \infint F\{\mbf
+R_\theta\{f(u, v)\}\} e\, ^{i\tau(xu + vy)}\
+  du\,dv,\label{eq:bp}\\
+   \text{with}\  (u, v) &= (\omega \cos \theta, \omega \sin \theta)\nonumber,
+\end{alignat}
+and where $\omega$ is the Fourier frequency component; $\hat f(x, y)$ is then the
+reconstructed object function.
+
+\medskip
+
+Below \cref{fig:no-filter} shows Radon transformations and subsequent
+backprojection reconstructions of the famous Shepp-Logan phantom, at relatvely
+low and high number of projection angles, respectively, using the \texttt{radon()}
+and \texttt{iradon()} functions from the \texttt{skimage.transform} Python library.
+
+\begin{figure}[H]
+  \includegraphics[width=\textwidth]{figures/no_filter.png}
+  \vspace{-0.8cm}
+  \caption{\small \textit{Radon transform and backprojection of the Shepp-Logan phantom at
+  various projection and backprojection angles (no filtering).}}
+\label{fig:no-filter}
+\end{figure}
+
+\subsection{Filtered backprojection}
+
+The reconstructions in above \cref{fig:no-filter} are obviously \textit{blurry} in
+comparison to the original image. One common issue with backprojection for image
+reconstruction is blurriness, which arises from the fact that in 2D frequency space,
+low frequencies reside closer to the origin while high frequencies lie further
+away, creating an overrepresentation of lower frequencies in the backprojection,
+ultimately resulting in a blur in the image domain, since the high frequencies
+in frequency space correspond to the finer details in the image
+domain\cite{toft}.
+
+One remedy is to apply a high pass filter to the frequency space (eg. the
+Fourier transform of the Radon transform, hence \cref{eq:bp}), dampening low
+frequencies and, consequently, accentuating high frequencies before projecting
+back (ie. applying the 2D inverse Fourier, as in \cref{eq:bp}) -- the
+combination of filtering and backprojection is called \textit{filtered
+backprojection} (FBP for short).
+
+\medskip
+
+Below \cref{fig:filter} shows the same reconstructions as before, but
+this time performed using FBP with a simple ramp
+filter\footnote{\texttt{skimage.transform.iradon} offers a number of filters,
+but all of them are different types of high pass filters and thus may produce visually similar
+results; hence only the ``ramp'' filter is demonstrated for this example, but
+note that other filters may better handle high frequency noise.}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{figures/filter_vs_no_filter.png}
+  \vspace{-0.2cm}
+  \caption{\small \textit{Radon transform and FBP of the Shepp-Logan phantom at
+  various projection and backprojection angles using a ramp filter.}}
+\label{fig:filter}
+\end{figure}
+
+
+Like the forward Radon transform, FBP is also a linear transformation,
+\textit{so long as the chosen filtering function is linear}. I shall not attempt
+to prove this fact, but rather illustrate it using
+\texttt{skimage.transform.iradon()} in below \cref{fig:fbp-linearity}:
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figures/fbp_linearity.png}
+  \vspace{-0.2cm}
+  \caption{\small \textit{Comparing sum of two partial reconstructions with a
+  reference reconstruction (using ramp filter). Note the very small MSE of
+  $9.67\text{e}-33$ in the difference plot -- because of its small magnitude, I
+  argue that this error is due to float
+  imprecisions.}}
+\label{fig:fbp-linearity}
+\end{figure}
+
+% Note the very small MSE of $9.67\text{e}-33$ in the difference image between the
+% reference reconstruction and the sum of partial reconstructions -- I argue that
+% because the error is this small, it most likely stems from float imprecisions.
+
+\sectend

@@ -1,0 +1,256 @@
+\newpage
+\subsection{Linear programming and optimization}
+
+\begin{enumerate}
+
+  \item hello. today's topic is linear programming and optimization.
+
+  \item linear programming is a form of optimization that is used to find
+    optimal solutions to systems of linear inequalities. (Many types of problems
+    have equivalent linear programs, such as max flow)
+
+  \item motivation: \TODO{?}
+
+  \item a linear program consists of an objective function, which is to be
+    minimized or maximized, as well as zero or more constraints under which the
+    objective function should be optimized.
+
+
+  \item here's an example:
+    \begin{textred}
+    \begin{alignat*}{3}
+      \text{minimize } \quad& -2x_1 && +3 x_2  \quad&\\
+      \text{s.t. }     \quad& x_1   && + x_2   \quad&=\quad 7\\
+                            & x_1   && -2x_2   \quad&\leq\quad 4\\
+                            & x_1   &&         \quad&\geq \quad0
+    \end{alignat*}
+    \end{textred}
+
+  \item before we can apply an algorithm to solve the problem, we need to
+    transform it to slack form, but before even that: standard form!
+
+  \item \emph{*transform to standard form*} (see \cref{sec:to_standard_form})
+
+  \item the general formula for the standard form LP is:
+    \begin{textred}
+    \begin{alignat*}{3}
+      \text{maximize } \quad&\sum_{j = 1}^n c_j x_j&&\\
+      \text{s.t. }     \quad&\sum_{j = 1}^n a_{ij}x_j \quad&& \leq \quad b_i   \text{ for } i = 1,\dots,m,\\
+                       \quad& x_j                     \quad&& \geq \quad 0   \ \text{ for } j = 1,\dots,n.
+    \end{alignat*}
+    \end{textred}
+
+  \item next, before applying the SIMPLEX algorithm, we also need to transform
+    the standard form to slack form.
+
+  \item \emph{*transform to slack form*} (see \cref{sec:to_slack_form})
+
+  \item SIMPLEX algorithm (see \cref{sec:simplex}).
+
+  \item the correctness of SIMPLEX is based on what we call the \emph{dual}
+    problem.
+
+  \item every LP problem has a dual. A dual to a maximization LP problem $A$ is
+    a related minimization LP problem $B$ such that the two programs share the
+    same optimal objective value.
+
+  \item the dual is given by:
+
+    \begin{textred}
+    \begin{alignat*}{3}
+      \text{minimize } & \sum_{i = 1}^m b_i y_i&&\\
+      \text{s.t. }     & \sum_{i = 1}^m a_{ij}y_i \quad&& \geq \quad c_j   \text{ for } j = 1,\dots,n,\\
+                       &                      y_i \quad&& \geq \quad 0   \ \text{ for } i = 1,\dots,m.
+    \end{alignat*}
+    \end{textred}
+
+  \item \emph{on how to easily extract the dual from the primal, see below}.
+
+  \item proof of weak duality:
+
+    \newcommand{\x}{\bar x}
+    \newcommand{\y}{\bar y}
+
+  \item \textcolor{red}{let $\x$ and $\y$ be \underline{feasible} solutions to some primal LP
+    and its dual. Then we have the following inequality:}
+
+    \begin{textred}
+    \begin{align}
+      \sum_{i = 1}^m c_j \x_j \leq \sum_{j = 1}^n b_i\y_i
+    \end{align}
+    \end{textred}
+
+  \item Proof: first, use the definition of the dual to rewrite $c_j$:
+
+    \begin{textred}
+    \begin{align}
+      \sum_{i = 1}^m c_j  \x_j \leq \sum_{i = 1}^m \left(\sum_{j = 1}^n
+      a_{ij}\y_i\right)  \x_j 
+    \end{align}
+    \end{textred}
+
+    permute the summations and use the definition of the primal:
+    \begin{textred}
+    \begin{align}
+      \sum_{i = 1}^m \left(\sum_{j = 1}^n a_{ij}\y_i\right) \x_j 
+      \quad&=\quad
+      \sum_{j = 1}^n \y_i \left(\sum_{i = 1}^m a_{ij} \x_j\right)\\
+      \quad&\leq\quad
+      \sum_{j = 1}^n \y_i b_i.
+    \end{align}
+    \end{textred}
+
+\end{enumerate}
+
+\subsubsection{Extra}
+
+\paragraph{LP standard form requirements}
+
+\label{sec:standard_form}
+\begin{enumerate}
+\item it is a maximization, not a minimization.
+
+\item all variables have nonnegativity constraints.
+
+\item all constraints are $\leq$-constraints (ie. no equalities or
+  $\geq$-inequalities)
+\end{enumerate}
+
+\paragraph{Regular LP to standard form}
+\label{sec:to_standard_form}
+\begin{enumerate}
+\item if the LP is a minimization: negate coefficients in the objective
+  function to turn it into a maximization.
+
+\item for each variable $x_j$ that does not have a nonnegativity constraint:
+  replace each occurence of $x_j$ with $x_j' - x_j''$ and add constraints $x_j'
+    \geq 0$ and $x_j'' \geq 0$.
+
+\item for each equality constraint $f(X) = b$, replace this constraint with two
+  inequality constraints $f(X) \leq b$ and $f(X) \geq b$
+
+\item for each $\geq$-inequality, simply flip the inequality by negating the
+  expression.
+
+\end{enumerate}
+
+\paragraph{Regular or standard form to slack form}
+\label{sec:to_slack_form}
+
+\begin{enumerate}
+\item first, convert the LP to standard form if it is not already.
+
+\item let $n$ and $m$ denote the number of variables and constraints, respectively.
+
+\item we create $m$ new variables $x_{n + 1}, \dots, x_{n + m}$, one for each
+  constraint in the standard form.
+
+  Then, for the $i$'th constraint $f_i(x_1, \dots, x_n) \leq b$, the slack form
+    has an equality constraint $x_{n + i} = b - f_i(x_1, \dots, x_n)$ and a
+    nonnegativity constraint $x_{n + i} \geq 0$.
+
+\item in addition, because we understand slack form LP's to always be
+  maximizations, we typically omit the words ``maximize'' and ``subject to''; we
+    use $z$ to denote the objective value; and we do not write out the implicit
+    nonnegativity constraints.
+
+\end{enumerate}
+
+\paragraph{SIMPLEX algorithm}
+\label{sec:simplex}
+
+\begin{enumerate}
+
+  \item given an LP in slack form, we want to repeatedly change the basic
+    solution by ``pivoting'' variables to and from the basic variables (ie. the
+    variables on the LHS of the constraints).
+
+  \item to do so, we first pick any non-basic variable by which the objective
+    function value \emph{increases}. Call this variable $x_e$, or the
+    ``entering'' variable.
+
+  \item next, we set all other non-basic variables to zeo and determine which
+    basic variable puts the tighest bound on $x_e$. Call the selected basic
+    variable $x_l$, or the ``leaving'' variable. (If some basic variable has a
+    positive coefficient for $x_e$, then it will always grow with $x_e$, puts no
+    bound on $x_e$, and thus is not interesting)
+
+    Intuitively, we can think of this as examining the derivative wrt. $x_e$ --
+    since essentially we are trying to find out how to make the objective
+    function grow -- and seeing how far we can ``push'' $x_e$ while still
+    respecting the constraints.
+
+  \item we now want to swap $x_e$ for $x_l$. To do so, express $x_e$ in terms of
+    $x_l$, make $x_e$ a basic variable, and remove $x_l$ as a basic variable.
+    Replace all occurrences of $x_e$ in the constraints with the new expression
+    for $x_e$.
+
+  \item this creates a new but equivalent slack form in which the new, basic
+    feasible solution is equal to or greater than the previous.
+
+  \item eventually, if the LP has a bounded solution, all of the coefficients in
+    the objective function will be negative, and by then there is no non-basic
+    variable we can increase to make the objective function increase further.
+    The algorithm terminates.
+
+  \item the optimal values for the variables (both basic and non-basic) are then
+    read out directly: the values for the basic variables are the slack in the
+    constraints, while the values for the non-basic variables are zero.
+\end{enumerate}
+
+
+\paragraph{Easy dual construction}~\smallskip
+
+I like to think of the construction of a dual $B$ from an LP $A$ as such:
+
+Concatenate the coefficients of the objective function into a row vector and
+append a dummy value to the end. Concatenate the constraint bounds $b_i$ as a
+column vector to the right of the coefficient matrix. Then, append the row
+vector of objective function coefficients to the bottom of this matrix.
+
+Transpose this matrix, extract the objective function coefficients and the
+constraint bounds, flip the inequalities, call it a minimzation program, and
+then you have the dual. Boom!
+
+For example, for the LP program
+
+\begin{alignat*}{4}
+  \text{maximize } \quad& 2x_1 && +3x_2     &+ 3x_3 &&   \\[4pt]
+  \text{s.t. }     \quad& x_1  && + x_2    &- x_3  &&\leq 7\\
+                        & -x_1 && -x_2     &+x_3   &&\leq -7\\
+                        & x_1  && -2x_2    &+2x_3  &&\leq 0,
+\end{alignat*}
+
+we have the matrix:
+
+\begin{align}
+  \left[
+  \begin{matrix}
+    1 & 1 & -1 & 7\\
+    -1 & -1 & 1 & -7\\
+    1 & -2 & 2 & 0\\
+    2 & -3 & 3 & \text{NIL}
+  \end{matrix}
+  \right]
+\end{align}
+where ``NIL'' is used for the dummy value. Transposing this, we get:
+\begin{align}
+  \left[
+  \begin{matrix}
+     1 & -1 &  1 &  2 \\
+     1 & -1 & -2 & -3 \\
+    -1 &  1 &  2 &  3 \\
+     7 & -7 &  0 & \text{NIL}
+  \end{matrix}
+  \right]
+\end{align}
+
+and from this we extract the dual (remembering to flip the inequalities and to
+change the LP to a minimization):
+
+\begin{alignat*}{4}
+  \text{minimize } \quad& 7y_1 && -7y_2  &       &&   \\[4pt]
+  \text{s.t. }     \quad& y_1  && -y_2   &+y_3   &&\geq 2\\
+                        & y_1  && -y_2   &-2y_3  &&\quad \geq -3\\
+                        & -y_1 && +y_2   &+2y_3  &&\geq 0
+\end{alignat*}

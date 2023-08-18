@@ -1,0 +1,47 @@
+%% various math packages
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{mathtools}
+\usepackage{xifthen}
+\usepackage{xparse}
+\usepackage{dsfont}
+\everymath{\displaystyle} % force display style for inline math
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}} % equation numbering for align*
+
+%% misc packages.
+\usepackage{xfrac}
+\usepackage{parskip}
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+\usepackage{cleveref}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{subcaption}
+\usepackage{enumitem}
+\usepackage[outputdir=out]{minted}
+\usemintedstyle{trac}
+\setminted{%frame=lines,
+    linenos=true,
+    fontsize=\footnotesize
+}
+\usepackage[table,xcdraw]{xcolor}
+
+
+%% math commands.
+\DeclareMathOperator*{\argmin}{argmin} % argmin.
+\newcommand{\bbar}[1]{\overline{#1}}   % a wider bar than \bar.
+\newcommand{\eps}{\varepsilon}         % prettier epsilon.
+\newcommand{\mbf}[1]{\mathbf{#1}}      % shorthand.
+\newcommand{\R}{\mathbb R}             % set of real numbers.
+\newcommand{\N}{\mathbb N}             % set of natural numbers.
+\newcommand{\Z}{\mathbb Z}             % set of integers.
+\let\emptyset\varnothing               % better emptyset symbol. 
+\newcommand{\pr}[1]{\text{Pr}\left[#1\right]} % pretty probabilities.
+\DeclareMathSymbol{*}{\mathbin}{symbols}{"01} % map asterisks to \cdot. use
+                                              % \ast for asterisk in math mode. 
+
+% bold and red TODO's.
+\newcommand{\TODO}[1]{\textcolor{red}{TODO: #1}}
+

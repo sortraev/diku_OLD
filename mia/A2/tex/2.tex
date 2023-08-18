@@ -1,0 +1,143 @@
+\section{Graph-based Image Segmentation}
+
+If we interpret an image as a weighted graph, in which vertices and edges
+represent pixels; where vertices are connected if the underlyig pixels are
+neighbours in the image; and edge weights represent differences in intensities
+between these pixels, then we can employ more sophisticated techniques than the
+histogram-based segmentation, and since 3D images are simply graphs with higher
+connectivity, the methods generalize nicely.
+
+\subsection{Min-cut Segmentation}
+
+One such graph-based method for segmentation is the \textit{min-cut} method. The
+method relies on the property of flot networks\footnote{Note that a flow
+network can be represented with a weighted (di-)graph if
+the capacity function is embedded into graph edges as weights.}, that the
+maximum flow through a network is equal to the total weight of edges in a
+minimum cut separating the source and sink terminals\footnote{CLRS\cite{clrs}
+has a nice proof of this property (pp. 723-724).}.
+
+This is also called the max-flow/min-cut theorem, and we can exploit it for
+segmentation purposes if we define the graph edge weights (ie. the capacity
+function) in such a way that similar pixels share a \textit{high} capacity edge,
+and edges between contrasting pixels have \textit{low} capacity.
+
+As with threshold segmentation some user input is at this point required, in the
+form of seed pixel coordinate(s) denoting source(s) and sink(s) for a particular
+object. By choosing seeds inside and outside of a desired segment, respectively,
+the algorithm will analyze the flows running from the object and out and produce
+a min-cut along the edge of the object -- flooding can then be
+used to label pixels inside the border denoted by the min-cut. 
+
+\medskip
+
+Ideally, that is -- if seeds are well-chosen, this will be the case. As Grady
+notes in \cite{grady}, a successful segmentation is practically guaranteed given
+enough user inpupt -- however, a number of different problems can arise from
+incorrect seeding. The most promiment of these is the ``small cut problem'', a
+consequence of under-seeding, in which the algorithm will simply select a cut
+involving a very small number of edges close to a seed vertex, since cutting a
+small number of high-intensity edges can in many cases be cheaper than cutting a
+large number of low-intensity edges. This is rectifiable but requires
+additional, or better placed, seeding \cite{grady}.
+
+
+% \TODO{choose 0 or 1 of these out-commented paragraphs!}
+% Another disadvantage of the method is the fact that only a single, contiguous
+% object can be segmented at a time, meaning disjoint objects which we would
+% identify as coherent (eg. a pair of lungs or parallel arteries) would
+% have to be segmented separately.
+
+% Another disadvantage is that since there can exist many cuts with capacities near
+% the min-cut, and even multiple min-cuts, the amount and placement of seeds, as
+% well as small changes in the image (eg. noise) can result in entirely different
+% results from the algorithm.
+
+\subsection{Random Walker Segmentation}
+
+As a remedy to the disadvantages of min-cut segmentation, Leo Grady formulated
+Random Walker Segmentation (henceforth, RW) as an alternative graph-based
+algorithm in \cite{grady}. Rather than using seeds to partition the graph, RW
+computes the probability than any given pixel be associated to any given seed,
+for each seed in the image, and labels each pixel according to the seed with
+which it is most likely to be associated.
+
+These probabilities are based on the same edge capacities as before, and do not
+involve (pseudo-)randomness, but it is beneficial to model the problem using
+probabilities. However in some simplified terms the highest probability
+terminating seed for a given random walker can be thought of as the seed
+for which the mean edge capacities on the path from pixel to seed are maximized.
+
+
+\medskip
+
+Below figure \cref{fig:RW-seg} shows RW segmentation of the same example image
+as before, for two different levels of seeding and two different
+parameterizations of the RW motion probability function.
+
+
+\begin{figure}%[H]
+  \includegraphics[width=0.8\textwidth]{figures/RW_segmentation.png}
+  % \vspace{-0.8cm}
+  \caption{\small \textit{Comparison of RW for different amounts of
+  seeding and different beta (penalization coefficient for the RW motion
+  function). The sparse seeding is a random sample
+  of the full seed pool. Note how segment 4 (yellow) is split in two disjoint
+  objects.}}
+  \label{fig:RW-seg}
+\end{figure}
+
+Obviously noise in the input image makes the segmentation less precise, but one
+advantage of RW (and graph-cut, too) is that with good seeding, the output
+segmentation is already de-noised as opposed to histogram segmentation.
+
+As the plot shows RW is also very sensitive to proper seeding: The disjoint
+segment 4 (yellow) is not properly segmented when its annex is not seeded
+(bottom row). Even if the solution is simply more seeding, this is still a
+disadvantage. Perhaps the biggest disadvantage of RW, however, is a huge
+sensitivity to proper parameterization of the RW motion probability function
+(ie. the probabilities attached to each edge in the graph), as is also evident
+in the plot, where the segmentation is, to put it mildly, hit and miss depending
+on beta (see caption).
+
+
+
+\sectend
+
+\iffalse{
+Section 2 (L2C, L2D) -- graph cut and random walker algorithms for segmentation -- 
+* graph cut: finding minimum cut via max flow.
+  the max-flow/min-cut theorem states that the maximum flow through a graph
+  is equal to the minimum sum cut.
+
+  in graph cut segmentation, we denote capacity of an edge between two pixels as
+  the difference in pixel intensities; as an example, the edge between two
+  (neighbouring) black pixels would have higher capacity than would the edge
+  between a black and a white pixel.
+
+  By choosing a source pixel (or \textit{seed}) inside of a given object, aswell
+  as a target seed \textit{outside} of that object (ie. in the background of the
+  image), the border of the object will, if the seeds are chosen correctly and
+  the algorithm is successful, be the min-cut of the image graph.
+
+  the problem: works only if we have one object and a background.
+
+* random walker
+
+  can segment multiple objects and several backgrounds.
+  ??
+
+  % we call it a \textit{random} walker, but a good way to think about the
+  % algorithm is to call it a \textit{minimizing} walker, and, in fact, there is
+  % not one but \textit{many} such ``walkers''
+
+  show example of random walker segmentation
+
+* both random walker and graph cut assume that objects in the image form in
+  contiguous clusters -- this implies that to segment multiple related objects,
+  each need to be properly and individually seeded, whereas with histogram based
+  segmentation we can simply choose a good threshold and capture all desired
+  objects -- on the other hand, if used properly then graph based segmentation
+  can more easily filter out unwanted noise without the need for CCD.
+
+}\fi

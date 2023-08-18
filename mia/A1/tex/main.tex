@@ -1,0 +1,50 @@
+\documentclass[a4paper,12pt]{article}
+
+\input{commands_and_packages.tex}
+
+\newcommand{\concat}{\ensuremath{+\!\!\!\!+\,}}
+\newcommand{\rpm}{\raisebox{.2ex}{$\scriptstyle\pm$}}
+\newcommand{\resub}[1]{\textcolor{red}{#1}}
+\newcommand{\blue}[1]{\textcolor{blue}{#1}}
+\newcommand{\ltt}{\sqsubseteq}
+\newcommand{\twodots}{\mathinner {\ldotp \ldotp}}
+
+\title{\large MIA -- Hand-in 1}
+\author{{\footnotesize Anders Lietzen Holst (wlc376)}\\ {\footnotesize \today}}
+
+\date{}
+
+
+\begin{document}
+
+% (L1A) Write down and explain the formula for the Radon transform
+% (L1B) Perform a radon transform of a 2-d image in Python
+% (L1C) DONE Prove the linearity of the Radon transform
+% (L1D) Explain what filtered back-projection is and a common use case
+% (L1E) Perform a filtered back projection of a sinogram image
+
+
+\maketitle
+
+\input{1.tex}
+\input{2.tex}
+
+
+\begin{thebibliography}{8}
+\bibitem{radon}
+  Radon, Johann (1917). \textit{Über die Bestimmung von Funktionen durch ihre Integralwerte längs gewisser
+    Mannigfaltigkeiten Ber. über Verh. Königlich-Sächsischen Ges. Wiss. Leipzig}
+    \textbf{69} 262–77
+
+\bibitem{dhawan}
+  Dhawan, A., 2011. \textit{Medical Image Analysis}. Hoboken, New Jersey: Wiley.
+    ISBN: 9780470622056.
+
+\bibitem{toft}
+  Toft, P. A. (1996). \textit{The Radon Transform -- Theory and Implementation}.
+    Technical University of Denmark.
+    \url{https://backend.orbit.dtu.dk/ws/portalfiles/portal/5529668/Binder1.pdf}.
+
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,216 @@
+\newpage
+\subsection{Hashing}
+
+\begin{enumerate}
+  \item hello.
+
+  \item motivation: variable- to fixed-length keys; unordered sets. Is often
+    used to speed up algorithms which require sets or associative arrays; for
+    example used to improve space complexity of vEB-trees from $O(|U|)$ to $O(n
+    \lg \lg |U|)$ (at the cost of expected $O(\lg \lg |U|)$ time updates).
+
+  \item a random hashing function \textcolor{red}{$h : U \mapsto [m]$} is a
+    function mapping values from a larger set to a (possibly, but not
+    necessarily) smaller set $[m]$. For pratical purposes, we typically require
+    that $[m]$ is bounded and that the values are fixed size/length. \emph{In
+    addition, note that if $[m]$ is larger than $U$, then the task of hashing is
+    trivial, as will likely be the benefits.}
+
+  \item if we are using random hashing, then for each $x \in U$ the hash
+    \textcolor{red}{$h(x) \in [m]$} is a random variable.
+
+  \item when picking a random hash function $h$, we are often interested in the
+    space needed to represent $h$; the time is takes to compute $h(x)$ (given $x
+    \in U$); and the properties of the underlying RV.
+
+  \item today, we shall primarily discuss the latter (the randomness in
+    hashing).
+
+  \item ideally, we would want a hashing function that is \emph{truly random},
+    ie. $h(x) \neq h(y)$ for any distinct keys $x$ and $y$ in $U$. Due to space
+    necessities, however, this is impractical, since designing such a hashing
+    function that holds for all inputs requires one to encode an output for
+    every possible input, which means a total of $m^{|U|}$ hashing functions in
+    one!
+
+    This would eliminate one of the primary motivations for hashing, which is to
+    represent an element from a huge range in a smaller range.
+
+  \item introduce \textbf{c-approximate universality}. A random hash function $h
+    : U \mapsto [m]$ is $c$-approximately universal if for all distinct keys $x$
+    and $y$ in $U$, the probability that they hash similarly is $\leq c/m$,
+    where $m = |\,[m]\,|$:
+    \begin{textred}
+      \begin{align}
+        \forall x \neq y \in U\ :\ \prh{h(x) = h(y)} \leq c/m.
+      \end{align}
+    \end{textred}
+
+  \item similarly, we define \textbf{c-approximate \emph{strong} universality}
+    as: a random hash function $h : U \mapsto [m]$ is $c$-approximately strongly
+    universal if each key $x \in U$ is hashed $c$-approximately uniformly into
+    $[m]$:
+    \begin{textred}
+      \begin{align}
+        \forall x \in U,\ q \in [m]\ :\ \prh{h(x) = q}\quad \leq\quad c/m.
+      \end{align}
+    \end{textred}
+
+    and if any two distinct keys hash independently, ie.:
+
+    \begin{textred}
+      \begin{align}
+        \forall x \neq y \in U,\text{ and } q, r \in [m]\ :\ \prh{h(x) = q\
+        \land\ h(y) = r} \quad\leq\quad (c/m)^2.
+      \end{align}
+    \end{textred}
+
+  \item in either case we require $c$ to be $O(1)$ (and ideally small), and
+    when $c = 1$, we simply say the given function is ``universal'' or
+    ``strongly universal''.
+
+  \item some examples of hashing functions are: 
+
+    \begin{enumerate}
+
+      \begin{textgray}
+      \item the \textbf{universal multiply-mod-prime}: choose a prime number $p \geq
+        |U|$, and pick uniformly random integers $a \in [p]_+$ and $b \in [p]$.
+        Then multiply-mod-prime is defined by:
+
+          \begin{align}
+            h_{a, b} = ((ax + b) \mod p) \mod m.
+          \end{align}
+      \end{textgray}
+
+
+      \item The \textbf{2-approximately universal multiply-shift}: 
+
+        When hashing from $w$ to $l$ bits: pick at uniformly random an odd
+        $w$-bit integer $a$ and define $h_a : [2^w] \mapsto [2^\ell]$ as such:
+
+        \begin{textred}
+          \begin{align}
+            h_a(x) = \left\lfloor\, \frac{ax \mod 2^w} {2^{w - \ell}} \,\right\rfloor.
+          \end{align}
+        \end{textred}
+
+        \begin{textgray}
+        which compensates for its lack in universality compared to
+        multiply-mod-prime with its speed in practical implementation.
+        \end{textgray}
+
+      \item The \textbf{strongly universal multiply-shift}:
+
+        When hashing from $w$ to $l$ bits: choose a $\bar w \geq w + \ell - 1$,
+        and pick at uniformly random $a, b \in [2^{\bar w}]$. Then define $h_{a,
+        b}$ as such:
+
+        \begin{textred}
+        \begin{align}
+          h_{a, b}    &: [2^w] \mapsto [2^\ell]\\[6pt]
+          h_{a, b}(x) &= \left\lfloor \frac{(ax + b) \mod 2^{\bar w}} {2^{\bar
+          w - \ell}}\right\rfloor
+        \end{align}
+        \end{textred}
+
+    \end{enumerate}
+      \item so far, so good. Now, I want to present an example application of
+        random hashing, in which strong universality provides a big benefit.
+
+      \item the example is \emph{coordinated sampling}. Given a universe $U$ of
+        samples, we imagine $k$ independent, but possibly overlapping subsets
+        $A_1, \dots, A_k \subseteq U$. These $k$ subsets may each be of enormous
+        size and hence for each subset, we take an even smaller sample $S_{h,
+        t}(A_i)$, where $h$ is some strongly universal hashing function from $U$
+        to $[m]$ and $t \in [m]$. Then the sample $S(A) = S_{h, t}(A)$ is given
+        by:
+        \begin{textred}
+          \begin{align}
+            S(A_i) = S_{h, t}(A_i) = \{a \in A_i \ :\  h(a) < t\}.
+          \end{align}
+        \end{textred}
+
+        In other words, an element $a$ is sampled from $A_i$ if its hash wrt.
+        $h$ is below the chosen threshold.
+
+      \item since $h$ is chosen to be strongly universal (ie. we have pairwise
+        independence between samples), the chance of any element in $A_i$
+        hashing to any given value in $[m]$ is $1/m$, and because we sample an
+        element if it hashes below $t$, the probability of any $a \in A_i$ being
+        sampled is $t / m$.
+
+        \emph{This part only requires universality, but strong universality
+        implies universality, so we are good.}
+
+      \item if the same $h$ and $t$ are used in all of the $k$ subsets of $U$,
+        then two samples can be used to examine likeness between the subsets
+        they are sampled from:
+
+        \begin{textred}
+          \begin{align}
+            \forall 1 \leq i, j \leq k\ : a \in A_i \land a \in A_j \implies a
+            \in S_{h, t}(A_i) \iff S_{h, t}(A_j).
+          \end{align}
+        \end{textred}
+
+        in other words, if an element is in two subsets, then it is sampled from
+        one subset \textbf{iff} it is also sampled from the other, so long as
+        the same $h$ and $t$ are used to sample from either subset. 
+
+ 
+      \item another useful fact is that $S(A_i)$ can be used to estimate the
+        size of $A_i$. Let's see how:
+
+        If the sampling probability is $t/m$, then the expected size of $S(A)$
+        is $t/m * |A|$:
+
+        \begin{textred}
+        \begin{alignat*}{4}
+                                             & |S(A)| \ &&\simeq \ \frac{t}{m} * |A|\\
+          \Leftrightarrow \quad \frac{m}{t}\ & |S(A)| \ &&\simeq \ |A|.
+        \end{alignat*}
+        \end{textred}
+
+        In fact, because $h$ is (strongly) universal, we have an unbiased
+        estimate of the size of $S(A)$:
+
+        \begin{textred}
+        \begin{align}
+          \mu = \E{|S(A)|} = \frac{t}{m} * |A|.
+        \end{align}
+        \end{textred}
+
+      \item if $h$ is also strongly universal, then we can use Chebyshev's
+        inequality to put a probabilistic bound the quality of this estimate.
+
+        Recall Chebyshev's inequality. If $X$ is iid with $X \in [0, 1]$ and
+        unbiased estimator $\E{X} = \mu$, and standard deviation $\sigma$, then
+        for $q > 0$:
+
+        \begin{textred}
+          \begin{align}
+            \text{Pr}\big[|X - \mu | \geq q \sigma\big] \quad \leq \quad \frac{1}{q^2}.
+          \end{align}
+        \end{textred}
+
+        and $\text{Var}(X) \leq \mu$.
+
+      \item in our case, if we let $X_a = [h(a) < t]$ be an indicator variable
+        for whether the element $a \in A$ is sampled under $h$ and $t$, then the
+        sum $X = \sum_{a \in A} X_a = |S(A)|$ is an RV with $\mu \geq
+        \text{Var}(X)$ and hence $\sqrt{\mu} \geq \sqrt{\text{Var}(X)} =
+        \sigma$.
+
+      \item let $a = |A|$ for brevity. To summarize, we have $X = S(A)$, $\mu =
+        at/m$, and $\sqrt{\mu} = \sqrt{at/m} \geq \sigma$, and can thus apply Chebyshev's:
+
+        \begin{textred}
+          \begin{align}
+            \text{Pr}\left[\Big\vert|S(A)| - \frac{t}{m} a
+            \Big\vert \geq q * \sqrt{\frac{t}{m}a}\right] \quad \leq \quad
+            \frac{1}{q^2}.
+          \end{align}
+        \end{textred}
+
+\end{enumerate}

@@ -1,0 +1,56 @@
+\section{The effect of scale and normalization of RV's in Hoeffding's}
+
+I want to prove that Corollary $2.5$ in Yevgeny's notes follows from Theorem
+$2.3$.
+
+So let's start with Theorem $2.3$:
+
+\newcommand{\sn}{\sum_{i = 1}^n X_i}
+\newcommand{\e}[1]{\text{exp}\left(#1\right)}
+\begin{align*}
+  \PP{\sn - \EE{\sn} \geq \eps} \leq \e{\tfrac{-2\eps^2}{\sum_{i = 1}^n (b_i -
+  a_i)^2}}
+\end{align*}
+
+First of all, since $X$ is Bernoulli distributed it has support $[0, 1]$:
+
+
+\begin{align*}
+  [a_i, b_i] = [0, 1] \implies\quad &\PP{\sn - \EE{\sn} \geq \eps} \leq
+  \e{\tfrac{-2\eps^2}{\sum_{i = 1}^n 1}}\\[4pt]
+  \Leftrightarrow\quad &\PP{\sn - \EE{\sn} \geq \eps} \leq
+  \e{\tfrac{-2\eps^2}{n}}
+\end{align*}
+
+Next, using linearity of the expected value, and the fact that $\EE{X} = \mu$
+when $X$ is Bernoulli distributed:
+
+\begin{alignat*}{3}
+  \Leftrightarrow\quad &\PP{\sn - \sum_{i = 1}^n \EE{X_i} \geq \eps} \ &\leq
+  \e{\tfrac{-2\eps^2}{n}}\\
+  \Leftrightarrow\quad &\PP{\sn - \sum_{i = 1}^n \mu \geq \eps} \ &\leq
+  \e{\tfrac{-2\eps^2}{n}}\\
+  \Leftrightarrow\quad &\PP{\sn - n \mu \geq \eps} \ &\leq
+  \e{\tfrac{-2\eps^2}{n}}\\
+  \Leftrightarrow\quad &\PP{\frac{1}{n}\sn - \mu \geq \frac{1}{n}\eps} \ &\leq
+  \e{\tfrac{-2\eps^2}{n}}
+\end{alignat*}
+
+
+\noindent Finally, let $\eps' = \tfrac{1}{n}\eps$. Since $\eps > 0$ and $n > 0$, we also
+have $\eps' > 0$, so this is still a valid $\eps'$. 
+
+Then we also have $\eps = n \eps'$ and:
+
+\begin{align*}
+  \Leftrightarrow\quad &\PP{\frac{1}{n}\sn - \mu \geq \eps'} \leq
+  \e{\tfrac{-2(n \eps)^2}{n}}\\
+  \Leftrightarrow\quad &\PP{\frac{1}{n}\sn - \mu \geq \eps'} \leq
+  \e{\tfrac{-2n^2\eps'^2}{n}}\\
+  \Leftrightarrow\quad &\PP{\frac{1}{n}\sn - \mu \geq \eps'} \leq
+  \e{-2n\eps'^2}
+\end{align*}
+
+\qed
+
+\sectend

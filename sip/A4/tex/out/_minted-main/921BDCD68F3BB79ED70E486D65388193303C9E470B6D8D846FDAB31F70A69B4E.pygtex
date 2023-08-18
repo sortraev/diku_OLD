@@ -1,0 +1,6 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{def} \PYG{n+nf}{pidf\PYGZus{}from\PYGZus{}cdf}\PYG{p}{(}\PYG{n}{cdf}\PYG{p}{):}
+    \PYG{k}{return} \PYG{k}{lambda} \PYG{n}{ls}\PYG{p}{:} \PYG{p}{(}\PYG{n}{cdf}\PYG{p}{[:,} \PYG{k+kc}{None}\PYG{p}{,} \PYG{k+kc}{None}\PYG{p}{]} \PYG{o}{\PYGZgt{}=} \PYG{n}{ls}\PYG{p}{)}\PYG{o}{.}\PYG{n}{squeeze}\PYG{p}{()}\PYG{o}{.}\PYG{n}{argmax}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{)}
+\PYG{k}{def} \PYG{n+nf}{img\PYGZus{}pidf}\PYG{p}{(}\PYG{n}{img}\PYG{p}{):}
+    \PYG{k}{return} \PYG{n}{pidf\PYGZus{}from\PYGZus{}cdf}\PYG{p}{(}\PYG{n}{img\PYGZus{}cdf}\PYG{p}{(}\PYG{n}{img}\PYG{p}{))}
+\end{Verbatim}

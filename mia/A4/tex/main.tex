@@ -1,0 +1,129 @@
+\iffalse{
+  >> LEARNING GOALS
+
+  % (L4A) Explain the theoretical basics behind CNNs
+  % (L4B) Implement and test a specific CNN for image segmentation
+  % (L4C) Define what cross-validation is
+  % (L4D) Assess classifier performance with different metrics
+  % (L4E) Design your own algorithm (e.g. CNN) and evaluate its performance on the skin lesion classification data.
+
+  >> DISPOSITION
+
+  >> 1: Convolutional Neural Networks in MIA (L4A)
+  * what is a neural network? an ML model comprised of a network of connected
+  \emph{neurons}, organized in so-called \emph{layers}, each with its own
+  associated weights and biases -- much like a set of equations. Each neuron
+  outputs a value that is fed to an activation function which indicates to the
+  next layer whether or not the output of this particular neuron is important.
+
+  section 1.1 convolutional NN
+  * what is a convolutional neural network? One big problem arises when we
+  attempt to use ANN's with image data: Input image data can vary greatly, and
+  ideally we want to build a model that is robust regardless of the placement
+  and orientation of objects in the image. This is called translation
+  invariance. A CNN comes close by feeding the input image through consecutive
+  convolution layers, each layer producing multiple feature maps, each map
+  capturing different features of the image -- for example, in one layer we
+  might have a set of neurons in a given layer which solely detect diagonal
+  rounded edges, and another set which boosts and captures the contrast between
+  foreground and background objects -- and then feeding the result of this
+  through downsampling (or pooling) layers, which extract defining features and
+  compresses the input into an exponentially smaller map of information.
+
+  This downsampling greatly reduces computational overhead as opposed to a
+  regular ANN, however, a natural consequence, of course, is that we must trade
+  off translation invariance for -equivariance (ie. the output \emph{is}
+  affected by translation of the input, but the translation is similar and thus
+  predictable).
+
+
+  section 2: U-Net and implementation (L4B + L4C?)
+
+  describe the U-Net model for image segmentation.
+  contracting and expanding path.
+  idea is to extract features, then upsample the extracted features to something
+  resembling the input image, but just the important features.
+  example of such a network (graph, or just textual description????)
+
+  show example segmentation (and mention why it fails for that one stupid mask)
+
+  subsection 2.1 : training and cross-validation (L4C)
+
+  subsection 2.2: evaluation (L4D)
+  loss/accuracy graph. mention that loss seems to still be decreasing, which
+  might indicate a necessity for further fitting, however, validation loss seems
+  to have plateaued.
+  ROC graph and AUC. explain why AUC = 0.97 is pretty good.
+
+
+  section 3: skin lesion image binary classification (L4E)
+
+  very short description of dataset: benign/malignant. We want a binary
+  classification of the data cases.
+
+  subsection 3.1:
+  describe the model: same as prior U-Net model, but with a dense layer substituted
+  for the entire expanding path.
+
+  subsection 3.2: Regularization using data augmentation
+  The supplied training data is heavily imbalanced with 80.8\% benign cases.
+  With the data as is, the model is very likely to simply always predict
+  ''benign``, for a training accuracy of $\sim 80.8\%$. In cases such as this
+  one, data augmentation is a suitable regularization method, can be used to
+  straighten out the imbalance. Hence, I augment the dataset with 522 malignant
+  cases for a total of 695, to better match the 727 benign cases, using random
+  rotation, translation, noise/blur, and brightness/contrast.
+
+  subsection 3.x: classifier assessment
+
+  subsubsection: assessing training process
+
+  show loss/accuracy of training process. explain that this can be used to
+  assess whether model tweaking or more fitting is needed (decreasing loss can
+  indicate need for more fitting; small loss but unexpected accuracy can
+  indicate bad local minimum, which can further indicate overly complex model or
+  not enough training data).
+
+  subsubsection: assessing results
+
+  After training: run on test data.
+  receiver operating characteristic curve
+}\fi
+
+
+\documentclass{llncs}
+
+\input{commands_and_packages.tex}
+
+\title{MIA Assignment 4}
+\author{Anders Holst (wlc376)}
+\institute{}
+
+\begin{document}
+
+\pagenumbering{arabic}
+\maketitle
+
+\input{1.tex}
+\input{2.tex}
+\input{3.tex}
+
+\newpage
+
+% \begin{thebibliography}{8}
+
+  % \bibitem{ronneberger}
+  %   Ronneberger, Olaf; Fischer, Philipp; Brox, Thomas. \textit{U-Net:
+  %   Convolutional Networks for Biomedical Image Segmentation}. arXiv:1505.04597.
+  %   \url{https://arxiv.org/abs/1505.04597}.
+  % \bibitem{wu}
+  %   Wu, Zufeng; Lan, Tian; Wang, Jiang; Ding, Yi; Qin, Zhiguang. \textit{Medical
+  %   Image Registration Using B-Spline Transform}. School of Information and
+  %   Software Engineering, University of Electronic Science and Technology of
+  %   China.
+  %
+  %   \url{https://ijssst.info/Vol-17/No-48/paper1.pdf}.
+
+% \end{thebibliography}
+
+\end{document}

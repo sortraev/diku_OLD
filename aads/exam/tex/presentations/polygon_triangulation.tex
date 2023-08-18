@@ -1,0 +1,139 @@
+
+
+\newpage
+\subsection{Polygon triangulation}
+
+\begin{enumerate}
+  \item hello.
+
+  \item motivation: is for example used in computer graphics, the art gallery
+    theorem, and many other parts of computational geometry.
+
+  \item a polygon triangulation is a partitioning of a polygon into a set of its
+    constituent triangles. All polygons can be triangulated, even with the
+    method I will present today, but we shall only concern ourselves only with
+    triangulation of \emph{simple polygons}. A polygon is \emph{simple} if it
+    does not intersect itself and has no holes.
+
+  \item let's see an example: *\emph{see \cref{fig:monotonization_example}}.
+
+  \item the method of triangulation we will be looking at today is based on
+    monotonization and can triangulate a simple polygon with $n$ vertices in
+    $O(|V| \lg |V|)$ time.
+
+  \item a y-monotone polygon is a simple polygon which is intersected at most 2
+    times by any given straight line in the plane orthogonal to the y-axis.
+
+  \item what is triangulation and (y-)monotonicity of polygons?
+
+  \item triangulation of monotone polygons in $O(n)$ time.
+
+  \item monotonization of simple polygons in $O(n * \lg n)$ time.
+
+  \item show that the number of vertices in the set of monotone subpolygons is
+    $\leq 3n - 6 = O(n)$.
+
+\end{enumerate}
+
+
+
+
+\newpage
+\subsubsection{Pseudocode}
+
+
+\paragraph{Polygon monotonization}
+
+Helper functions
+\begin{minted}{python}
+HANDLE_START_VERTEX(v, T, _):
+    T.insert(v.next(), helper = v)
+
+HANDLE_END_VERTEX(v, T, D):
+    w = v.prev().helper
+    if w.type == MERGE:
+        D.insert((v, w))
+    T.delete(v.prev())
+
+HANDLE_SPLIT_VERTEX(v, T, D):
+    e_j = T.left_of(v)
+    D.insert((v, e_j.helper))
+    e_j.helper = v
+
+    T.insert(v.next(), helper = v)
+
+HANDLE_MERGE_VERTEX(v, T, D):
+    HANDLE_END_VERTEX(v, T, D)
+
+    e_j = T.left_of(v)
+    w = e_j.helper
+    if w.type == MERGE:
+        D.insert((v, w))
+    e_j.helper = v
+
+HANDLE_REGULAR_VERTEX(v, T, D):
+    if polygon is to the right of v:
+        HANDLE_END_VERTEX(v, T, D)
+        T.insert(v.next(), helper = v)
+    else:
+        # this case is similar to second half of HANDLE_MERGE_VERTEX.
+        e_j = T.left_of(v)
+        w = e_j.helper
+        if w.type == MERGE:
+            D.insert((v, w))
+        e_j.helper = v
+    
+\end{minted}
+\begin{minted}{python}
+MAKE_MONOTONE(D):
+    V = D.V sorted descendingly by height.
+    n = |V|
+
+    T = # empty status structure (binary search tree), consisting of tuples
+        # ((v, u), w), where (v, u) is an edge and w is its helper.
+
+    for i = 1 .. n:
+        case V[i].type of
+          START: HANDLE_START_VERTEX  (V[i], T, D)
+          END:   HANDLE_END_VERTEX    (V[i], T, D)
+          SPLIT: HANDLE_SPLIT_VERTEX  (V[i], T, D)
+          MERGE: HANDLE_MERGE_VERTEX  (V[i], T, D)
+          _:     HANDLE_REGULAR_VERTEX(V[i], T, D)
+    return D
+\end{minted}
+
+\paragraph{Monotone polygon triangulation}~\smallskip
+
+When sorting \texttt{D.V}, do so by merging the two chains starting at the
+top-most vertex. The top-most vertex is found in linear time, and the merge is
+then also done in linear time using the DCEL. While merging, mark vertices by
+which chain they are on.
+
+\begin{minted}{python}
+TRIANGULATE_MONOTONE_POLYGON(D):
+    n  = |P.D.V|
+    V  = # D.V sorted descendingly by height using a merge of chains,
+         # marking vertices with their chain ID.
+    S  = # empty stack.
+    S.push(V[1]); S.push(V[2])
+
+    for i = 3 to n - 1:
+
+        if V[i].chain != S.top().chain then:
+            while len(S) > 1: # draw diagonals to all but bottom of stack.
+                D += (V[i], S.pop())
+            S.pop() # clear the stack.
+            S.push(V[i]); S.push(V[i- 1])
+        else: # V[i] and S.top() on the same chain.
+            u = S.pop() # backup top element. since it is on same chain
+                        # as V[i], there cannot be a diagonal here.
+            while (V[i], S.top()) is a valid diagonal in D:
+                u = S.pop()
+                D += (V[i], u)
+            S.push(u); S.push(V[i])
+
+    S.pop()
+    while len(S) > 1:        # add diagonals from bottom vertex to all
+        D += (V[n], S.pop()) # but the top and bottom of the stack.
+    S.pop()
+\end{minted}

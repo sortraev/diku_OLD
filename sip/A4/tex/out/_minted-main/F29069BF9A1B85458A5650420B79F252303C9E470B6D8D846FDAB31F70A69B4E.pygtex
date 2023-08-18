@@ -1,0 +1,4 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{def} \PYG{n+nf}{cdf\PYGZus{}substitution}\PYG{p}{(}\PYG{n}{img}\PYG{p}{,} \PYG{n}{cdf} \PYG{o}{=} \PYG{k+kc}{None}\PYG{p}{):}
+    \PYG{k}{return} \PYG{p}{(}\PYG{n}{cdf} \PYG{k}{if} \PYG{n}{cdf} \PYG{o+ow}{is} \PYG{o+ow}{not} \PYG{k+kc}{None} \PYG{k}{else} \PYG{n}{img\PYGZus{}cdf}\PYG{p}{(}\PYG{n}{img}\PYG{p}{))[}\PYG{n}{img}\PYG{p}{]}
+\end{Verbatim}

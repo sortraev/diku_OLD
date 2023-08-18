@@ -1,0 +1,183 @@
+\subsection{Max flow}
+
+\begin{enumerate}
+
+  \item hello. today's topic is max flow.
+
+  \item the most obvious applications of max flow are perhaps networking routing
+    and bipartite matching, but max flow is also used in for example image
+    segmentation.
+
+  \item today we'll be looking at the Edmonds-Karp algorithm, a formalization
+    and improvement on the Ford-Fulkerson method.
+
+  \item for the sake of time conservation, I will assume you are familiar with
+    the max flow problem. If not, please let me know now. In addition, I will
+    omit a number of definitions such as flow conservation.
+
+  \item I will also not go too much in depth with Ford-Fulkerson, except to say
+    that the method is as follows: as long as there exists an augmenting path
+    $p$ (ie. a path with positive capacity for each edge in the path): send the
+    maximum amount of flow along each edge in this path. \emph{This maximum
+    amount of flow is determined by the minimum residual edge capacity in the
+    path, and this amount is added to the forward edges and subtracted from the
+    residual edges.}
+
+  \item Ford-Fulkerson does not specify how to find augmenting paths. This
+    yields a worst-case complexity of $O(|E| * |f|)$.
+
+  \item Edmonds-Karp is a formalization of Ford-Fulkerson which uses BFS to find
+    augmenting paths. In this BFS, all edges have weight 1, but a vertex $v$
+    is only reachable from $u$ if the edge $(u, v)$ has leftover capacity
+    \emph{or} if $(u, v)$ is a backwards edge and there is positive flow on the
+    forward edge $(v, u)$.
+
+  \item let's see an example: *\emph{show example in
+    \cref{fig:max_flow_example}}*. Please note that the state of the example
+    graph is not obtainable through normal execution of Edmonds-Karp, since
+    here, we have augmented using a path that is not a shortest path in the
+    graph. This is simply chosen in order to illustrate flow cancellation.
+
+  \item anyway, let's use Edmonds-Karp to finish computing this max flow (see
+    \cref{sec:edmonds_karp_example}).
+
+  \item the runtime of Edmonds-Karp is $O(|V| * |E|^2)$, since each BFS takes
+    $O(|E|)$ time and there are $O(|V| * |E|)$ iterations. I will prove the
+    latter statement using Christian's simplified proof.
+
+  \item before proving the statement, I prove a necessary lemma.
+
+  \item first, please note that I use $G_i = G_{f_i}$ and $\delta_i =
+    \delta_{f_i}$ for convenience.
+
+  \item let $G_0$ be the state of the residual graph at some point during
+    iteration of Edmonds-Karp, and consider $f_1, \dots, f_k$, a sequence of
+    flows for the next $k \geq 0$ iterations for which the shortest path length
+    from source to target remains the same, ie. $d = \delta_0(s, t) =
+    \delta_i(s, t)$ for all $i = 0 ... k - 1$.
+
+  \item under these assumptions, the lemma states that flow is only pushed along
+    edges that are forward edges in $G_0$, and that after the $k$'th iteration
+    we have $\delta_k(s, t) \geq d$.
+
+  \item the proof is by induction. The base case is $k = 0$. Trivially, flow is
+    pushed through forward edges in $G_0$ for all $k = 0$ iterations. and here
+    we trivially have $d = \delta_i(s, t)$ for all $i$ since the range is empty,
+    and since we have $\delta_k(s, t) = \delta_0(s, t)$, we also have
+    $\delta_k(s, t) \geq d$.
+
+  \item assume that the claim holds for $k - 1$, ie. that flow has only been
+    pushed through forward edges in $G_0$ for the last $k - 1$ iterations and
+    that $\delta_{k - 1}(s, t) = d$.
+
+  \item we obtain $G_k$ from $G_{k - 1}$ by augmenting along a shortest path $p$
+    in $G_{k - 1}$. We know that for each edge $(u, v) \in p$, we have
+    $\delta_0(s, v) \leq \delta_0(s, u) + 1$, since $(u, v)$ can be either a
+    forward edge or a cancellation.\label{item:foo}
+
+  \item however, since we know the shortest path to be $\delta_0(s, t) = d$, and
+    any augmenting path is a shortest path, we must have $|p| = d$. Hence we
+    must have $\delta_0(s, v) = \delta_0(s, u) + 1$.
+
+  \item as for a shortest path $p$ in $G_k$, a similar argument to point
+    \ref{item:foo} applies: for each edge $(u, v)$ in $p$ we must have
+    $\delta_0(s, v) \leq \delta_0(s, u) + 1$, but we cannot say whether these
+    are exclusively forward edges since we don't (necessarily) have $\delta_k(s,
+    t) = \delta_0(s, t)$. Hence we can conclude $\delta_k(s, t) \geq d$, but
+    nothing more.
+
+  \item this concludes the lemma. The theorem I want to prove is then: the
+    number of iterations in Edmonds-Karp is $O(|V| * |E|)$.
+
+  \item consider $f_0, \dots, f_{k - 1}$ a maximum length sequence of flows for which
+    the length of the augmenting path remains the same. In other words, we have
+    $d = \delta_0(s, t) = \delta_i(s, t)$ for all $i = 0...k - 1$. Since the
+    sequence was chosen to be maximal, we have $\delta_k \neq d$.
+
+  \item by the previous lemma, we have $k \leq |E|$, since $G_0$ has at most
+    $|E|$ forward edges and at least one edge is removed in each iteration of
+    Edmonds-Karp (if zero edges are removed, then either we pushed flow along a
+    backwards edge, which contradicts the lemma, \emph{or} we didn't fully
+    satuate the new augmenting path, which is against the algorithm
+    specification).
+
+  \item By the lemma we also have $\delta_k(s, t) \geq d$, but by the previous
+    assumption we also have $\delta_k(s, t) \neq d$, and hence we must have
+    $\delta_k(s, t) > d$. In other words, the length of the augmenting path has
+    increased by at least 1.
+
+  \item Since the maximum possible length of an augmenting path is $|V| - 1$,
+    the shortest path length will increase at most $O(|V|)$ times, and each
+    increase takes at most $O(|E|)$ iterations, hence the number of iterations
+    is bounded by $O(|V| * |E|)$.
+
+  \item this concludes the proof. since each iteration involves a BFS of time
+    $O(|V| + |E|) = O(|E|)$, the total runtime of Edmonds-Karp is $O(|V| *
+    |E|^2)$.
+
+\end{enumerate}
+
+\subsubsection{Edmonds-Karp example}
+\label{sec:edmonds_karp_example}
+
+\begin{enumerate}
+
+  \item the first iteration of Edmonds-Karp begins with a BFS from $s$.
+
+  \item in the first iteration of this BFS, we discover nodes $a$ and $b$.
+
+    in the second iteration, we discover no new neighbors to $a$, since $b$ is
+    already found and $t$ is not reachable from $a$ because the edge $(a, t)$ is
+    at full capacity. However, from $b$ we discover $t$ and the BFS terminates.
+    the augmenting path is $p = \langle s, b, t\rangle$, and we can augment by
+    1, since this is the minimum residual capacity on $p$.
+
+  \item in the second iteration of Edmonds-Karp, we start a new BFS from $s$. we
+    find only $l$, since the edge $(s, b)$ is at full capacity and thus $b$ is
+    not reachable.
+
+  \item in the first iteration of the second BFS, we again find $a$, but $b$ is
+    not found since the edge $(s, b)$ is at full capacity and thus $b$ is not
+    reachable.
+
+    in the second iteration, we discover $b$ through the backwards edge from
+    $a$. in the third iteration, we find $t$ from $b$ and the BFS terminates.
+
+    the path is thus $p = \langle s, a, b, t \rangle$, and the minimum capacity
+    on $p$ is equal to the backwards edge $(a, b)$, which has capacity 2 since
+    that is the value of the flow from $b$ to $a$. we thus augment with 2 and
+    cancel the 2 on edge $(b, a)$.
+
+  \item in the third iteration of Edmonds-Karp, we once again start a new BFS
+    from $s$.
+
+  \item in the first iteration of this BFS, we find $a$, but $b$ is not
+    reachable. in the second iteration, there are no reachable nodes from $a$
+    and the BFS terminates unsuccessfully.
+
+  \item since there are no more augmenting paths, Edmonds-Karp terminates.
+
+\end{enumerate}
+
+\subsubsection{Assumptions}
+
+\paragraph{Value of a flow $f$} is equal to the flow leaving the source minus the flow
+entering the source (we typically only send flow into the source in residual
+networks):
+\begin{align}
+  |f| = \sum_{v \in V} f(s, v) - \sum_{v \in V} f(v, s).
+\end{align}
+
+\paragraph{Flow conservation:} for any $u$, the total flow going into $u$ is the same as the
+total flow leaving $u$:
+\begin{align}
+  \sum_{v \in V} f(v, u) = \sum_{v \in V} f(u, v).
+\end{align}
+
+\paragraph{Capacity constraint:} for all $u,\, v \in V$ we require:
+
+\begin{align}
+  0 \leq f(u, v) \leq c(u, v).
+\end{align}
+
+For $(u, v) \not \in E$, we have $f(u, v) = c(u, v) = 0$.

@@ -1,0 +1,158 @@
+\newpage
+\subsection{Exact exponential algorithms and fixed parameter tractability}
+
+\subsubsection{EEA}
+
+\begin{enumerate}
+  \item today's topic: exact exponential algorithms and parameterized
+    complexity!
+
+  \item motivation: in complexity theory we usually want algorithms that are:
+    fast (ideally we want polynomial time); universal (should handle all
+    problem instances, even hard cases); and exact (no approximations).
+
+    With hard problems we may have to relax at least one of these wishes. Today
+    we discuss relaxation of the first two points.
+
+  \item first, EEA. We relax the desire for speed. Consider the NP class of
+    problems. We know that there exist exponential solutions to all problems in
+    NP, since we can simply guess all $O(2^n)$ possible solutions and check each
+    against our certificate for a total complexity of $O^\ast(2^n)$.
+
+  \item as such, exact exponential functions are easily found for all problems
+    in NP. For problems in NP-hard but not in NP, we may have to be smart.
+
+  \item I will assume you are familiar with big-O-star notation. if not, please
+    shout NOW! :)
+
+    \begin{textgray}
+    let's introduce O-star notation, a variant of the big-$O$ notation, which
+    is useful when considering exponential time algorithms since it allows us to
+    ignore polynomial factors:
+
+    $$f(n) \in O^\ast(g(n)) \iff \exists c \in \mathbb R : f(n) \in O(n^cg(n))$$
+
+    since even though the poly term is multiplicative and not additive, we
+    ignore it when $n$ is sufficiently large. Using this, NP problems can be
+    solved by brute-force in $O^\ast(2^n)$ time, where $n$ is the number of bits
+    in the representation.
+
+    This of course means that we may have two algorithms where one is faster
+    than the other in terms of big-$O$ notation, but equal in terms of
+    big-$O$-star notation.
+    \end{textgray}
+
+  \item let's look at an example of an NP-hard problem: TSP. Ignoring poly
+    factors, the brute-force solution is factorial in the number of vertices $n$
+    (ie. $O^\ast(n!)$), but the Held-Karp algorithm can solve it in
+    $O^\ast(2^{n})$ time.
+
+  \item the Held-Karp algorithm is a bottom-up dynamic programming algorithm.
+    While there is no way to clearly define optimal substructure of the TSP
+    problem, Held-Karp uses optimal substructure of minimal length paths.
+    For every pair $(S, v_i)$, where $S$ is a nonempty subset of ${v_2, \dots,
+    v_n}$ and $v_i \in S$, it computes $\OPT(S, v_i)$, the minimal length tour
+    from $v_1$ to $v_i$ which visits all vertices in $S$ exactly once.
+
+    We iteratively compute $\OPT(S, v_i)$ for all possible subsets of $S$ in
+    increasing order of the size of subsets. OPT is defined as such:
+
+    \begin{textred}
+    \begin{alignat*}{4}
+      \OPT(\{v_i\}, v_i) &= d(v_1, v_i), \quad &&\text{when } S = \{v_i\},\\[4pt]
+      \OPT(S, v_i) &= \min\left\{\OPT(S', v_j) + d(v_j, v_i) : v_j \in S' = S
+      \setminus \{v_i\} \right\}  ,\quad &&\text{when } |S| > 1.
+    \end{alignat*}
+    \end{textred}
+
+  \item wrt. time complexity, let's consider the pseudocode for Held-Karp
+    *\emph{see TSP pseudocode in \cref{code:tsp}}*.
+
+    The complexity is dominated by the nested for loop in lines 4-8, since the
+    loop in lines 2-3 and the final min operation in lines 9-10 each take linear
+    time.
+
+    So let's look at the loop nest. The loop in line 4 considers each possible
+    subset size $j = 2 .. n - 1$, which gives an outer summation
+    from $j = 2 .. n - 1$.
+
+    Then, in line 5, we consider every subset $S$ with $|S| = j$. Since we omit
+    $c_1$, there are \textcolor{red}{$\binom{n-1}{j}$} such possible subsets.
+
+    Finally, the loop in line 6 iterates $S$ and computes a minimum over $(j-1)$
+    different OPT values for each value in $S$, which can be represented with
+    the summation \textcolor{red}{$\sum_{i = 1}^j (j - 1)$}.
+
+    In summary, the complexity is:
+
+    \begin{textred}
+    \begin{alignat*}{4}
+      \sum_{j = 2}^{n - 1}\binom{n - 1}{j}\sum_{i = 1}^j (j - 1)\quad&\leq\quad
+      n^2\sum_{j = 1}^n\binom{n}{j}\\
+      &=\quad n^2*2^n\\
+      &=\quad O(n^2*2^n)\\
+      &=\quad O^\ast(2^n).
+    \end{alignat*}
+    \end{textred}
+
+
+  \item wrt. space complexity: for each of the $O(2^n)$ different cycles (ie.
+    subsets of $S$), we have to store that cycle during the run. Each cycle
+    comprises $O(n)$ vertices, hence the space complexity is \textcolor{red}{$O(2^n * n) =
+    O(2^{n + \lg n}) = O^\ast(2^n)$}.
+\end{enumerate}
+
+\subsubsection{FPT}
+
+\begin{enumerate}
+  \item next, we have parameterized complexity. this is the study of the
+    complexity of certain problems when we fixate one or more parameters to the
+    problem which may or not be independent of the actual problem size.
+
+    As an example, we will discuss k-vertex-cover, a decision problem variant of
+    min vertex cover, and analyze its complexity as we fixate $k$ to a small
+    value.
+
+  \item I will assume you are familiar with the k-vertex cover problem. if not,
+    please let me know now! :)
+
+  \item anyway, the k-vertex cover problem is NP-complete, meaning we at least
+    know of a $O^\ast(2^n)$ time brute-force solution.
+
+  \item a slightly better brute-force solution is to enumerate the $\binom{n}{k}
+    = O(n^k)$ ways to select $k$ vertices from $n$ vertices and check if any of
+    them is a vertex cover. this is polynomial for fixed $k$, which is nice, but
+    it is not considered FPT since the superpolynomial factor of the runtime is 
+    a function of $n$ and $k$, not $k$ exclusively.
+
+  \item let's find an FPT algorithm to solve the problem. To do so, we use the
+    fact that for each edge in the graph, at least one of the endpoints must be
+    in the vertex cover:
+
+    \begin{align}
+      \forall (u, v) \in E\, :\, u \in V' \  \lor \ v\in V'.
+    \end{align}
+
+  \item it works as such: given a graph $G$, pick a random edge $(u, v) \in E$;
+    add $u$ to the cover by removing its incident edges (since these are now
+    ``covered''), decrement $k$, and recurse on the resulting graph. if at the
+    start of a recursive call $E$ is empty, then the answer is yes, because all
+    edges have been covered; else if $k > 0$, we keep recursing with the current
+    graph; else, if there are edges left but no more room for vertices in the
+    cover, then the answer is no: go back up the recursion tree and retry with
+    $v$ in place of $u$.
+
+  \item the recursion tree has height $O(k)$ (since we may stop before $k$
+    reaches 0), and in each call up to 2 recursive calls are made, so the tree
+    is binary and hence the number of recursive calls is $O(2^k)$.
+
+  \item if we apply kernelization before running the tree search, we can ensure
+    that each of the $n$ vertices has at most $k$ neighbours, and then the
+    time taken to create the subgraphs at each step is $O(nk)$. this
+    kernelization takes time $O(m)$.
+
+  \item hence the total runtime is $O(m + 2^k * n * k)$. Since the
+    superpolynomial factor is only a function of $k$, we have found an FPT
+    algorithm for k-vertex cover. success!
+
+\end{enumerate}

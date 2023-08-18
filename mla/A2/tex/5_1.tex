@@ -1,0 +1,85 @@
+\section{Logistic Regression}
+
+
+\subsection{Cross-entropy error measure}
+
+\subsubsection{Part (a)}
+
+In the maximum likelihood method, we want to maximize the likelihood -- but
+instead of differentiating a product, we instead maximize the log-likelihood
+\textit{or}, as I will do, minimize its negative, which amounts to
+differentiating the negative log-likelihood function given by:
+
+\begin{align}
+  - \sum_{n = 1}^N \lnb{\PP{y_n | x_n}}\label{eq:log_likelihood}
+\end{align}
+
+For logistic regression with labels $Y \in \{-1, 1\}$, we have: 
+
+\begin{align*}
+  \PP{Y = y\ |\ X = x} = 
+\begin{cases}
+  h(x),\quad &y = 1\\
+  1 - h(x),\quad &y = -1
+\end{cases}
+\end{align*}
+
+Using the indicator function, the above definition can be rewritten into
+something which is not piecewise but which still splits the two cases
+rewritten into something that allows us to split the two cases (note the use of
+bracket notation for the indicator function, as in Abu Mostafa):
+
+\begin{align*}
+  \PP{Y = y\ |\ X = x}\ =\ \booltoint{y = 1} * h(x)\ +\ \booltoint{y = -1} * (1 -
+  h(x))
+\end{align*}
+
+And then \cref{eq:log_likelihood} becomes:
+
+\begin{align*}
+  - \sum_{n = 1}^N \left(\booltoint{y_n = 1}\lnb{h(x)}\ +\ \booltoint{y_n = -1} \lnb{1 -
+  h(x)}\right).
+\end{align*}
+
+Using $\lnb{a} = -\lnb{a^{-1}}$:
+\begin{align}
+  \sum_{n = 1}^N \left(\booltoint{y_n = 1} \lnb{\frac{1}{h(x)}}\ +\
+  \booltoint{y_n =
+  -1}\lnb{\frac{1}{1 - h(x)}}\right).
+  \label{eq:end_part_a}
+\end{align}
+\qed
+
+\subsubsection{Part (b)}
+
+\noindent For the case $h(\mbf x) = \mysigx$, we have:
+\begin{align*}
+  \lnb{\frac{1}{\mysigx}}    &= \lnb{1 + e^{-\mbf w^{\text{T}} \mbf x_n}},\\[6pt]
+  \lnb{\frac{1}{1 - \mysigx}} &= \lnb{1 + e^{\mbf w^{\text{T}} \mbf x_n}}.
+\end{align*}
+
+\noindent Substituting this into \cref{eq:end_part_a}, we get:
+
+\begin{align*}
+  \sum_{n = 1}^N \left(\booltoint{y_n = 1} \lnb{1 + e^{-\mbf w^{\text{T}} \mbf x_n}}\ +\ \booltoint{y_n =
+  -1}\lnb{1 + e^{\mbf w^{\text{T}} \mbf x_n}}\right).
+\end{align*}
+
+\noindent At this point, please note that:
+\begin{align*}
+  \lnb{1 + e^{-\mbf w^{\text{T}} \mbf x_n}} = \lnb{1 + e^{-y_n \mbf w^{\text{T}} \mbf x_n}}, \quad
+  &\text{when } y_n = 1,\\[4pt]
+  \lnb{1 + e^{\mbf w^{\text{T}} \mbf x_n}} = \lnb{1 + e^{-y_n \mbf w^{\text{T}} \mbf x_n}}, \quad
+  &\text{when } y_n = -1.
+\end{align*}
+
+\noindent Using this knowledge we can collapse the terms in the logairhtm as
+such:
+
+\begin{align*}
+  \sum_{n = 1}^N \lnb{1 + e^{-y_n\mbf w^{\text{T}} \mbf x_n}}.
+\end{align*}
+
+\noindent Finally, minimizing this function is equivalent to minimizing the same
+function scaled by $\tfrac{1}{N}$, thus concluding the proof.
+\qed

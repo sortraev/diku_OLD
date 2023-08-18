@@ -1,0 +1,102 @@
+% \documentclass[a4paper,12pt]{article}
+%
+% \input{commands_and_packages.tex}
+%
+% \newcommand{\concat}{\ensuremath{+\!\!\!\!+\,}}
+% \newcommand{\rpm}{\raisebox{.2ex}{$\scriptstyle\pm$}}
+% \newcommand{\resub}[1]{\textcolor{red}{#1}}
+% \newcommand{\blue}[1]{\textcolor{blue}{#1}}
+% \newcommand{\ltt}{\sqsubseteq}
+% \newcommand{\twodots}{\mathinner {\ldotp \ldotp}}
+%
+% \title{\large MIA -- Hand-in 3}
+% \author{{\footnotesize Anders Lietzen Holst (wlc376)}\\ {\footnotesize \today}}
+%
+% \date{}
+
+% % (L3C) Describe regularization.
+
+% % (L3E) Implement a non-rigid registration in python, including a
+% %         transformation model and a similarity measure.
+%
+% % (L3B) Describe the role of similarity measure.
+% % (L3A) Describe what the registration problem is.
+% % (L3D) Knowledge of the different types of transformations.
+
+
+\iffalse{
+  >> disposition
+
+  section 1:
+  * describe registration -- geometrically transform an image into (something
+      geometrically resembling) another. useful tool to be able to compare
+      different images of the same thing (or the same thing in different
+      bodies). For example, if two images are created using the same modality
+      (x-ray, MRI, etc) and are aligned wrt. the subject, determining the
+      correlation may not be a problem at all, but sometimes we may eg. want to
+      compare an x-ray to an MRI, or to compare an image of one body to the
+      image of another, perhaps taken with no knowledge of the first image.
+
+  * when is it used and why
+  * supervised algorithm; needs training data
+
+
+  section 2:
+  steps of the algorithm -- in particular, describe similarity:
+
+    pixelwise similarities (eg. MSE) and (normalized) cross correlation match
+    pixel intensities, but we often want to match \textit{patterns}: hence
+    mutual image information, based on joint entropy.
+
+    The mutual information $MI(I, J)$ measures the amount of information one can
+    obtain about an image $I$ from the image $J$, and vice versa, and is given
+    by the double sum over image pixels:
+
+
+\begin{align*}
+  MI(\mathcal I, \mathcal J) &= \sum_{i \in \mathcal I} \sum_{j \in \mathcal J}
+  p(i, j) \log{3}\TODO{this}
+\end{align*}
+
+  and an image registration is finished when the mutual information is
+  \textit{maximized}.
+
+
+  section 3:
+  * different types of transformations: rigid, non-rigid
+
+  * regularization?
+
+}\fi
+
+
+
+\documentclass{llncs}
+
+\input{commands_and_packages.tex}
+
+\title{Mia Assignment 3}
+\author{Anders Holst (wlc376)}
+\institute{}
+
+\begin{document}
+
+\pagenumbering{arabic}
+\maketitle
+
+\input{1.tex}
+\input{2.tex}
+
+
+\begin{thebibliography}{8}
+  \bibitem{wu}
+    Wu, Zufeng; Lan, Tian; Wang, Jiang; Ding, Yi; Qin, Zhiguang. \textit{Medical
+    Image Registration Using B-Spline Transform}. School of Information and
+    Software Engineering, University of Electronic Science and Technology of
+    China.
+
+    \url{https://ijssst.info/Vol-17/No-48/paper1.pdf}.
+
+\end{thebibliography}
+
+\end{document}

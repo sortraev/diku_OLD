@@ -1,0 +1,101 @@
+\newcommand{\infint}{\int\limits_{-\infty}^\infty}
+\section{Image filtering}
+
+\subsection{Finite diffference kernels}
+
+\emph{Note: In the following, I assume that $x$-coordinates grow left to right,
+and that $y$-coordinates grow bottom up, as in a regular coordinate system.}
+
+To compute the finite difference approximation using correlation, the kernels
+should be:
+\begin{align*}
+  y\text{-derivative correlation kernel: }&\quad
+  \frac 1 2
+  \begin{bmatrix}
+    1\\
+    0\\
+   -1
+  \end{bmatrix},\\
+  x\text{-derivative correlation kernel: }&\quad
+  \frac 1 2
+  \begin{bmatrix}
+    -1 & 0 & 1
+  \end{bmatrix}.
+\end{align*}
+
+If we want to use convolution rather than correlation, the kernels should each
+be flipped since it is not symmetric, ie.:
+\begin{align*}
+  y\text{-derivative convolution kernel: }&\quad
+  \frac 1 2
+  \begin{bmatrix}
+    -1\\
+     0\\
+     1
+  \end{bmatrix},\\
+  x\text{-derivative convolution kernel: }&\quad
+  \frac 1 2
+  \begin{bmatrix}
+    1 & 0 & -1
+  \end{bmatrix}.
+\end{align*}
+
+For all kernels, the center pixel is the second element of the kernel, ie. the 0
+in each kernel. For symmetric kernels such as the Gaussian or mean filter
+kernels, correlation and convolution produce the same result, since
+flipping/reflecting a symmetric function/kernel yields the same kernel.
+
+\newpage
+\subsection{Linear separability of Prewitt and Sobel}
+
+\emph{The assignment text does not state whether to write the correlation or
+convolution filters, so I choose convolution. Also, I again assume that x grows
+left to right, and that y grows upwards.}
+
+The two separated $y$-derivative \textbf{convolution} filters are:
+\begin{align*}
+  \text{Prewitt }y\text{-derv. convolution kernel}: &\quad
+  \begin{bmatrix}
+    1 & 1 & 1\\
+    0 & 0 & 0\\
+    -1 & -1 & -1 
+  \end{bmatrix} = 
+  \begin{bmatrix}
+    1\\0\\-1
+  \end{bmatrix} * 
+  \begin{bmatrix}
+    1 & 1 & 1
+  \end{bmatrix},\\[12pt]
+  \text{Sobel }y\text{-derv. convolution kernel}: &\quad
+  \begin{bmatrix}
+    1 & 2 & 1\\
+    0 & 0 & 0\\
+    -1 & -2 & -1 
+  \end{bmatrix} = 
+  \begin{bmatrix}
+    1\\0\\-1
+  \end{bmatrix} * 
+  \begin{bmatrix}
+    1 & 2 & 1
+  \end{bmatrix}.
+\end{align*}
+
+The Prewitt and Sobel operators are more likely to be robust to noise than the
+simple finite difference approximation for the following reason. An image edge
+exists where there is a sudden change in pixel intensity between two
+neighbouring (groups of) pixels. However, we typically think of an edge as a
+sequence of pairwisely neighbouring pixels for which a smooth curve can be drawn
+in the cartesian space which visits each pixel in order, such that each
+neighbouring pair of pixels share similar pixel intensities, and such that for
+each pixel in the sequence, its neighbouring pixel in the direction
+\emph{perpendicular} to the edge sequence have significantly different pixel
+intensities to that of the edge pixel.
+
+The Prewitt and Sobel operators each respect this notion of edges by not only
+considering the center pixel, but also the pixels above and below \emph{or} to
+the left and right of the center pixel, for the $x$- and $y$-derivatives,
+respectively, such that, for example, a single pixel that contrasts with its
+neighbours in the $x$-direction is not considered part of an edge unless it also
+contrasts, to some degree, with its diagonal neighbours in the $x$-direction,
+whereas the simple finite diff. approximation filters would regard a single
+noisy pixel as an edge on its own, regardless of the direction.

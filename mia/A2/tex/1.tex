@@ -1,0 +1,58 @@
+\section{Medical Image Segmentation}
+
+Perhaps the most commonly used technique in medical image analysis is
+\textit{segmentation}.
+% When imaging the inside of the human body, we are
+% typically interested in focusing on one or a small number of specific objects in
+% the imaged element, and while we for some imaging technologies (eg. SPECT) and
+% for some types of images are able to preparate the imaged subject with eg. radio
+% tracers that emphasize specific targets in the resulting image, we are in
+% general not very capable of isolating specific bodily objects using the raw
+% images alone.
+%
+This is the process of identifying and specific objects in a given image, and
+separating them from each other and/or from the background of the image, such
+that they can be examined in isolation.
+
+Many different methods exist for computer-assisted image segmentation -- in this
+report we shall discuss histogram-based, graph-based, and, briefly, shape-based
+image segmentation.
+
+
+\subsection{Histogram-based Segmentation}
+\label{sec:hist-seg}
+
+The simplest form of image segmentation is histogram-based segmentation. The
+idea behind is that if we can identify important (bands of) pixel intensities
+corresponding to target object/s, then we can isolate those objects by removing
+pixels which fall outside of those bands.
+
+In \cref{fig:hist-seg} an example noisy image is segmented using histogram-based
+segmentation. Since the image is known ahead of time to contain four significant
+segments, the histogram is performed using 10 bins, and the four largest histogram
+bands are extracted and used in thresholding.
+
+\begin{figure}%[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{figures/histogram_segmentation.png}
+  \caption{\small \textit{Histogram-based segmentation of an example image. Note
+  that only thresholdings of the two largest bins are shown here. Image created
+  using } \url{jspaint.app}.}
+\label{fig:hist-seg}
+\end{figure}
+
+
+The main advantage of the histogram method is \textit{simplicity} --
+however, the method can fail if object pixels are not distinct from background
+pixels, or if within one object pixels from different ends of the histogram
+spectrum exist, since then thresholding woulld inevitably only be able to target
+part of that particular object. The example in \cref{fig:hist-seg} was
+successful mainly because each object contained only one solid color
+(modulo noise), and because those four colors were relatively contrasting.
+
+Another related disadvantage is that the output segmentation might contain noise
+if the input has noise in the same histogram ranges as desired objects, as was
+the case in the example in \cref{fig:hist-seg}. In \cref{sec:morphs} we shall
+see discuss how to reduce such noise.
+
+\sectend

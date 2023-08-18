@@ -1,0 +1,26 @@
+
+pop rdi
+
+
+rsp+8*14: e82399ee9b1f9a52
+rsp+8*13: e82389aa52d79a52
+rsp+8*12: 0
+rsp+8*11: 7ffff7ffd000
+rsp+8*10: 7fffffffddf8
+rsp+8* 9: 0
+rsp+8* 8: 401050
+rsp+8* 7: 2a
+rsp+8* 6: 401203
+rsp+8* 5: 401030
+rsp+8* 4: 404040
+rsp+8* 3: 401203
+rsp+8* 2: 401040
+rsp+8* 1: 404040
+rsp+8* 0: 401203 -> pop rdi; ret
+
+401203: pop rdi; ret
+        rdi = 404040
+4010
+
+0x00007fffffffdcc8
+0x00007fffffffdcd0

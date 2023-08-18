@@ -1,0 +1,95 @@
+\section{The Radon Transform}
+
+In broad and sparse terms, the Radon transform $\mbf R\{f(\mbf x)\}$ of some
+object function $f(\mbf x)$ for $\mbf x \in \mathbb R^n$ is a transformation
+from the spatial domain $\mathbb R^n$ onto some chosen projection space in
+$\mathbb R^{n - 1}$ -- the transform is then given by the set of hyperplane
+integrals over all hyperplanes in the spatial domain perpendicular to the
+projection space. By changing the angle of projection, the $(n-1)$-dimensional
+volume of the object function $f$ can be ``viewed'' from different
+angles.
+
+However, for the purposes of image de- and reconstruction, we shall restrict our
+view to object functions of two dimensions, ie. images. 
+
+Radon proved in 1917\cite{radon} that given infinitely many projections, the
+original image can be accurately reconstructed. Since we are working with
+computers, we are limited to a finite number of projection angles, and thus to
+an \textit{approximation} of the original object function, the accuracy of
+which, however, increases with the number of projection angles.
+
+\subsection{Mathematical formular for the Radon transform}
+
+Using Dhawan's\cite{dhawan} definition and notation, the 2D Radon transform
+$\mbf R\{f(x, y)\}$ of some object function $f(x, y)$ is the projection $P(p,
+\theta)$ in the polar coordinate system given by the line integral:
+\begin{alignat*}{2}
+  P(p, \theta) = \mbf R_\theta\{f(x, y)\} = \int_{L_\theta} f(x, y) \ dl
+\end{alignat*}
+where $x \cos \theta + y \sin \theta = p$ and $L_\theta \subset \mathbb R^2$ is
+the set of lines with slope $\theta$. In other words, the Radon transform
+computes the infinite number of line integrals over the parallel
+paths whose slope is $\theta$, and thus $\text{img}(\mbf R_\theta\{f(x,
+y)\})$ is two-dimensional.
+
+\medskip
+
+We might wish to express the transform in terms of a rectangular coordinate
+system in the frequency domain. To do so, we rotate $(x, y)$ to $(p, q)$ by
+choosing:
+\begin{alignat*}{3}
+  p &=  &x \cos \theta + y \sin \theta~\\
+  q &= -&x \sin \theta + y \cos \theta,
+\end{alignat*}
+and then re-express the transform as:
+
+\begin{alignat}{2}
+  \mbf R_\theta\{f(x, y)\} =\int\limits_{-\infty}^\infty f(p \cos \theta - q \sin \theta, p \sin \theta + q
+  \cos \theta) \ dq. \label{eq:R}
+\end{alignat}
+
+
+\subsection{Proof: Linearity of the Radon transform}
+% I will only show linearity of the 2D Radon transform.
+\begin{proof}
+To prove linearity of the Radon transform $\mbf R_\theta$, it suffices to show:
+\begin{align}
+  \mbf R_\theta\{a\,f(x, y) + b\,g(x, y)\} = a \mbf R_\theta\{f(x, y)\} + b \mbf R_\theta\{g(x, y)\}
+  \label{eq:proof_end}
+\end{align}
+for object functions (eg. images) $f(x, y)$ and $g(x, y)$, and
+constants $a, b$.
+
+\noindent The proof relies on the sum and constant coefficient rules for integration,
+  which I shall not reiterate here.
+
+Starting from the LHS and using \cref{eq:R}:
+\begin{alignat*}{3}
+  \mbf R_\theta\{a\,f(x, y) + b\,g(x, y)\} &=
+    \int &a\,f(p \cos \theta - q \sin \theta,\ &p \sin \theta + q \cos
+    \theta)\\[-8pt]
+    &&+\, b\,g(p \cos \theta - q \sin \theta,\ &p \sin \theta + q \cos \theta)\
+    dq.
+\end{alignat*}
+\noindent Using the sum rule and constant coefficient rules for integration:
+\begin{align*}
+  \mbf R_\theta\{a\,f(x, y) + b\,g(x, y)\} =
+    &\quad \, \int a\,f(p \cos \theta - q \sin \theta,\ p \sin \theta + q \cos
+    \theta)\ dq\\[-6pt]
+     &+\, \int b\,g(p \cos \theta - q \sin \theta,\ p \sin \theta + q \cos \theta)\
+    dq\\[4pt]
+  =
+    &\quad \, \,  a \int f(p \cos \theta - q \sin \theta,\ p \sin \theta + q \cos
+    \theta)\ dq\\[-6pt]
+     &+\ b \int g(p \cos \theta - q \sin \theta,\ p \sin \theta + q \cos \theta)\
+    dq.
+\end{align*}
+\noindent Finally, using \cref{eq:R} in reverse on the summand integrals, I get:
+$$
+  \mbf R_\theta\{a\,f(x, y) + b\,g(x, y)\} =\ a \mbf R_\theta\{f(x, y)\} +\ b \mbf R_\theta\{g(x, y)\},
+$$
+  which is equivalent to \cref{eq:proof_end}, thus concluding the proof.
+\end{proof}
+
+
+\sectend

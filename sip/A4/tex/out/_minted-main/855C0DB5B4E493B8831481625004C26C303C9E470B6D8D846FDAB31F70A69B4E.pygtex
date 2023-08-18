@@ -1,0 +1,11 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{def} \PYG{n+nf}{scale\PYGZus{}fft}\PYG{p}{(}\PYG{n}{img}\PYG{p}{,} \PYG{n}{sigma}\PYG{p}{):}
+    \PYG{n}{n}\PYG{p}{,} \PYG{n}{m} \PYG{o}{=} \PYG{n}{s} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{asarray}\PYG{p}{(}\PYG{n}{img}\PYG{o}{.}\PYG{n}{shape}\PYG{p}{)}
+    \PYG{n}{X}\PYG{p}{,} \PYG{n}{Y} \PYG{o}{=} \PYG{n}{ifftshift}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{indices}\PYG{p}{(}\PYG{n}{s}\PYG{p}{),} \PYG{n}{axes} \PYG{o}{=} \PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{p}{))}
+
+    \PYG{c+c1}{\PYGZsh{} compute sigma for the frequency domain.}
+    \PYG{n}{sigma\PYGZus{}X}\PYG{p}{,} \PYG{n}{sigma\PYGZus{}Y} \PYG{o}{=} \PYG{n}{s} \PYG{o}{/} \PYG{p}{(}\PYG{l+m+mi}{2} \PYG{o}{*} \PYG{n}{np}\PYG{o}{.}\PYG{n}{pi} \PYG{o}{*} \PYG{n}{sigma}\PYG{p}{)}
+    \PYG{n}{F\PYGZus{}gauss} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{exp}\PYG{p}{(}\PYG{o}{\PYGZhy{}}\PYG{p}{((}\PYG{n}{X} \PYG{o}{\PYGZhy{}} \PYG{n}{n} \PYG{o}{//} \PYG{l+m+mi}{2}\PYG{p}{)} \PYG{o}{**} \PYG{l+m+mi}{2} \PYG{o}{/} \PYG{p}{(}\PYG{l+m+mi}{2} \PYG{o}{*} \PYG{n}{sigma\PYGZus{}X} \PYG{o}{**} \PYG{l+m+mi}{2}\PYG{p}{)} \PYG{o}{+}
+                       \PYG{p}{(}\PYG{n}{Y} \PYG{o}{\PYGZhy{}} \PYG{n}{m} \PYG{o}{//} \PYG{l+m+mi}{2}\PYG{p}{)} \PYG{o}{**} \PYG{l+m+mi}{2} \PYG{o}{/} \PYG{p}{(}\PYG{l+m+mi}{2} \PYG{o}{*} \PYG{n}{sigma\PYGZus{}Y} \PYG{o}{**} \PYG{l+m+mi}{2}\PYG{p}{)))}
+    \PYG{k}{return} \PYG{n}{ifft2}\PYG{p}{(}\PYG{n}{fft2}\PYG{p}{(}\PYG{n}{img}\PYG{p}{)} \PYG{o}{*} \PYG{n}{F\PYGZus{}gauss}\PYG{p}{)}\PYG{o}{.}\PYG{n}{real}
+\end{Verbatim}

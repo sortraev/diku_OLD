@@ -1,0 +1,47 @@
+\documentclass[a4paper,12pt]{article}
+
+\input{commands_and_packages.tex}
+
+\newcommand{\concat}{\ensuremath{+\!\!\!\!+\,}}
+\newcommand{\rpm}{\raisebox{.2ex}{$\scriptstyle\pm$}}
+\newcommand{\resub}[1]{\textcolor{red}{#1}}
+\newcommand{\blue}[1]{\textcolor{blue}{#1}}
+\newcommand{\ltt}{\sqsubseteq}
+\newcommand{\twodots}{\mathinner {\ldotp \ldotp}}
+
+\usepackage{graphicx, calc}
+\newlength\myheight
+\newlength\mydepth
+\settototalheight\myheight{Xygp}
+\settodepth\mydepth{Xygp}
+\setlength\fboxsep{0pt}
+
+
+% \usepackage{titling}
+
+
+\title{MLA 2022 - Exam}
+\author{Anders Holst\\Exam number: 87
+\raisebox{-1.2\mydepth}{\includegraphics[height=1.5\myheight]{figures/dewgong.png}}
+$\!\!$\thanks{Dewgong, Pokémon \#87.
+\url{https://archives.bulbagarden.net/media/upload/9/9b/Spr_1y_087.png}.}
+}
+
+% \author{foo\footnotetext{1}{foo}}
+
+\date{\today}
+
+
+
+\begin{document}
+\maketitle
+
+\newpage
+\input{1.tex} % DONE!
+\input{2.tex} % DONE!
+\input{3.tex} % DONE!
+\input{4.tex} % DONE!
+\input{5.tex} % DONE!
+\input{6.tex} % DONE!
+
+\end{document}

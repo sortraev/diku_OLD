@@ -1,0 +1,52 @@
+\section{Confidence Intervals for Bernoulli Distrbutions}
+
+I want to compute a two-sided 0.97-CI for the true mean behind distribution from
+which the sample given in \texttt{S.csv} is drawn.
+
+A good way to look at the problem is to say that I am looking for the bounds of
+a confidence interval such that 97\% of the probability mass falls within the
+interval and 3\% of the mass outside -- and since I am looking for a two-sided
+bound, I want $\tfrac{3}{2} = 1.5$\% of the mass to fall \textit{outside} the
+interval on either side.
+
+With probability $1 - \delta$, the lower and upper bound on the true mean $\mu$,
+respectively, can in general be bounded by:
+
+\begin{alignat*}{3}
+  \bbar X - \mu &\leq \sqrt{
+    \tfrac{1}{2n}\lnb{\tfrac{1}{\sfrac{\delta}{2}}}} \qquad &&\text{with probability} \geq
+  1 - \delta\, ,\\[6pt]
+  \bbar X - \mu &\geq - \sqrt{
+    \tfrac{1}{2n}\lnb{\tfrac{1}{\sfrac{\delta}{2}}}} \qquad &&\text{with probability} \geq
+  1 - \delta\, .
+\end{alignat*}
+Equivalently (isolating $\mu$ and rearranging):
+\begin{alignat*}{3}
+  \mu &\geq \bbar X - \sqrt{
+    \tfrac{1}{2n}\lnb{\tfrac{1}{\sfrac{\delta}{2}}}} \qquad &&\text{with probability} \geq
+  1 - \delta\, ,\\[6pt]
+  \mu &\leq \bbar X + \sqrt{
+    \tfrac{1}{2n}\lnb{\tfrac{1}{\sfrac{\delta}{2}}}} \qquad &&\text{with probability} \geq
+  1 - \delta\, .
+\end{alignat*}
+Setting $\delta := 0.03$, the two bounds I want to examine are thus:
+\begin{alignat}{3}
+  \mu &\geq \bbar X - \sqrt{
+    \tfrac{1}{2n}\lnb{\tfrac{1}{0.015}}} \qquad &&\text{with probability} \geq
+  0.97\, ,\label{eq:lower_bound}\\[6pt]
+  \mu &\leq \bbar X + \sqrt{
+    \tfrac{1}{2n}\lnb{\tfrac{1}{0.015}}} \qquad &&\text{with probability} \geq
+  0.97\, .\label{eq:upper_bound}
+\end{alignat}
+
+I use numpy to load the data in \texttt{S.csv} and to compute the bounds in
+\cref{eq:lower_bound} and \cref{eq:upper_bound} (see attached
+\texttt{hoeffding\_bernoulli\_CI.py}), and find the 0.97-CI to be (here rounded to
+three decimals):
+
+\begin{align*}
+  \left[0.559,\, 0.682\right] .
+\end{align*}
+
+\sectend
+\newpage

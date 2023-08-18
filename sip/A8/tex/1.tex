@@ -1,0 +1,22 @@
+\section{Transformations on points clouds}
+
+\subsection{Procrustes: Benefits of homogeneous coordinates}
+
+Homogeneous coordinates are advantageous for Procrustes because it allows us to
+concisely but explicitly describe transformations in terms of linear maps, ie.
+(transformation) matrices. This is also beneficial for implementation as it
+means alignment can be efficiently implemented with matrix multiplication.
+
+\subsection{Procrustes: Degrees of freedom and minimum number of points}
+
+There are four degrees of freedom: Two for the separate translations along the
+$x$ and $y$ axes; one for the rotation; and one for the scaling (since
+Procrustes uses only uniform scaling).
+
+If $N = 1$, then we \emph{are} able to perfectly align the single point pair,
+but we will have infinitely many choices for the rotation and scaling factors,
+since a shape consisting of a single point that has been moved to the origin
+$(0,\, 0)$ by standardization is rotationally symmetric and scaling does not
+transform the origin. Hence we require $N \geq 2$ to uniquely determine the
+parameters of the transformation.
+

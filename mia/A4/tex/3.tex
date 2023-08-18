@@ -1,0 +1,79 @@
+% \vspace{-1cm}
+\section{Medical image segmentation using U-Net CNN's}
+
+Due to its contracting nature, the output of a CNN is typically much smaller
+than its input -- perhaps a scalar, as in the model in \cref{sec:skinlesion} --
+which is a problem if we want to produce eg. a segmentation, which should have
+the same size (up to number of channels) as the input.
+
+Specifically designed for segmentation, a U-Net is a variation on the CNN (see
+\cref{sec:cnn}), in which we remove the final FC layer(s) and instead reflect the
+entire contracting path into an \emph{upsampling} path, in which upsampled
+feature maps are concatenated with the (size) corresponding feature maps from
+the contracting path, and if the model is trained to extract segment features,
+then the result, after activation, is a map of probabilities that any given
+pixel is part of the segmentation, which is then thresholded to produce the
+segmentation.
+
+
+\subsection{Example U-Net segmentation}
+
+As an example, a U-Net model similar to the CNN used in
+\cref{sec:skinlesion_model} -- but with a reflection of the contracting stage
+substituted for the FC output layer -- is trained and evaluated on train/test
+sets of lung field segmentations. In addition, instead of explicit data
+augmentation (as used in \cref{sec:skinlesion}), an augmentation layer was added
+to the CNN, and hold-out validation was used during training due to the small
+size of the training set (124 samples).
+
+Figure \cref{fig:unet_results} shows two example predictions from the testing
+set. The top row shows a rather successful prediction with a DICE of 0.98, while
+the bottom row shows what is seemingly a decent segmentation, but due to an
+out-of-distribution test case\footnote{One may argue that this test case
+represents a correct segmentation of the healthy part of a damaged lung -- but
+the task is lung segmentation, not lung disease detection, and hence this test
+case is considered out-of-distribution.}, a DICE score of only 0.9 is achieved.
+
+\medskip
+
+The mean DICE score and AUC over predictions for the entire test set were 0.96
+and 0.97, respectively (plots omitted to save space).
+
+In conclusion, the U-Net performed well, and, judging by the ROC-curve and AUC
+score, might even perform as well as a human.
+
+\begin{figure}
+\vspace{-0.5cm}
+  \centering
+  \includegraphics[width=0.6\textwidth]{figures/unet_result_examples.png}
+  \caption{{\footnotesize Sample U-Net model predictions on the lung field testing set.
+  % Note the difference between the ''faulty`` mask for \texttt{JPCLN016.gif} (top
+  % middle) and the corresponding prediction segmentation (top right).
+  }}
+  \label{fig:unet_results}
+\vspace{-0.6cm}
+\end{figure}
+
+
+% \subsection{Model evaluation (L4D)}
+%
+% loss/accuracy graph. mention that loss seems to still be decreasing, which
+% might indicate a necessity for further fitting, however, validation loss seems
+% to have plateaued.
+%
+% show loss/accuracy of training process. explain that this can be used to
+% assess whether model tweaking or more fitting is needed (decreasing loss can
+% indicate need for more fitting; small loss but unexpected accuracy can
+% indicate bad local minimum, which can further indicate overly complex model or
+% not enough training data).
+%
+% % \begin{figure}
+% %   \includegraphics[width=\textwidth]{figures/unet_plots.png}
+% %   \caption{{\footnotesize \TODO{short description; result}}}
+% %   \label{fig:unet_plots}
+% % \end{figure}
+% % \vspace{-0.5cm}
+%
+% ROC graph and AUC. explain why AUC = 0.97 is pretty good.
+
+% \sectend

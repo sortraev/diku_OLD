@@ -1,0 +1,97 @@
+\newpage
+\section{Thanks for the Fish}
+
+I use my own implementation of linear regression, which can be found in
+\texttt{code/q5/my\_linreg.py}. The implementation uses $QR$-decomposition and
+an upper-triangular solver (since the $R$ of a $QR$-decomposition is always
+upper-triangular), with a fall-back to the pseudo-inverse method when the number
+of features is higher than the number of samples, as seen in the below snippet
+of the fitting function of the implemented class:
+
+\begin{minted}{python}
+class MyLinReg():
+    def fit(self, X, y):
+        if X.ndim == 1:
+            X = X.reshape((-1, 1))
+        n, d, *_ = X.shape
+        X_aug = np.c_[X, np.ones(X.shape[0])] # append column of ones.
+
+        if n > d: # QR-decompose and solve system of equations.
+            Q, R = np.linalg.qr(X_aug)
+            _w = scipy.linalg.solve_triangular(R, Q.T.dot(y))
+
+        else:     # if R singular, solve using pseudo-inverse instead.
+            _w = np.linalg.pinv(X_aug).dot(y).reshape((-1, ))
+
+        self.w, self.b = _w[:-1], _w[-1]
+        self.model = lambda _X: np.dot(_X, self.w.T) + self.b
+
+        return self
+
+    ...
+    def predict(self, X):
+        ... # check that model is fitted.
+        return self.model(X)
+\end{minted}
+
+Aside from this, there is nothing special about the implementation.
+
+In the below code, I fit the model, extract model parameters, and compute MSE,
+variance, and $R^2$:
+
+\begin{minted}[frame=none]{python}
+model = my_stuff.MyLinReg()
+model.fit(X, y)
+
+w, b = model.get_model_params()
+predictions = model.predict(X)
+
+mse = np.mean((predictions - y) ** 2)
+sample_var = y.var()
+R2 = 1 - (mse / sample_var)
+\end{minted}
+
+\newpage
+\paragraph{Model parameters}~
+
+Having fitted the model to the data, I find the three model parameters to be:
+\begin{align*}
+  \mathbf{w}_1 &= 44.74,\\
+  \mathbf{w}_2 &= -36.83,\\
+  \text{b } = \mathbf{w}_0 &= 1105.42,
+\end{align*}
+
+where $b = \mathbf{w}_0$ is the $y$-intercept.
+
+\paragraph{Model MSE and sample variance}~
+
+The MSE of my linear regression estimator and the sample variance are:
+\begin{align*}
+  \text{estimator MSE}   &= 79709.305,\\
+  \text{sample variance} &= 1193588.021.
+\end{align*}
+
+We can compare the MSE and sample variance by considering the $R^2$, also known
+as the \textit{coefficient of determination}, for the estimator. This is given by:
+\begin{align*}
+  R^2 &= 1 - \frac{\text{estimator MSE}}{\text{sample variance}}\\[8pt]
+      &= 1 - \frac{\sum_{i = 1}^n (\mathbf{y}_i - h(\mathbf{x}_i))^2}{\sum_{i = 1}^n (\mathbf{y}_i - \bar{\mathbf{y}})^2}
+\end{align*}
+
+where $h(\mathbf{x}_i)$, $\mathbf{y}_i$, and $\bar{\mathbf{y}}$ are the
+prediction for $\mathbf{x}_i$; the actual value; and the sample mean of
+$\mathbf{y}$. We already examined and discussed $R^2$ in assignment 1, so I
+won't go into too much detail here, except to say that an $R^2$ close to 0 means
+the model is as good as randomly guessing, and a value close to 1 is ideal.
+
+I compute $R^2$ for my model to be:
+
+\begin{align*}
+  R^2 &= 1 - \frac{79709.305}{1193588.021}
+  \simeq 0.933.
+\end{align*}
+
+The computed $R^2$ is relatively close to 1, meaning the estimator provides a
+very good fit for the data.
+
+\sectend

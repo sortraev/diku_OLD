@@ -1,0 +1,30 @@
+\section{The Basic Assumptions}
+\subsection{Task 1.1}
+
+The two basic assumptions are (1) that samples from the given sample space $S$
+we use for training are all i.i.d., and (2) that, for a given learning problem,
+new samples are drawn from the same distribution as $S$.
+
+\subsection{Task 1.2}
+
+The basic idea of statistical learning is that we can learn a model on training
+data and generalize it to new data (eg. testing data).
+
+During model selection, we typically split a dataset into training and
+validation (or testing) data -- if we break assumption (1), then we cannot
+guarantee that the data used to train the model is comparable to the data used
+for validation/testing, meaning model design and selection is going to be very
+difficult.
+
+If we respect assumption (1) but violate (2), then we end up with a model that
+supposedly should generalize well, but we cannot guarantee with any certainty
+that our model is able to correctly predict \textit{new} data, since these new
+data may follow completely different patterns from what the model is trained to
+make predictions on.
+
+This intuition is further examplified in a more formal manner when we begin to
+apply theory of generalization bounding, since all of our theories of
+generalization bounds rely on the basic principle of empirical risk
+minimization.
+
+\sectend

@@ -1,0 +1,49 @@
+\newpage
+
+\subsection{Exact exponential algorithms and FPT}
+
+
+\paragraph{Disposition}
+\begin{itemize}
+\item motivation (EEA vs PC vs approximation)
+\item O-star notation
+\item exact exponential algorithm example: traveling salesperson problem
+\item parameterized complexity example: vertex-cover problem.
+\end{itemize}
+
+
+\paragraph{Notes}
+
+\begin{enumerate}
+  \item hello.
+  \item EEA and FPT.
+  \item fast, universal, exact.\\
+  \item first: EEA.
+  \item EEA for NP problems.
+  \item EEA for NP-hard problems.
+  \item big-O-star notation (??).
+  \item TSP; naive time and space complexity.
+  \item Held-Karp: bottom-up DP.
+  \item $\OPT(S, v_i)$ -- $S$ and $v_i$.
+  \item TIME and SPACE of $\OPT(S, v_i)$.\\
+  \item FPT -- idea and motivation.
+  \item k-VC; non-FPT polynomial solution.
+  \item FPT+kernelization and its complexity.
+\end{enumerate}
+
+\paragraph{Pseudocode}
+\label{code:tsp}
+
+\begin{minted}[escapeinside=@@, linenos=true, frame=lines]{text}
+TSP({c@$_1$@, .., c@$_n$@}, d):
+  for i = 2 .. n:
+    OPT[{c@$_i$@}, c@$_i$@] = d(c@$_1$@, c@$_i$@)
+  for j = 2 .. n - 1:
+    for every subset S of {c@$_2$@, .., c@$_n$@} with |S| = j:
+      for c@$_i$@ in S:
+        OPT[S, c_i] = min{OPT[S', c@$_k$@] + d(c@$_k$@, c@$_i$@)
+                          : c@$_k$@ in S' = S @\textbackslash@ {c@$_i$@}}
+  return min{OPT[{c@$_2$@, .., c@$_n$@}, c@$_i$@] + d(c@$_i$@, c@$_1$@)
+             : c@$_i$@ in {c@$_2$@, .., c@$_n$@}}
+\end{minted}
+

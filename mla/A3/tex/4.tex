@@ -1,0 +1,195 @@
+\section{Preprocessing}
+
+\subsection{Abu Mostafa exercise 9.1}
+
+If income is measured in thousands of dollars, then the euclidean distance
+between Mr. Unknown to Mr. Good and Mr. Bad are:
+
+\begin{align*}
+  \text{dist(Mr. Unknown, Mr. Good)} &= \sqrt{(21 - 47)^2 + (36 - 35)^2}\\
+                                     &= 26.02,\\[4pt]
+  \text{dist(Mr. Unknown, Mr. Bad)} &= \sqrt{(21 - 22)^2 + (36 - 40)^2}\\
+                                    &= 4.12,
+\end{align*}
+
+and so Mr. Unknown is clearly much closer to Mr. Bad, and thus BoL should
+\textit{not} give credit to Mr. Unknown.
+
+However, if income is measured in dollars:
+
+\begin{align*}
+  \text{dist(Mr. Unknown, Mr. Good)} &= \sqrt{(21 - 47)^2 + (36000 - 35000)^2}\\
+                                     &= 1000.34,\\[4pt]
+  \text{dist(Mr. Unknown, Mr. Bad)} &= \sqrt{(21 - 22)^2 + (36000 - 40000)^2}\\
+                                    &= 4000.00,
+\end{align*}
+
+then Mr. Unknown is closer to Mr. Good, since now income weighs much heavier on
+the distance than does age, and so here BoL \textit{should} give credit to Mr.
+UNknown. 
+
+\subsection{Abu Mostafa exercise 9.2}
+
+\newcommand{\one}{\mbf{1}_n}
+\newcommand{\id}{\mbf{I}_n}
+
+Starting from the definition of $\mbf Z$, the centering of $\mbf X$, as given in
+Abu Mostafa chp. 9.1:
+
+\begin{align*}
+  \mbf Z = \mbf X - \one \left(\tfrac{1}{n}\mbf X \T \one\right)\T,
+\end{align*}
+
+where $\one$ is a vector of $n$ ones. Multiply both sides with $\mbf X^{-1}$:
+
+\begin{align*}
+  \mbf Z \mbf X^{-1} &= \id - \one \left(\tfrac{1}{n}\mbf X \T \one\right)\T \mbf
+  X^{-1}.
+\end{align*}
+
+Using $(\mbf A\T \mbf B) \T = \mbf B \T \mbf A$:
+
+\begin{align*}
+  &= \id - \one \left(\tfrac{1}{n}\one\T \mbf X\right) \mbf X^{-1}\\[4pt]
+  &= \id - \one \tfrac{1}{n}\one\T \mbf X \mbf X^{-1}\\[4pt]
+ &= \id - \tfrac{1}{n}\one \one\T\ .
+\end{align*}
+
+Now, multiply both sides with $\mbf X$:
+
+\begin{align*}
+  \mbf Z &= \left(\id - \tfrac{1}{n}\one \one\T\right) \mbf X\ .
+\end{align*}
+\qed
+
+\subsection{Abu Mostafa exercise 9.4}
+\subsubsection{Part (a) -- variance and covariance}
+
+For $x_1$ we have simply $\var{x_1} = \var{\hat x_1} = 1$. For $x_2$:
+
+\begin{align*}
+  \var{x_2} &= \var{\sqrt{1 - \eps^2}\hat x_1 + \eps\hat x_2}
+\end{align*}
+
+Using independence of $\hat x_1$ and $\hat x_2$ and $\var{\hat x_1} = \var{\hat
+x_2} = 1$:
+
+\begin{align*}
+  &= \var{\sqrt{1 - \eps^2} \hat x_1} + \var{\eps \hat x_2}\\
+  &= (1 - \eps^2) + \eps^2\\&= 1.\\
+\end{align*}
+
+For the covariance, we want to compute:
+\begin{align}
+  \cov{x_1, x_2} =\cov{\hat x_1, \sqrt{1 - \eps^2} \hat x_1 + \eps  \hat
+  x_2}\label{eq:target}.
+\end{align}
+
+
+First, note that covariance is a bilinear operation, meaning that for
+RV's $X, Y, Z$ and constants $a, b$, we have:
+
+\begin{align*}
+  \cov{X, aY + bZ} &= \cov{X, aY} + \cov{X, bZ}\nonumber\\
+                    &= a * \cov{X, Y} + b * \cov{X, Z}
+\end{align*}
+
+In this case we have $(X, Y, Z) = (\hat x_1, \hat x_1, \hat x_2)$ and
+$(a, b) = (\sqrt{1 - \eps^2}, \eps)$. Substituting this into \cref{eq:target}:
+
+\begin{align*}
+  \cov{\hat x_1, \sqrt{1 - \eps^2} \hat x_1 + \eps  \hat x_2} &=
+  \sqrt{1 - \eps^2}\  \cov{\hat x_1, \hat x_1} + \eps\  \cov{\hat x_1, \hat
+  x_2}
+\end{align*}
+
+Using $\cov{\hat x_1, \hat x_1} = \var{\hat x_1} = 1$:
+
+\begin{align*}
+  &= \sqrt{1 - \eps^2} + \eps\  \cov{\hat x_1, \hat x_2}
+\end{align*}
+
+Using independence of $\hat x_1$ and $\hat x_2$, we have $\cov{\hat
+x_1, \hat x_2} = 0$, and finally:
+
+\begin{align*}
+\cov{\hat x_1, \sqrt{1 - \eps^2}  \hat x_1 + \eps  \hat x_2} =
+  \sqrt{1 - \eps^2}.
+\end{align*}
+
+
+\subsubsection{Part (b) -- linearity in correlated inputs}
+
+To show that $f$ is linear in its correlated inputs, I want to find $(a,\, b,\, c,\, d)$ such that:
+\begin{align*}
+  w_1 &= a\hat w_1 + b \hat w_2\\
+  w_2 &= c\hat w_1 + d \hat w_2\ .
+\end{align*}
+
+Consider $f(\mbf x)$:
+\begin{align*}
+  f(\mbf x) &= w_1 x_1 + w_2 x_2\\
+            &= w_1\hat x_1 + w_2 \left(\sqrt{1 - \eps^2}\hat x_1 + \eps \hat x_2  \right)\\
+            &= w_1 \hat x_1 + w_2 \sqrt{1 - \eps^2}\ \hat x_1 + \eps w_2 \hat
+            x_2\\
+            &= \left(\sqrt{1 - \eps^2}\ w_2 + w_1\right) \hat x_1 + \eps w_2 \hat x_2
+\end{align*}
+
+We obtain $\hat w_1 = \sqrt{1 - \eps^2}\ w_2 + w_1$ and $\hat w_2 = \eps w_2$.
+Thus $f$ is linear in its correlated inputs with:
+\begin{align*}
+  (a,\, b,\, c,\, d) \ = \ \left(1, -\sqrt{1 - \eps^2}, 0, \tfrac{1}{\eps}\right)\ .
+\end{align*}
+
+\subsubsection{Part (c) -- bounding regularization}
+
+If we have $f(\hat{\mbf x}) = \hat x_1 + \hat x_2 = \hat w_1 \hat x_1 + \hat w_2
+\hat x_2$ with $\hat w_1 = \hat w_2 = 1$, then the correlated inputs are:
+\begin{align*}
+  \hat w_2 = 1 &\quad \Leftrightarrow\quad w_2 = \frac{1}{\eps},\\[8pt]
+\end{align*}
+and:
+\begin{align*}
+  \hat w_1 = 1 \quad \Leftrightarrow\quad w_1 &= 1 - \sqrt{1 - \eps^2}\ w_2\\
+                                              &= 1 - \frac{\sqrt{1 -
+                                              \eps^2}}{\eps}\ ,
+\end{align*}
+
+and the lower bound on $C$ is:
+\begin{align*}
+  C \ \geq\  w_1^2 + w_2^2 &= \left(1 - \frac{\sqrt{1 - \eps^2}}{\eps}\right)^2 +
+  \frac{1}{\eps^2}\\
+                           &= \frac{(\eps - \sqrt{1 - \eps^2})^2}{\eps^2} +
+  \frac{1}{\eps^2}\\
+                           &= \frac{1 + (\eps - \sqrt{1 - \eps^2})^2}{\eps^2}\ .
+\end{align*}
+
+Using $(a - b)^2 = a^2 + b^2 - 2ab$:
+\begin{align*}
+  C \ &\geq \ \frac{1 + (\eps^2 + \sqrt{1 - \eps^2}^2 - 2\eps\sqrt{1 - \eps^2})^2}{\eps^2}\\[4pt]
+  &= \ \frac{1 + (\eps^2 + 1 - \eps^2 - 2\eps\sqrt{1 - \eps^2})^2}{\eps^2}\\[4pt]
+  &= \ \frac{2 - 2\eps\sqrt{1 - \eps^2}}{\eps^2}\ .
+\end{align*}
+
+\subsubsection{Part (d) -- lower bound on maximum regularization}
+
+The question is essentially:
+\begin{align*}
+  \lim_{\eps \to 0}\ C \quad &\geq\quad  \lim_{\eps \to 0}\ \frac{2 -
+  2\eps\sqrt{1 - \eps^2}}{\eps^2}\ .
+\end{align*}
+
+Since we have $2 - 2 \eps \sqrt{1 - \eps^2} < \eps^2$ for all $\eps \in (-1, 1)$
+(note that given the square root, this is the range of $\eps$ so long as we
+consider only real-valued solutions), we have:
+
+\begin{align*}
+  \lim_{\eps \to 0}\ \frac{2 - 2\eps\sqrt{1 - \eps^2}}{\eps^2} = \infty
+\end{align*}
+
+And thus we see that as correlation increases, the lower bound on regularization
+grows infinitely, meaning we need an impossibly large amount of regularization
+on the target function.
+
+\sectend
+\newpage

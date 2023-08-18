@@ -1,0 +1,214 @@
+\newcommand{\I}{\mathcal I}
+\newcommand{\J}{\mathcal J}
+
+\section{Algorithm(s) for image registration}
+
+So far we simply know that image registration computes the transformation which
+turns a moving image $\I$ into a new image $\I'$ most resembling some fixed
+image $\J$. In less abstract terms, we can view registration as an optimization
+problem: We repeatedly morph and transform the moving image until we obtain the
+$\I'$ which most resembles $\J$, at each step evaluating the similarity between
+$\I'$ and $\J$.
+
+\subsection{Basic algorithm}
+
+The general algorithm for image registration consists of three steps:
+
+\begin{enumerate}
+  \item[1.] \textbf{initialization}: the transformation function we are looking
+    for is initialized, and, optionally, a domain expert or possibly a computer
+    may determine landmarks in the image, whose preservation the algorithm
+    should prioritize during optimization of the transformation function
+    (this is one form of regularization, which will be discussed in
+    \cref{sec:regularization}).
+
+  \item[2.] \textbf{image similarity quantification}: the current transformation
+    function is applied to the moving image, and the degree of similarity
+    between the transformed moving and the fixed image is measured as per a
+    chosen similarity metric (see \cref{sec:similarity}).
+    This can be viewed as training error.
+
+  \item[3.] \textbf{transformation estimation}: the transformation which best maps
+    the coordinate system of the moving image to the fixed image is estimated
+    via optimization, wrt. the similarities computed earlier. If similarity
+    is optimal, return the estimated transformation function; else go back to
+    step 2.
+\end{enumerate}
+
+When the estimated transformation function is returned, it can be applied to the
+moving image, but the function itself may also reveal interesting facts about
+the differences between the images. In the following section, we shall discuss
+similarity metrics, the optimization step, and regularization.
+
+\subsubsection{Similarity metrics}~\smallskip
+\label{sec:similarity}
+
+In the second step of the algorithm, the current transformation is applied to
+the moving image, after which the resulting image is compared to the fixed
+image. This is done using a pre-chosen \textit{similarity metric}, a
+function over two images returning a similarity score, which can be viewed as
+negative training error and thus be used in optimization. Three commonly used
+categories of similarity metrics are the intensity-based, histogram-based, and
+feature-based similarities.
+
+\paragraph{Intensity-based similarity}~
+
+The simplest forms of image similarity are those based on actual pixel values.
+The intensity-based similarity between two images $\I$ and $\J$ is proportional
+to the differences in pixel intensities between the two images, whether it be
+per pixel or region based. The most commonly used examples of intensity based
+measures are  MSE (mean square error) and cross-correlation, which compute
+per-pixel intensity similarities.
+
+These measures have the immediate advantage that they are easy to reason about,
+and some of them can be computationally cheap compared to eg. MI, but they all
+require images to be of similar intensity ranges, and do not consider structural
+similarities. As an example, consider two images $\I$ and $\J = -\I$. One is
+the negative of the other, so they must be structurally identical, but the
+intensity based similarity will be very low since the images are literally
+opposites -- for these reasons, these methods can be very effective for images
+which are known to be of similar intensities, eg. images created using the same
+modality, but can fail tremendously in many cases.
+
+\paragraph{Histogram-based similarty (MI)}~
+
+If pixel value ranges in the two images $\I$ and $\J$ are not comparable, then
+we might use histogram-based similarities. The mutual information $MI(\I, \J)$
+measures the amount of information one can obtain about image $\I$ from image
+$\J$, and vice versa, and is given by the double sum over image pixels:
+
+\begin{align*}
+  MI(\I, \J) &= \sum_{i\, \in \,\I} \sum_{j\, \in
+  \,\J} p(i, j) \log\left\{\frac{p(i, j)}{p(i)p(j)}\right\},
+\end{align*}
+
+where $p(i, j)$ is the joint probability, and $p(i)$ and $p(j)$ are the
+individual image probabilities. In the discrete case, $p(i, j)$ is derived from
+the joint 2D histogram, while $p(i)$ and $p(j)$ are derived from the marginal
+histograms (in turn derived from the joint histogram).
+
+% Since $MI(\I, \J)$ is the amount of information shared between $\I$ and $\J$, an
+% image registration is optimal when the mutual information is \textit{maximized}.
+
+One of the primary motivations for MI is the usefulness in multi-modal
+registration, as well as for use between uni-modal images from different cameras
+or subjects, and since it is agnostic of individual intensities, for the
+previous example of $\J = -\I$, mutual information would be maximal.
+
+However, note that even if we don't require images to \textit{look} similar in
+order to use histogram-based metrics, we still require some structural
+relationship. This would eg. imply that a CT scan and an MRI of the same brain
+might not be comparable, since the CT scan would mostly only capture the outline
+of the skull, whereas the MRI would capture a lot of shapes inside.
+
+\paragraph{Feature-based similarity}~
+
+The third category of similarity metrics is useful whenever we need to compare
+two images with only some contents in common, as in the brain example given
+above. Here we would prefer the algorithm to transform wrt. a set of known
+structures.
+
+Compared to the other two categories, feature-based is the most involved, since
+it requires user input in the form of landmark coordinates (reminiscent of
+graph-based segmentation algorithms), but can be computationally cheaper since
+the problem can now be expressed as a set of equations.
+
+If feature-based similarity is used, then the landmark selection is part of step
+1 (initialization) of the algorithm.
+
+\subsubsection{Transformation fitting (optimization)}~
+
+If the current transformation was found suboptimal, the optimization step will
+update the parameters of the transformation wrt. the derivative of the
+similarity metric. This optimization is usually performed using gradient descent
+(GD) or a similar iterative optimization algorithm, however GD has the pitfall
+of finding local minima, so it may be a good idea to use a more exhaustive
+search for the first initialization of the transform.
+
+The result of the fitting is a new transformation field. For rigid and affine
+transformations, fitting the new transformation may be as simple as updating the
+weight in a rotation/translation matrix, but for non-rigid transformations the
+process is a little more tedious. Since a non-rigid transformation can contain
+an arbitrary mapping with local deformations of the coordinate system, the lines
+of the coordinate system likely do not stay straight and parallel wrt. each
+other -- however, we at least prefer to preserve continuity of the coordinate
+system. In general this may be difficult depending on the transformation, but we
+can create an approximation with continuous lines using eg. B-spline
+interpolation or Bézier curves, which, in fact, is often computationally
+efficient\cite{wu}.
+
+
+\subsection{Atlas-based registration}
+
+One possible variant of the algorithm is \textit{atlas-based image
+registration}, which uses a training set (or \textit{atlas}) of images to
+compute the average of transformations of moving images wrt. a fixed image,
+which can then be used to register new images.
+\vspace{-0.8cm}
+
+\begin{figure}[H]
+  \includegraphics[width=\textwidth]{figures/atlas_registration_5_trainimgs.png}
+  \caption{{\footnotesize Example atlas-based registration using 5 training
+  images.}}
+  \label{fig:atlasreg1}
+  % \includegraphics[width=\textwidth]{figures/atlas_registration_40_trainimgs.png}
+  % \caption{{\footnotesize Example atlas-based registration using 40 training
+  % images.}}
+  % \label{fig:atlasreg2}
+\end{figure}
+\vspace{-0.5cm}
+
+The immediate benefit of this method is that it allows for more nuanced
+registrations, in that the result is not fitted especially to certain features
+which may be unique to a single image.
+
+The atlas-based does have a big disadvantage, though, as it computationally
+expensive, requiring one complete registration for each training image, so there
+is a very big trade-off between speed and efficiency related to the size of the
+training set, and the results are not necessarily impressive, since the
+averaging part of the algorithm means small or outlying features are hard to
+capture.
+
+\subsubsection{Regularization}
+\label{sec:regularization}
+
+In machine learning, a common problem in predictions and model estimation is
+called \textit{overfitting}, and this happens when a model becomes overly
+sensitive to outliers and noise in a particular training data, to the point
+where the model begins to expect similar noise in new data, ultimately
+influencing the accuracy of new predictions negatively.
+
+While cross-validation can be used as an effective data-oriented solution,
+\textit{regularization} is another commonly used solution method, which involves
+restricting the learning process to prevent learning overly complex models.
+
+\smallskip
+
+The problem of overfitting exists also in image registration, where we might
+sometimes notice the registration eagerly fitting minute details of the moving
+image to the fixed image, where we might rather wish for the registration to
+transform the larger structures of the image and leave the finer details be.
+This problem is especially prevalent in multimodal registration, where we often
+have two images containing shapes sharing the same basic structural outline, but
+with different insides, as in the PET/MRI example given in below
+\cref{fig:overfitting}:
+
+\begin{figure}[H]
+  \includegraphics[width=\textwidth]{figures/petmri_overfitting.png}
+  \caption{{\footnotesize Example of overfitting in multi-modal registration.}}
+  \label{fig:overfitting}
+\end{figure}
+\vspace{-0.5cm}
+
+Inspecting the deformation field, we see some rather intense deformations in the
+area inside the skull, where we might have expected to see deformations along
+the boundary of the skull and lines closer to being straight inside (this
+example is, of course, for illustrative purposes -- note that in this novel
+example, we might have achieved the desired result with simply translation and
+scaling).
+
+While in such cases we are perhaps better defining a number of landmark points
+and using feature-based registration, we might also employ regularization to
+penalize the high number of irregular deformations inside the skull.
+
+\sectend

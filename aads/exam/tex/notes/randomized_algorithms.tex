@@ -1,0 +1,80 @@
+\newpage
+
+\subsection{Randomized algorithms}
+
+
+\paragraph{Disposition}
+
+\begin{itemize}
+  \item hello and intro.
+  \item motivation.
+
+  \item Las Vegas vs Monte Carlo.
+  \item regular quicksort and its worst case complexity.
+
+  \item LV example: RandQS.
+  \item proof: \#comparisons made by RandQS.
+
+  \item MC examle: RAND\_MIN\_CUT.
+  \item proof: probabilistic error-bound for RAND\_MIN\_CUT.
+\end{itemize}
+
+
+
+\paragraph{Notes}
+
+\begin{enumerate}
+  \item hello.
+
+  \item motivation for randomization.
+
+  \item Las Vegas and Monte Carlo.
+
+  \item regular quicksort: pivoting and complexities.
+
+  \item LV example: RandQS -- strategy and complexity.
+
+  \item proof: \#comparisons made by RandQS.
+
+  \item MC example: RAND\_MIN\_CUT -- strategy.
+  \item proof:probabilistic error-bound for RAND\_MIN\_CUT.
+\end{enumerate}
+
+
+\newpage
+\subsubsection{Pseudocode}
+
+\paragraph{RandQS}
+
+\begin{minted}{text}
+RandQS(S):
+    if |S| <= 1:
+        return S
+    pivot = pick at uniform random an item in S;
+            remove it from S and use it as pivot.
+    S_l = {x in S : x <= pivot}
+    S_r = {x in S : x >  pivot}
+    return RandQS(S_l) ++ [pivot] ++ RandQS(S_r)
+\end{minted}
+
+\paragraph{Randomized min-cut}
+
+\begin{minted}{text}
+RAND_MIN_CUT(V, E):
+    V' = {MAKE-SET(v) : v in V}
+
+    C  = empty set
+    E' = random permutation of E
+    n = |V'|
+    for (u, v) in E':
+        p_u = find(u)
+        p_v = find(v)
+        if p_u != p_v:
+            if n > 2 then:
+                UNION(p_u, p_v)
+                n -= 1
+            else:
+                C += (u, v)
+
+    return C
+\end{minted}

@@ -1,0 +1,1166 @@
+
+mud:     file format elf64-x86-64
+
+
+Disassembly of section .init:
+
+0000000000001000 <_init>:
+    1000:	f3 0f 1e fa          	endbr64
+    1004:	48 83 ec 08          	sub    rsp,0x8
+    1008:	48 8b 05 c9 2f 00 00 	mov    rax,QWORD PTR [rip+0x2fc9]        # 3fd8 <__gmon_start__>
+    100f:	48 85 c0             	test   rax,rax
+    1012:	74 02                	je     1016 <_init+0x16>
+    1014:	ff d0                	call   rax
+    1016:	48 83 c4 08          	add    rsp,0x8
+    101a:	c3                   	ret
+
+Disassembly of section .plt:
+
+0000000000001020 <.plt>:
+    1020:	ff 35 42 2f 00 00    	push   QWORD PTR [rip+0x2f42]        # 3f68 <_GLOBAL_OFFSET_TABLE_+0x8>
+    1026:	f2 ff 25 43 2f 00 00 	bnd jmp QWORD PTR [rip+0x2f43]        # 3f70 <_GLOBAL_OFFSET_TABLE_+0x10>
+    102d:	0f 1f 00             	nop    DWORD PTR [rax]
+    1030:	f3 0f 1e fa          	endbr64
+    1034:	68 00 00 00 00       	push   0x0
+    1039:	f2 e9 e1 ff ff ff    	bnd jmp 1020 <.plt>
+    103f:	90                   	nop
+    1040:	f3 0f 1e fa          	endbr64
+    1044:	68 01 00 00 00       	push   0x1
+    1049:	f2 e9 d1 ff ff ff    	bnd jmp 1020 <.plt>
+    104f:	90                   	nop
+    1050:	f3 0f 1e fa          	endbr64
+    1054:	68 02 00 00 00       	push   0x2
+    1059:	f2 e9 c1 ff ff ff    	bnd jmp 1020 <.plt>
+    105f:	90                   	nop
+    1060:	f3 0f 1e fa          	endbr64
+    1064:	68 03 00 00 00       	push   0x3
+    1069:	f2 e9 b1 ff ff ff    	bnd jmp 1020 <.plt>
+    106f:	90                   	nop
+    1070:	f3 0f 1e fa          	endbr64
+    1074:	68 04 00 00 00       	push   0x4
+    1079:	f2 e9 a1 ff ff ff    	bnd jmp 1020 <.plt>
+    107f:	90                   	nop
+    1080:	f3 0f 1e fa          	endbr64
+    1084:	68 05 00 00 00       	push   0x5
+    1089:	f2 e9 91 ff ff ff    	bnd jmp 1020 <.plt>
+    108f:	90                   	nop
+    1090:	f3 0f 1e fa          	endbr64
+    1094:	68 06 00 00 00       	push   0x6
+    1099:	f2 e9 81 ff ff ff    	bnd jmp 1020 <.plt>
+    109f:	90                   	nop
+    10a0:	f3 0f 1e fa          	endbr64
+    10a4:	68 07 00 00 00       	push   0x7
+    10a9:	f2 e9 71 ff ff ff    	bnd jmp 1020 <.plt>
+    10af:	90                   	nop
+    10b0:	f3 0f 1e fa          	endbr64
+    10b4:	68 08 00 00 00       	push   0x8
+    10b9:	f2 e9 61 ff ff ff    	bnd jmp 1020 <.plt>
+    10bf:	90                   	nop
+    10c0:	f3 0f 1e fa          	endbr64
+    10c4:	68 09 00 00 00       	push   0x9
+    10c9:	f2 e9 51 ff ff ff    	bnd jmp 1020 <.plt>
+    10cf:	90                   	nop
+
+Disassembly of section .plt.got:
+
+00000000000010d0 <__cxa_finalize@plt>:
+    10d0:	f3 0f 1e fa          	endbr64
+    10d4:	f2 ff 25 0d 2f 00 00 	bnd jmp QWORD PTR [rip+0x2f0d]        # 3fe8 <__cxa_finalize@GLIBC_2.2.5>
+    10db:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+Disassembly of section .plt.sec:
+
+00000000000010e0 <puts@plt>:
+    10e0:	f3 0f 1e fa          	endbr64
+    10e4:	f2 ff 25 8d 2e 00 00 	bnd jmp QWORD PTR [rip+0x2e8d]        # 3f78 <puts@GLIBC_2.2.5>
+    10eb:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+00000000000010f0 <strlen@plt>:
+    10f0:	f3 0f 1e fa          	endbr64
+    10f4:	f2 ff 25 85 2e 00 00 	bnd jmp QWORD PTR [rip+0x2e85]        # 3f80 <strlen@GLIBC_2.2.5>
+    10fb:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+0000000000001100 <printf@plt>:
+    1100:	f3 0f 1e fa          	endbr64
+    1104:	f2 ff 25 7d 2e 00 00 	bnd jmp QWORD PTR [rip+0x2e7d]        # 3f88 <printf@GLIBC_2.2.5>
+    110b:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+0000000000001110 <readline@plt>:
+    1110:	f3 0f 1e fa          	endbr64
+    1114:	f2 ff 25 75 2e 00 00 	bnd jmp QWORD PTR [rip+0x2e75]        # 3f90 <readline>
+    111b:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+0000000000001120 <putc@plt>:
+    1120:	f3 0f 1e fa          	endbr64
+    1124:	f2 ff 25 6d 2e 00 00 	bnd jmp QWORD PTR [rip+0x2e6d]        # 3f98 <putc@GLIBC_2.2.5>
+    112b:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+0000000000001130 <strtol@plt>:
+    1130:	f3 0f 1e fa          	endbr64
+    1134:	f2 ff 25 65 2e 00 00 	bnd jmp QWORD PTR [rip+0x2e65]        # 3fa0 <strtol@GLIBC_2.2.5>
+    113b:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+0000000000001140 <fflush@plt>:
+    1140:	f3 0f 1e fa          	endbr64
+    1144:	f2 ff 25 5d 2e 00 00 	bnd jmp QWORD PTR [rip+0x2e5d]        # 3fa8 <fflush@GLIBC_2.2.5>
+    114b:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+0000000000001150 <exit@plt>:
+    1150:	f3 0f 1e fa          	endbr64
+    1154:	f2 ff 25 55 2e 00 00 	bnd jmp QWORD PTR [rip+0x2e55]        # 3fb0 <exit@GLIBC_2.2.5>
+    115b:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+0000000000001160 <sleep@plt>:
+    1160:	f3 0f 1e fa          	endbr64
+    1164:	f2 ff 25 4d 2e 00 00 	bnd jmp QWORD PTR [rip+0x2e4d]        # 3fb8 <sleep@GLIBC_2.2.5>
+    116b:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+0000000000001170 <usleep@plt>:
+    1170:	f3 0f 1e fa          	endbr64
+    1174:	f2 ff 25 45 2e 00 00 	bnd jmp QWORD PTR [rip+0x2e45]        # 3fc0 <usleep@GLIBC_2.2.5>
+    117b:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+Disassembly of section .text:
+
+0000000000001180 <main>:
+    1180:	f3 0f 1e fa          	endbr64
+    1184:	55                   	push   rbp
+    1185:	48 8d 15 34 0a 00 00 	lea    rdx,[rip+0xa34]        # 1bc0 <room_2_2>
+    118c:	c7 05 7e 2e 00 00 02 	mov    DWORD PTR [rip+0x2e7e],0x2        # 4014 <ypos>
+    1193:	00 00 00 
+    1196:	c7 05 78 2e 00 00 02 	mov    DWORD PTR [rip+0x2e78],0x2        # 4018 <xpos>
+    119d:	00 00 00 
+    11a0:	c7 05 5e 2e 00 00 00 	mov    DWORD PTR [rip+0x2e5e],0x0        # 4008 <has_bicycle>
+    11a7:	00 00 00 
+    11aa:	48 89 e5             	mov    rbp,rsp
+    11ad:	c7 05 59 2e 00 00 00 	mov    DWORD PTR [rip+0x2e59],0x0        # 4010 <enlighted>
+    11b4:	00 00 00 
+    11b7:	c7 05 4b 2e 00 00 00 	mov    DWORD PTR [rip+0x2e4b],0x0        # 400c <seen_count>
+    11be:	00 00 00 
+    11c1:	41 54                	push   r12
+    11c3:	4c 8d 25 96 29 00 00 	lea    r12,[rip+0x2996]        # 3b60 <rooms>
+    11ca:	53                   	push   rbx
+    11cb:	48 8d 1d 9e 12 00 00 	lea    rbx,[rip+0x129e]        # 2470 <_fini+0x718>
+    11d2:	66 0f 1f 44 00 00    	nop    WORD PTR [rax+rax*1+0x0]
+    11d8:	31 c0                	xor    eax,eax
+    11da:	ff d2                	call   rdx
+    11dc:	31 c0                	xor    eax,eax
+    11de:	e8 73 0a 00 00       	call   1c56 <move_next_room>
+    11e3:	8b 15 2b 2e 00 00    	mov    edx,DWORD PTR [rip+0x2e2b]        # 4014 <ypos>
+    11e9:	48 89 df             	mov    rdi,rbx
+    11ec:	31 c0                	xor    eax,eax
+    11ee:	8b 35 24 2e 00 00    	mov    esi,DWORD PTR [rip+0x2e24]        # 4018 <xpos>
+    11f4:	e8 07 ff ff ff       	call   1100 <printf@plt>
+    11f9:	8b 15 19 2e 00 00    	mov    edx,DWORD PTR [rip+0x2e19]        # 4018 <xpos>
+    11ff:	8b 05 0f 2e 00 00    	mov    eax,DWORD PTR [rip+0x2e0f]        # 4014 <ypos>
+    1205:	48 8d 04 d0          	lea    rax,[rax+rdx*8]
+    1209:	49 8b 14 c4          	mov    rdx,QWORD PTR [r12+rax*8]
+    120d:	eb c9                	jmp    11d8 <main+0x58>
+    120f:	90                   	nop
+
+0000000000001210 <_start>:
+    1210:	f3 0f 1e fa          	endbr64
+    1214:	31 ed                	xor    ebp,ebp
+    1216:	49 89 d1             	mov    r9,rdx
+    1219:	5e                   	pop    rsi
+    121a:	48 89 e2             	mov    rdx,rsp
+    121d:	48 83 e4 f0          	and    rsp,0xfffffffffffffff0
+    1221:	50                   	push   rax
+    1222:	54                   	push   rsp
+    1223:	4c 8d 05 26 0b 00 00 	lea    r8,[rip+0xb26]        # 1d50 <__libc_csu_fini>
+    122a:	48 8d 0d af 0a 00 00 	lea    rcx,[rip+0xaaf]        # 1ce0 <__libc_csu_init>
+    1231:	48 8d 3d 48 ff ff ff 	lea    rdi,[rip+0xffffffffffffff48]        # 1180 <main>
+    1238:	ff 15 92 2d 00 00    	call   QWORD PTR [rip+0x2d92]        # 3fd0 <__libc_start_main@GLIBC_2.2.5>
+    123e:	f4                   	hlt
+    123f:	90                   	nop
+
+0000000000001240 <deregister_tm_clones>:
+    1240:	48 8d 3d d9 2d 00 00 	lea    rdi,[rip+0x2dd9]        # 4020 <stdout@@GLIBC_2.2.5>
+    1247:	48 8d 05 d2 2d 00 00 	lea    rax,[rip+0x2dd2]        # 4020 <stdout@@GLIBC_2.2.5>
+    124e:	48 39 f8             	cmp    rax,rdi
+    1251:	74 15                	je     1268 <deregister_tm_clones+0x28>
+    1253:	48 8b 05 6e 2d 00 00 	mov    rax,QWORD PTR [rip+0x2d6e]        # 3fc8 <_ITM_deregisterTMCloneTable>
+    125a:	48 85 c0             	test   rax,rax
+    125d:	74 09                	je     1268 <deregister_tm_clones+0x28>
+    125f:	ff e0                	jmp    rax
+    1261:	0f 1f 80 00 00 00 00 	nop    DWORD PTR [rax+0x0]
+    1268:	c3                   	ret
+    1269:	0f 1f 80 00 00 00 00 	nop    DWORD PTR [rax+0x0]
+
+0000000000001270 <register_tm_clones>:
+    1270:	48 8d 3d a9 2d 00 00 	lea    rdi,[rip+0x2da9]        # 4020 <stdout@@GLIBC_2.2.5>
+    1277:	48 8d 35 a2 2d 00 00 	lea    rsi,[rip+0x2da2]        # 4020 <stdout@@GLIBC_2.2.5>
+    127e:	48 29 fe             	sub    rsi,rdi
+    1281:	48 89 f0             	mov    rax,rsi
+    1284:	48 c1 ee 3f          	shr    rsi,0x3f
+    1288:	48 c1 f8 03          	sar    rax,0x3
+    128c:	48 01 c6             	add    rsi,rax
+    128f:	48 d1 fe             	sar    rsi,1
+    1292:	74 14                	je     12a8 <register_tm_clones+0x38>
+    1294:	48 8b 05 45 2d 00 00 	mov    rax,QWORD PTR [rip+0x2d45]        # 3fe0 <_ITM_registerTMCloneTable>
+    129b:	48 85 c0             	test   rax,rax
+    129e:	74 08                	je     12a8 <register_tm_clones+0x38>
+    12a0:	ff e0                	jmp    rax
+    12a2:	66 0f 1f 44 00 00    	nop    WORD PTR [rax+rax*1+0x0]
+    12a8:	c3                   	ret
+    12a9:	0f 1f 80 00 00 00 00 	nop    DWORD PTR [rax+0x0]
+
+00000000000012b0 <__do_global_dtors_aux>:
+    12b0:	f3 0f 1e fa          	endbr64
+    12b4:	80 3d 6d 2d 00 00 00 	cmp    BYTE PTR [rip+0x2d6d],0x0        # 4028 <completed.8061>
+    12bb:	75 2b                	jne    12e8 <__do_global_dtors_aux+0x38>
+    12bd:	55                   	push   rbp
+    12be:	48 83 3d 22 2d 00 00 	cmp    QWORD PTR [rip+0x2d22],0x0        # 3fe8 <__cxa_finalize@GLIBC_2.2.5>
+    12c5:	00 
+    12c6:	48 89 e5             	mov    rbp,rsp
+    12c9:	74 0c                	je     12d7 <__do_global_dtors_aux+0x27>
+    12cb:	48 8b 3d 2e 2d 00 00 	mov    rdi,QWORD PTR [rip+0x2d2e]        # 4000 <__dso_handle>
+    12d2:	e8 f9 fd ff ff       	call   10d0 <__cxa_finalize@plt>
+    12d7:	e8 64 ff ff ff       	call   1240 <deregister_tm_clones>
+    12dc:	c6 05 45 2d 00 00 01 	mov    BYTE PTR [rip+0x2d45],0x1        # 4028 <completed.8061>
+    12e3:	5d                   	pop    rbp
+    12e4:	c3                   	ret
+    12e5:	0f 1f 00             	nop    DWORD PTR [rax]
+    12e8:	c3                   	ret
+    12e9:	0f 1f 80 00 00 00 00 	nop    DWORD PTR [rax+0x0]
+
+00000000000012f0 <frame_dummy>:
+    12f0:	f3 0f 1e fa          	endbr64
+    12f4:	e9 77 ff ff ff       	jmp    1270 <register_tm_clones>
+    12f9:	0f 1f 80 00 00 00 00 	nop    DWORD PTR [rax+0x0]
+
+0000000000001300 <say>:
+    1300:	f3 0f 1e fa          	endbr64
+    1304:	55                   	push   rbp
+    1305:	31 c0                	xor    eax,eax
+    1307:	48 89 e5             	mov    rbp,rsp
+    130a:	41 54                	push   r12
+    130c:	49 89 fc             	mov    r12,rdi
+    130f:	48 8d 3d ea 0c 00 00 	lea    rdi,[rip+0xcea]        # 2000 <_fini+0x2a8>
+    1316:	48 83 ec 08          	sub    rsp,0x8
+    131a:	e8 e1 fd ff ff       	call   1100 <printf@plt>
+    131f:	4c 89 e7             	mov    rdi,r12
+    1322:	e8 b9 fd ff ff       	call   10e0 <puts@plt>
+    1327:	bf 01 00 00 00       	mov    edi,0x1
+    132c:	e8 2f fe ff ff       	call   1160 <sleep@plt>
+    1331:	48 83 c4 08          	add    rsp,0x8
+    1335:	41 5c                	pop    r12
+    1337:	5d                   	pop    rbp
+    1338:	c3                   	ret
+    1339:	0f 1f 80 00 00 00 00 	nop    DWORD PTR [rax+0x0]
+
+0000000000001340 <room_3_5>:
+    1340:	f3 0f 1e fa          	endbr64
+    1344:	55                   	push   rbp
+    1345:	48 8d 3d b9 0c 00 00 	lea    rdi,[rip+0xcb9]        # 2005 <_fini+0x2ad>
+    134c:	48 89 e5             	mov    rbp,rsp
+    134f:	e8 ac ff ff ff       	call   1300 <say>
+    1354:	5d                   	pop    rbp
+    1355:	c7 05 b1 2c 00 00 01 	mov    DWORD PTR [rip+0x2cb1],0x1        # 4010 <enlighted>
+    135c:	00 00 00 
+    135f:	c3                   	ret
+
+0000000000001360 <edge_of_the_earth>:
+    1360:	f3 0f 1e fa          	endbr64
+    1364:	55                   	push   rbp
+    1365:	48 8d 3d bc 0c 00 00 	lea    rdi,[rip+0xcbc]        # 2028 <_fini+0x2d0>
+    136c:	48 89 e5             	mov    rbp,rsp
+    136f:	e8 8c ff ff ff       	call   1300 <say>
+    1374:	48 8d 3d d0 0c 00 00 	lea    rdi,[rip+0xcd0]        # 204b <_fini+0x2f3>
+    137b:	e8 80 ff ff ff       	call   1300 <say>
+    1380:	31 ff                	xor    edi,edi
+    1382:	e8 c9 fd ff ff       	call   1150 <exit@plt>
+    1387:	66 0f 1f 84 00 00 00 	nop    WORD PTR [rax+rax*1+0x0]
+    138e:	00 00 
+
+0000000000001390 <room_0_0>:
+    1390:	f3 0f 1e fa          	endbr64
+    1394:	55                   	push   rbp
+    1395:	31 c0                	xor    eax,eax
+    1397:	48 89 e5             	mov    rbp,rsp
+    139a:	e8 c1 ff ff ff       	call   1360 <edge_of_the_earth>
+    139f:	90                   	nop
+
+00000000000013a0 <room_7_7>:
+    13a0:	f3 0f 1e fa          	endbr64
+    13a4:	55                   	push   rbp
+    13a5:	31 c0                	xor    eax,eax
+    13a7:	48 89 e5             	mov    rbp,rsp
+    13aa:	e8 b1 ff ff ff       	call   1360 <edge_of_the_earth>
+    13af:	90                   	nop
+
+00000000000013b0 <room_7_6>:
+    13b0:	f3 0f 1e fa          	endbr64
+    13b4:	55                   	push   rbp
+    13b5:	31 c0                	xor    eax,eax
+    13b7:	48 89 e5             	mov    rbp,rsp
+    13ba:	e8 a1 ff ff ff       	call   1360 <edge_of_the_earth>
+    13bf:	90                   	nop
+
+00000000000013c0 <room_7_5>:
+    13c0:	f3 0f 1e fa          	endbr64
+    13c4:	55                   	push   rbp
+    13c5:	31 c0                	xor    eax,eax
+    13c7:	48 89 e5             	mov    rbp,rsp
+    13ca:	e8 91 ff ff ff       	call   1360 <edge_of_the_earth>
+    13cf:	90                   	nop
+
+00000000000013d0 <room_7_4>:
+    13d0:	f3 0f 1e fa          	endbr64
+    13d4:	55                   	push   rbp
+    13d5:	31 c0                	xor    eax,eax
+    13d7:	48 89 e5             	mov    rbp,rsp
+    13da:	e8 81 ff ff ff       	call   1360 <edge_of_the_earth>
+    13df:	90                   	nop
+
+00000000000013e0 <room_7_3>:
+    13e0:	f3 0f 1e fa          	endbr64
+    13e4:	55                   	push   rbp
+    13e5:	31 c0                	xor    eax,eax
+    13e7:	48 89 e5             	mov    rbp,rsp
+    13ea:	e8 71 ff ff ff       	call   1360 <edge_of_the_earth>
+    13ef:	90                   	nop
+
+00000000000013f0 <room_7_2>:
+    13f0:	f3 0f 1e fa          	endbr64
+    13f4:	55                   	push   rbp
+    13f5:	31 c0                	xor    eax,eax
+    13f7:	48 89 e5             	mov    rbp,rsp
+    13fa:	e8 61 ff ff ff       	call   1360 <edge_of_the_earth>
+    13ff:	90                   	nop
+
+0000000000001400 <room_7_1>:
+    1400:	f3 0f 1e fa          	endbr64
+    1404:	55                   	push   rbp
+    1405:	31 c0                	xor    eax,eax
+    1407:	48 89 e5             	mov    rbp,rsp
+    140a:	e8 51 ff ff ff       	call   1360 <edge_of_the_earth>
+    140f:	90                   	nop
+
+0000000000001410 <room_7_0>:
+    1410:	f3 0f 1e fa          	endbr64
+    1414:	55                   	push   rbp
+    1415:	31 c0                	xor    eax,eax
+    1417:	48 89 e5             	mov    rbp,rsp
+    141a:	e8 41 ff ff ff       	call   1360 <edge_of_the_earth>
+    141f:	90                   	nop
+
+0000000000001420 <room_6_7>:
+    1420:	f3 0f 1e fa          	endbr64
+    1424:	55                   	push   rbp
+    1425:	31 c0                	xor    eax,eax
+    1427:	48 89 e5             	mov    rbp,rsp
+    142a:	e8 31 ff ff ff       	call   1360 <edge_of_the_earth>
+    142f:	90                   	nop
+
+0000000000001430 <room_6_0>:
+    1430:	f3 0f 1e fa          	endbr64
+    1434:	55                   	push   rbp
+    1435:	31 c0                	xor    eax,eax
+    1437:	48 89 e5             	mov    rbp,rsp
+    143a:	e8 21 ff ff ff       	call   1360 <edge_of_the_earth>
+    143f:	90                   	nop
+
+0000000000001440 <room_5_7>:
+    1440:	f3 0f 1e fa          	endbr64
+    1444:	55                   	push   rbp
+    1445:	31 c0                	xor    eax,eax
+    1447:	48 89 e5             	mov    rbp,rsp
+    144a:	e8 11 ff ff ff       	call   1360 <edge_of_the_earth>
+    144f:	90                   	nop
+
+0000000000001450 <room_5_0>:
+    1450:	f3 0f 1e fa          	endbr64
+    1454:	55                   	push   rbp
+    1455:	31 c0                	xor    eax,eax
+    1457:	48 89 e5             	mov    rbp,rsp
+    145a:	e8 01 ff ff ff       	call   1360 <edge_of_the_earth>
+    145f:	90                   	nop
+
+0000000000001460 <room_4_7>:
+    1460:	f3 0f 1e fa          	endbr64
+    1464:	55                   	push   rbp
+    1465:	31 c0                	xor    eax,eax
+    1467:	48 89 e5             	mov    rbp,rsp
+    146a:	e8 f1 fe ff ff       	call   1360 <edge_of_the_earth>
+    146f:	90                   	nop
+
+0000000000001470 <room_4_0>:
+    1470:	f3 0f 1e fa          	endbr64
+    1474:	55                   	push   rbp
+    1475:	31 c0                	xor    eax,eax
+    1477:	48 89 e5             	mov    rbp,rsp
+    147a:	e8 e1 fe ff ff       	call   1360 <edge_of_the_earth>
+    147f:	90                   	nop
+
+0000000000001480 <room_3_7>:
+    1480:	f3 0f 1e fa          	endbr64
+    1484:	55                   	push   rbp
+    1485:	31 c0                	xor    eax,eax
+    1487:	48 89 e5             	mov    rbp,rsp
+    148a:	e8 d1 fe ff ff       	call   1360 <edge_of_the_earth>
+    148f:	90                   	nop
+
+0000000000001490 <room_3_0>:
+    1490:	f3 0f 1e fa          	endbr64
+    1494:	55                   	push   rbp
+    1495:	31 c0                	xor    eax,eax
+    1497:	48 89 e5             	mov    rbp,rsp
+    149a:	e8 c1 fe ff ff       	call   1360 <edge_of_the_earth>
+    149f:	90                   	nop
+
+00000000000014a0 <room_2_7>:
+    14a0:	f3 0f 1e fa          	endbr64
+    14a4:	55                   	push   rbp
+    14a5:	31 c0                	xor    eax,eax
+    14a7:	48 89 e5             	mov    rbp,rsp
+    14aa:	e8 b1 fe ff ff       	call   1360 <edge_of_the_earth>
+    14af:	90                   	nop
+
+00000000000014b0 <room_2_0>:
+    14b0:	f3 0f 1e fa          	endbr64
+    14b4:	55                   	push   rbp
+    14b5:	31 c0                	xor    eax,eax
+    14b7:	48 89 e5             	mov    rbp,rsp
+    14ba:	e8 a1 fe ff ff       	call   1360 <edge_of_the_earth>
+    14bf:	90                   	nop
+
+00000000000014c0 <room_1_7>:
+    14c0:	f3 0f 1e fa          	endbr64
+    14c4:	55                   	push   rbp
+    14c5:	31 c0                	xor    eax,eax
+    14c7:	48 89 e5             	mov    rbp,rsp
+    14ca:	e8 91 fe ff ff       	call   1360 <edge_of_the_earth>
+    14cf:	90                   	nop
+
+00000000000014d0 <room_1_0>:
+    14d0:	f3 0f 1e fa          	endbr64
+    14d4:	55                   	push   rbp
+    14d5:	31 c0                	xor    eax,eax
+    14d7:	48 89 e5             	mov    rbp,rsp
+    14da:	e8 81 fe ff ff       	call   1360 <edge_of_the_earth>
+    14df:	90                   	nop
+
+00000000000014e0 <room_0_7>:
+    14e0:	f3 0f 1e fa          	endbr64
+    14e4:	55                   	push   rbp
+    14e5:	31 c0                	xor    eax,eax
+    14e7:	48 89 e5             	mov    rbp,rsp
+    14ea:	e8 71 fe ff ff       	call   1360 <edge_of_the_earth>
+    14ef:	90                   	nop
+
+00000000000014f0 <room_0_6>:
+    14f0:	f3 0f 1e fa          	endbr64
+    14f4:	55                   	push   rbp
+    14f5:	31 c0                	xor    eax,eax
+    14f7:	48 89 e5             	mov    rbp,rsp
+    14fa:	e8 61 fe ff ff       	call   1360 <edge_of_the_earth>
+    14ff:	90                   	nop
+
+0000000000001500 <room_0_5>:
+    1500:	f3 0f 1e fa          	endbr64
+    1504:	55                   	push   rbp
+    1505:	31 c0                	xor    eax,eax
+    1507:	48 89 e5             	mov    rbp,rsp
+    150a:	e8 51 fe ff ff       	call   1360 <edge_of_the_earth>
+    150f:	90                   	nop
+
+0000000000001510 <room_0_4>:
+    1510:	f3 0f 1e fa          	endbr64
+    1514:	55                   	push   rbp
+    1515:	31 c0                	xor    eax,eax
+    1517:	48 89 e5             	mov    rbp,rsp
+    151a:	e8 41 fe ff ff       	call   1360 <edge_of_the_earth>
+    151f:	90                   	nop
+
+0000000000001520 <room_0_3>:
+    1520:	f3 0f 1e fa          	endbr64
+    1524:	55                   	push   rbp
+    1525:	31 c0                	xor    eax,eax
+    1527:	48 89 e5             	mov    rbp,rsp
+    152a:	e8 31 fe ff ff       	call   1360 <edge_of_the_earth>
+    152f:	90                   	nop
+
+0000000000001530 <room_0_2>:
+    1530:	f3 0f 1e fa          	endbr64
+    1534:	55                   	push   rbp
+    1535:	31 c0                	xor    eax,eax
+    1537:	48 89 e5             	mov    rbp,rsp
+    153a:	e8 21 fe ff ff       	call   1360 <edge_of_the_earth>
+    153f:	90                   	nop
+
+0000000000001540 <room_0_1>:
+    1540:	f3 0f 1e fa          	endbr64
+    1544:	55                   	push   rbp
+    1545:	31 c0                	xor    eax,eax
+    1547:	48 89 e5             	mov    rbp,rsp
+    154a:	e8 11 fe ff ff       	call   1360 <edge_of_the_earth>
+    154f:	90                   	nop
+
+0000000000001550 <boring_room>:
+    1550:	f3 0f 1e fa          	endbr64
+    1554:	55                   	push   rbp
+    1555:	48 8d 3d 01 0b 00 00 	lea    rdi,[rip+0xb01]        # 205d <_fini+0x305>
+    155c:	48 89 e5             	mov    rbp,rsp
+    155f:	e8 9c fd ff ff       	call   1300 <say>
+    1564:	48 8d 3d 03 0b 00 00 	lea    rdi,[rip+0xb03]        # 206e <_fini+0x316>
+    156b:	e8 90 fd ff ff       	call   1300 <say>
+    1570:	48 8d 3d 0c 0b 00 00 	lea    rdi,[rip+0xb0c]        # 2083 <_fini+0x32b>
+    1577:	e8 84 fd ff ff       	call   1300 <say>
+    157c:	5d                   	pop    rbp
+    157d:	c3                   	ret
+    157e:	66 90                	xchg   ax,ax
+
+0000000000001580 <room_1_1>:
+    1580:	f3 0f 1e fa          	endbr64
+    1584:	55                   	push   rbp
+    1585:	31 c0                	xor    eax,eax
+    1587:	48 89 e5             	mov    rbp,rsp
+    158a:	e8 c1 ff ff ff       	call   1550 <boring_room>
+    158f:	5d                   	pop    rbp
+    1590:	c3                   	ret
+    1591:	66 2e 0f 1f 84 00 00 	cs nop WORD PTR [rax+rax*1+0x0]
+    1598:	00 00 00 
+    159b:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+00000000000015a0 <room_5_3>:
+    15a0:	f3 0f 1e fa          	endbr64
+    15a4:	55                   	push   rbp
+    15a5:	8b 05 5d 2a 00 00    	mov    eax,DWORD PTR [rip+0x2a5d]        # 4008 <has_bicycle>
+    15ab:	48 89 e5             	mov    rbp,rsp
+    15ae:	85 c0                	test   eax,eax
+    15b0:	74 0e                	je     15c0 <room_5_3+0x20>
+    15b2:	31 c0                	xor    eax,eax
+    15b4:	e8 97 ff ff ff       	call   1550 <boring_room>
+    15b9:	5d                   	pop    rbp
+    15ba:	c3                   	ret
+    15bb:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+    15c0:	48 8d 3d 96 0a 00 00 	lea    rdi,[rip+0xa96]        # 205d <_fini+0x305>
+    15c7:	83 05 3e 2a 00 00 01 	add    DWORD PTR [rip+0x2a3e],0x1        # 400c <seen_count>
+    15ce:	e8 2d fd ff ff       	call   1300 <say>
+    15d3:	48 8d 3d c6 0a 00 00 	lea    rdi,[rip+0xac6]        # 20a0 <_fini+0x348>
+    15da:	e8 21 fd ff ff       	call   1300 <say>
+    15df:	48 8d 3d 9d 0a 00 00 	lea    rdi,[rip+0xa9d]        # 2083 <_fini+0x32b>
+    15e6:	e8 15 fd ff ff       	call   1300 <say>
+    15eb:	83 3d 1a 2a 00 00 03 	cmp    DWORD PTR [rip+0x2a1a],0x3        # 400c <seen_count>
+    15f2:	75 c5                	jne    15b9 <room_5_3+0x19>
+    15f4:	48 8d 3d f5 0a 00 00 	lea    rdi,[rip+0xaf5]        # 20f0 <_fini+0x398>
+    15fb:	c7 05 03 2a 00 00 01 	mov    DWORD PTR [rip+0x2a03],0x1        # 4008 <has_bicycle>
+    1602:	00 00 00 
+    1605:	e8 f6 fc ff ff       	call   1300 <say>
+    160a:	48 8d 3d 17 0b 00 00 	lea    rdi,[rip+0xb17]        # 2128 <_fini+0x3d0>
+    1611:	e8 ea fc ff ff       	call   1300 <say>
+    1616:	5d                   	pop    rbp
+    1617:	c3                   	ret
+    1618:	0f 1f 84 00 00 00 00 	nop    DWORD PTR [rax+rax*1+0x0]
+    161f:	00 
+
+0000000000001620 <room_6_6>:
+    1620:	f3 0f 1e fa          	endbr64
+    1624:	55                   	push   rbp
+    1625:	31 c0                	xor    eax,eax
+    1627:	48 89 e5             	mov    rbp,rsp
+    162a:	e8 21 ff ff ff       	call   1550 <boring_room>
+    162f:	5d                   	pop    rbp
+    1630:	c3                   	ret
+    1631:	66 2e 0f 1f 84 00 00 	cs nop WORD PTR [rax+rax*1+0x0]
+    1638:	00 00 00 
+    163b:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+0000000000001640 <room_6_5>:
+    1640:	f3 0f 1e fa          	endbr64
+    1644:	55                   	push   rbp
+    1645:	31 c0                	xor    eax,eax
+    1647:	48 89 e5             	mov    rbp,rsp
+    164a:	e8 01 ff ff ff       	call   1550 <boring_room>
+    164f:	5d                   	pop    rbp
+    1650:	c3                   	ret
+    1651:	66 2e 0f 1f 84 00 00 	cs nop WORD PTR [rax+rax*1+0x0]
+    1658:	00 00 00 
+    165b:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+0000000000001660 <room_6_4>:
+    1660:	f3 0f 1e fa          	endbr64
+    1664:	55                   	push   rbp
+    1665:	31 c0                	xor    eax,eax
+    1667:	48 89 e5             	mov    rbp,rsp
+    166a:	e8 e1 fe ff ff       	call   1550 <boring_room>
+    166f:	5d                   	pop    rbp
+    1670:	c3                   	ret
+    1671:	66 2e 0f 1f 84 00 00 	cs nop WORD PTR [rax+rax*1+0x0]
+    1678:	00 00 00 
+    167b:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+0000000000001680 <room_6_3>:
+    1680:	f3 0f 1e fa          	endbr64
+    1684:	55                   	push   rbp
+    1685:	31 c0                	xor    eax,eax
+    1687:	48 89 e5             	mov    rbp,rsp
+    168a:	e8 c1 fe ff ff       	call   1550 <boring_room>
+    168f:	5d                   	pop    rbp
+    1690:	c3                   	ret
+    1691:	66 2e 0f 1f 84 00 00 	cs nop WORD PTR [rax+rax*1+0x0]
+    1698:	00 00 00 
+    169b:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+00000000000016a0 <room_6_2>:
+    16a0:	f3 0f 1e fa          	endbr64
+    16a4:	55                   	push   rbp
+    16a5:	31 c0                	xor    eax,eax
+    16a7:	48 89 e5             	mov    rbp,rsp
+    16aa:	e8 a1 fe ff ff       	call   1550 <boring_room>
+    16af:	5d                   	pop    rbp
+    16b0:	c3                   	ret
+    16b1:	66 2e 0f 1f 84 00 00 	cs nop WORD PTR [rax+rax*1+0x0]
+    16b8:	00 00 00 
+    16bb:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+00000000000016c0 <room_6_1>:
+    16c0:	f3 0f 1e fa          	endbr64
+    16c4:	55                   	push   rbp
+    16c5:	31 c0                	xor    eax,eax
+    16c7:	48 89 e5             	mov    rbp,rsp
+    16ca:	e8 81 fe ff ff       	call   1550 <boring_room>
+    16cf:	5d                   	pop    rbp
+    16d0:	c3                   	ret
+    16d1:	66 2e 0f 1f 84 00 00 	cs nop WORD PTR [rax+rax*1+0x0]
+    16d8:	00 00 00 
+    16db:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+00000000000016e0 <room_5_6>:
+    16e0:	f3 0f 1e fa          	endbr64
+    16e4:	55                   	push   rbp
+    16e5:	31 c0                	xor    eax,eax
+    16e7:	48 89 e5             	mov    rbp,rsp
+    16ea:	e8 61 fe ff ff       	call   1550 <boring_room>
+    16ef:	5d                   	pop    rbp
+    16f0:	c3                   	ret
+    16f1:	66 2e 0f 1f 84 00 00 	cs nop WORD PTR [rax+rax*1+0x0]
+    16f8:	00 00 00 
+    16fb:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+0000000000001700 <room_5_5>:
+    1700:	f3 0f 1e fa          	endbr64
+    1704:	55                   	push   rbp
+    1705:	31 c0                	xor    eax,eax
+    1707:	48 89 e5             	mov    rbp,rsp
+    170a:	e8 41 fe ff ff       	call   1550 <boring_room>
+    170f:	5d                   	pop    rbp
+    1710:	c3                   	ret
+    1711:	66 2e 0f 1f 84 00 00 	cs nop WORD PTR [rax+rax*1+0x0]
+    1718:	00 00 00 
+    171b:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+0000000000001720 <room_5_4>:
+    1720:	f3 0f 1e fa          	endbr64
+    1724:	55                   	push   rbp
+    1725:	31 c0                	xor    eax,eax
+    1727:	48 89 e5             	mov    rbp,rsp
+    172a:	e8 21 fe ff ff       	call   1550 <boring_room>
+    172f:	5d                   	pop    rbp
+    1730:	c3                   	ret
+    1731:	66 2e 0f 1f 84 00 00 	cs nop WORD PTR [rax+rax*1+0x0]
+    1738:	00 00 00 
+    173b:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+0000000000001740 <room_5_2>:
+    1740:	f3 0f 1e fa          	endbr64
+    1744:	55                   	push   rbp
+    1745:	31 c0                	xor    eax,eax
+    1747:	48 89 e5             	mov    rbp,rsp
+    174a:	e8 01 fe ff ff       	call   1550 <boring_room>
+    174f:	5d                   	pop    rbp
+    1750:	c3                   	ret
+    1751:	66 2e 0f 1f 84 00 00 	cs nop WORD PTR [rax+rax*1+0x0]
+    1758:	00 00 00 
+    175b:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+0000000000001760 <room_5_1>:
+    1760:	f3 0f 1e fa          	endbr64
+    1764:	55                   	push   rbp
+    1765:	31 c0                	xor    eax,eax
+    1767:	48 89 e5             	mov    rbp,rsp
+    176a:	e8 e1 fd ff ff       	call   1550 <boring_room>
+    176f:	5d                   	pop    rbp
+    1770:	c3                   	ret
+    1771:	66 2e 0f 1f 84 00 00 	cs nop WORD PTR [rax+rax*1+0x0]
+    1778:	00 00 00 
+    177b:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+0000000000001780 <room_4_6>:
+    1780:	f3 0f 1e fa          	endbr64
+    1784:	55                   	push   rbp
+    1785:	31 c0                	xor    eax,eax
+    1787:	48 89 e5             	mov    rbp,rsp
+    178a:	e8 c1 fd ff ff       	call   1550 <boring_room>
+    178f:	5d                   	pop    rbp
+    1790:	c3                   	ret
+    1791:	66 2e 0f 1f 84 00 00 	cs nop WORD PTR [rax+rax*1+0x0]
+    1798:	00 00 00 
+    179b:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+00000000000017a0 <room_4_5>:
+    17a0:	f3 0f 1e fa          	endbr64
+    17a4:	55                   	push   rbp
+    17a5:	31 c0                	xor    eax,eax
+    17a7:	48 89 e5             	mov    rbp,rsp
+    17aa:	e8 a1 fd ff ff       	call   1550 <boring_room>
+    17af:	5d                   	pop    rbp
+    17b0:	c3                   	ret
+    17b1:	66 2e 0f 1f 84 00 00 	cs nop WORD PTR [rax+rax*1+0x0]
+    17b8:	00 00 00 
+    17bb:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+00000000000017c0 <room_4_4>:
+    17c0:	f3 0f 1e fa          	endbr64
+    17c4:	55                   	push   rbp
+    17c5:	31 c0                	xor    eax,eax
+    17c7:	48 89 e5             	mov    rbp,rsp
+    17ca:	e8 81 fd ff ff       	call   1550 <boring_room>
+    17cf:	5d                   	pop    rbp
+    17d0:	c3                   	ret
+    17d1:	66 2e 0f 1f 84 00 00 	cs nop WORD PTR [rax+rax*1+0x0]
+    17d8:	00 00 00 
+    17db:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+00000000000017e0 <room_4_3>:
+    17e0:	f3 0f 1e fa          	endbr64
+    17e4:	55                   	push   rbp
+    17e5:	31 c0                	xor    eax,eax
+    17e7:	48 89 e5             	mov    rbp,rsp
+    17ea:	e8 61 fd ff ff       	call   1550 <boring_room>
+    17ef:	5d                   	pop    rbp
+    17f0:	c3                   	ret
+    17f1:	66 2e 0f 1f 84 00 00 	cs nop WORD PTR [rax+rax*1+0x0]
+    17f8:	00 00 00 
+    17fb:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+0000000000001800 <room_4_2>:
+    1800:	f3 0f 1e fa          	endbr64
+    1804:	55                   	push   rbp
+    1805:	31 c0                	xor    eax,eax
+    1807:	48 89 e5             	mov    rbp,rsp
+    180a:	e8 41 fd ff ff       	call   1550 <boring_room>
+    180f:	5d                   	pop    rbp
+    1810:	c3                   	ret
+    1811:	66 2e 0f 1f 84 00 00 	cs nop WORD PTR [rax+rax*1+0x0]
+    1818:	00 00 00 
+    181b:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+0000000000001820 <room_4_1>:
+    1820:	f3 0f 1e fa          	endbr64
+    1824:	55                   	push   rbp
+    1825:	31 c0                	xor    eax,eax
+    1827:	48 89 e5             	mov    rbp,rsp
+    182a:	e8 21 fd ff ff       	call   1550 <boring_room>
+    182f:	5d                   	pop    rbp
+    1830:	c3                   	ret
+    1831:	66 2e 0f 1f 84 00 00 	cs nop WORD PTR [rax+rax*1+0x0]
+    1838:	00 00 00 
+    183b:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+0000000000001840 <room_3_6>:
+    1840:	f3 0f 1e fa          	endbr64
+    1844:	55                   	push   rbp
+    1845:	31 c0                	xor    eax,eax
+    1847:	48 89 e5             	mov    rbp,rsp
+    184a:	e8 01 fd ff ff       	call   1550 <boring_room>
+    184f:	5d                   	pop    rbp
+    1850:	c3                   	ret
+    1851:	66 2e 0f 1f 84 00 00 	cs nop WORD PTR [rax+rax*1+0x0]
+    1858:	00 00 00 
+    185b:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+0000000000001860 <room_3_4>:
+    1860:	f3 0f 1e fa          	endbr64
+    1864:	55                   	push   rbp
+    1865:	31 c0                	xor    eax,eax
+    1867:	48 89 e5             	mov    rbp,rsp
+    186a:	e8 e1 fc ff ff       	call   1550 <boring_room>
+    186f:	5d                   	pop    rbp
+    1870:	c3                   	ret
+    1871:	66 2e 0f 1f 84 00 00 	cs nop WORD PTR [rax+rax*1+0x0]
+    1878:	00 00 00 
+    187b:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+0000000000001880 <room_3_3>:
+    1880:	f3 0f 1e fa          	endbr64
+    1884:	55                   	push   rbp
+    1885:	31 c0                	xor    eax,eax
+    1887:	48 89 e5             	mov    rbp,rsp
+    188a:	e8 c1 fc ff ff       	call   1550 <boring_room>
+    188f:	5d                   	pop    rbp
+    1890:	c3                   	ret
+    1891:	66 2e 0f 1f 84 00 00 	cs nop WORD PTR [rax+rax*1+0x0]
+    1898:	00 00 00 
+    189b:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+00000000000018a0 <room_3_2>:
+    18a0:	f3 0f 1e fa          	endbr64
+    18a4:	55                   	push   rbp
+    18a5:	31 c0                	xor    eax,eax
+    18a7:	48 89 e5             	mov    rbp,rsp
+    18aa:	e8 a1 fc ff ff       	call   1550 <boring_room>
+    18af:	5d                   	pop    rbp
+    18b0:	c3                   	ret
+    18b1:	66 2e 0f 1f 84 00 00 	cs nop WORD PTR [rax+rax*1+0x0]
+    18b8:	00 00 00 
+    18bb:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+00000000000018c0 <room_3_1>:
+    18c0:	f3 0f 1e fa          	endbr64
+    18c4:	55                   	push   rbp
+    18c5:	31 c0                	xor    eax,eax
+    18c7:	48 89 e5             	mov    rbp,rsp
+    18ca:	e8 81 fc ff ff       	call   1550 <boring_room>
+    18cf:	5d                   	pop    rbp
+    18d0:	c3                   	ret
+    18d1:	66 2e 0f 1f 84 00 00 	cs nop WORD PTR [rax+rax*1+0x0]
+    18d8:	00 00 00 
+    18db:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+00000000000018e0 <room_2_6>:
+    18e0:	f3 0f 1e fa          	endbr64
+    18e4:	55                   	push   rbp
+    18e5:	31 c0                	xor    eax,eax
+    18e7:	48 89 e5             	mov    rbp,rsp
+    18ea:	e8 61 fc ff ff       	call   1550 <boring_room>
+    18ef:	5d                   	pop    rbp
+    18f0:	c3                   	ret
+    18f1:	66 2e 0f 1f 84 00 00 	cs nop WORD PTR [rax+rax*1+0x0]
+    18f8:	00 00 00 
+    18fb:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+0000000000001900 <room_2_5>:
+    1900:	f3 0f 1e fa          	endbr64
+    1904:	55                   	push   rbp
+    1905:	31 c0                	xor    eax,eax
+    1907:	48 89 e5             	mov    rbp,rsp
+    190a:	e8 41 fc ff ff       	call   1550 <boring_room>
+    190f:	5d                   	pop    rbp
+    1910:	c3                   	ret
+    1911:	66 2e 0f 1f 84 00 00 	cs nop WORD PTR [rax+rax*1+0x0]
+    1918:	00 00 00 
+    191b:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+0000000000001920 <room_2_4>:
+    1920:	f3 0f 1e fa          	endbr64
+    1924:	55                   	push   rbp
+    1925:	31 c0                	xor    eax,eax
+    1927:	48 89 e5             	mov    rbp,rsp
+    192a:	e8 21 fc ff ff       	call   1550 <boring_room>
+    192f:	5d                   	pop    rbp
+    1930:	c3                   	ret
+    1931:	66 2e 0f 1f 84 00 00 	cs nop WORD PTR [rax+rax*1+0x0]
+    1938:	00 00 00 
+    193b:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+0000000000001940 <room_2_3>:
+    1940:	f3 0f 1e fa          	endbr64
+    1944:	55                   	push   rbp
+    1945:	31 c0                	xor    eax,eax
+    1947:	48 89 e5             	mov    rbp,rsp
+    194a:	e8 01 fc ff ff       	call   1550 <boring_room>
+    194f:	5d                   	pop    rbp
+    1950:	c3                   	ret
+    1951:	66 2e 0f 1f 84 00 00 	cs nop WORD PTR [rax+rax*1+0x0]
+    1958:	00 00 00 
+    195b:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+0000000000001960 <room_2_1>:
+    1960:	f3 0f 1e fa          	endbr64
+    1964:	55                   	push   rbp
+    1965:	31 c0                	xor    eax,eax
+    1967:	48 89 e5             	mov    rbp,rsp
+    196a:	e8 e1 fb ff ff       	call   1550 <boring_room>
+    196f:	5d                   	pop    rbp
+    1970:	c3                   	ret
+    1971:	66 2e 0f 1f 84 00 00 	cs nop WORD PTR [rax+rax*1+0x0]
+    1978:	00 00 00 
+    197b:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+0000000000001980 <room_1_6>:
+    1980:	f3 0f 1e fa          	endbr64
+    1984:	55                   	push   rbp
+    1985:	31 c0                	xor    eax,eax
+    1987:	48 89 e5             	mov    rbp,rsp
+    198a:	e8 c1 fb ff ff       	call   1550 <boring_room>
+    198f:	5d                   	pop    rbp
+    1990:	c3                   	ret
+    1991:	66 2e 0f 1f 84 00 00 	cs nop WORD PTR [rax+rax*1+0x0]
+    1998:	00 00 00 
+    199b:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+00000000000019a0 <room_1_5>:
+    19a0:	f3 0f 1e fa          	endbr64
+    19a4:	55                   	push   rbp
+    19a5:	31 c0                	xor    eax,eax
+    19a7:	48 89 e5             	mov    rbp,rsp
+    19aa:	e8 a1 fb ff ff       	call   1550 <boring_room>
+    19af:	5d                   	pop    rbp
+    19b0:	c3                   	ret
+    19b1:	66 2e 0f 1f 84 00 00 	cs nop WORD PTR [rax+rax*1+0x0]
+    19b8:	00 00 00 
+    19bb:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+00000000000019c0 <room_1_4>:
+    19c0:	f3 0f 1e fa          	endbr64
+    19c4:	55                   	push   rbp
+    19c5:	31 c0                	xor    eax,eax
+    19c7:	48 89 e5             	mov    rbp,rsp
+    19ca:	e8 81 fb ff ff       	call   1550 <boring_room>
+    19cf:	5d                   	pop    rbp
+    19d0:	c3                   	ret
+    19d1:	66 2e 0f 1f 84 00 00 	cs nop WORD PTR [rax+rax*1+0x0]
+    19d8:	00 00 00 
+    19db:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+00000000000019e0 <room_1_3>:
+    19e0:	f3 0f 1e fa          	endbr64
+    19e4:	55                   	push   rbp
+    19e5:	31 c0                	xor    eax,eax
+    19e7:	48 89 e5             	mov    rbp,rsp
+    19ea:	e8 61 fb ff ff       	call   1550 <boring_room>
+    19ef:	5d                   	pop    rbp
+    19f0:	c3                   	ret
+    19f1:	66 2e 0f 1f 84 00 00 	cs nop WORD PTR [rax+rax*1+0x0]
+    19f8:	00 00 00 
+    19fb:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+0000000000001a00 <room_1_2>:
+    1a00:	f3 0f 1e fa          	endbr64
+    1a04:	55                   	push   rbp
+    1a05:	31 c0                	xor    eax,eax
+    1a07:	48 89 e5             	mov    rbp,rsp
+    1a0a:	e8 41 fb ff ff       	call   1550 <boring_room>
+    1a0f:	5d                   	pop    rbp
+    1a10:	c3                   	ret
+    1a11:	66 2e 0f 1f 84 00 00 	cs nop WORD PTR [rax+rax*1+0x0]
+    1a18:	00 00 00 
+    1a1b:	0f 1f 44 00 00       	nop    DWORD PTR [rax+rax*1+0x0]
+
+0000000000001a20 <secret_win>:
+    1a20:	f3 0f 1e fa          	endbr64
+    1a24:	55                   	push   rbp
+    1a25:	b8 a0 ad ff ff       	mov    eax,0xffffada0
+    1a2a:	48 8d 3d 1f 07 00 00 	lea    rdi,[rip+0x71f]        # 2150 <_fini+0x3f8>
+    1a31:	48 89 e5             	mov    rbp,rsp
+    1a34:	41 55                	push   r13
+    1a36:	41 54                	push   r12
+    1a38:	4c 8d 6d d7          	lea    r13,[rbp-0x29]
+    1a3c:	53                   	push   rbx
+    1a3d:	48 8d 9d 70 ff ff ff 	lea    rbx,[rbp-0x90]
+    1a44:	48 83 ec 78          	sub    rsp,0x78
+    1a48:	66 0f 6f 05 40 0a 00 	movdqa xmm0,XMMWORD PTR [rip+0xa40]        # 2490 <_fini+0x738>
+    1a4f:	00 
+    1a50:	66 89 45 d4          	mov    WORD PTR [rbp-0x2c],ax
+    1a54:	c7 45 d0 f8 fd e9 fe 	mov    DWORD PTR [rbp-0x30],0xfee9fdf8
+    1a5b:	0f 29 85 70 ff ff ff 	movaps XMMWORD PTR [rbp-0x90],xmm0
+    1a62:	66 0f 6f 05 36 0a 00 	movdqa xmm0,XMMWORD PTR [rip+0xa36]        # 24a0 <_fini+0x748>
+    1a69:	00 
+    1a6a:	c6 45 d6 9a          	mov    BYTE PTR [rbp-0x2a],0x9a
+    1a6e:	0f 29 45 80          	movaps XMMWORD PTR [rbp-0x80],xmm0
+    1a72:	66 0f 6f 05 36 0a 00 	movdqa xmm0,XMMWORD PTR [rip+0xa36]        # 24b0 <_fini+0x758>
+    1a79:	00 
+    1a7a:	0f 29 45 90          	movaps XMMWORD PTR [rbp-0x70],xmm0
+    1a7e:	66 0f 6f 05 3a 0a 00 	movdqa xmm0,XMMWORD PTR [rip+0xa3a]        # 24c0 <_fini+0x768>
+    1a85:	00 
+    1a86:	0f 29 45 a0          	movaps XMMWORD PTR [rbp-0x60],xmm0
+    1a8a:	66 0f 6f 05 3e 0a 00 	movdqa xmm0,XMMWORD PTR [rip+0xa3e]        # 24d0 <_fini+0x778>
+    1a91:	00 
+    1a92:	0f 29 45 b0          	movaps XMMWORD PTR [rbp-0x50],xmm0
+    1a96:	66 0f 6f 05 42 0a 00 	movdqa xmm0,XMMWORD PTR [rip+0xa42]        # 24e0 <_fini+0x788>
+    1a9d:	00 
+    1a9e:	0f 29 45 c0          	movaps XMMWORD PTR [rbp-0x40],xmm0
+    1aa2:	e8 59 f8 ff ff       	call   1300 <say>
+    1aa7:	48 8d 3d 37 08 00 00 	lea    rdi,[rip+0x837]        # 22e5 <_fini+0x58d>
+    1aae:	e8 4d f8 ff ff       	call   1300 <say>
+    1ab3:	48 8d 3d 7d 0a 00 00 	lea    rdi,[rip+0xa7d]        # 2537 <_fini+0x7df>
+    1aba:	e8 41 f8 ff ff       	call   1300 <say>
+    1abf:	48 8d 3d da 06 00 00 	lea    rdi,[rip+0x6da]        # 21a0 <_fini+0x448>
+    1ac6:	e8 35 f8 ff ff       	call   1300 <say>
+    1acb:	48 8d 3d 1e 07 00 00 	lea    rdi,[rip+0x71e]        # 21f0 <_fini+0x498>
+    1ad2:	e8 29 f8 ff ff       	call   1300 <say>
+    1ad7:	48 8d 3d 6a 07 00 00 	lea    rdi,[rip+0x76a]        # 2248 <_fini+0x4f0>
+    1ade:	e8 1d f8 ff ff       	call   1300 <say>
+    1ae3:	48 8d 3d 0d 08 00 00 	lea    rdi,[rip+0x80d]        # 22f7 <_fini+0x59f>
+    1aea:	e8 11 f8 ff ff       	call   1300 <say>
+    1aef:	48 8d 3d 41 0a 00 00 	lea    rdi,[rip+0xa41]        # 2537 <_fini+0x7df>
+    1af6:	e8 05 f8 ff ff       	call   1300 <say>
+    1afb:	48 8d 3d 96 07 00 00 	lea    rdi,[rip+0x796]        # 2298 <_fini+0x540>
+    1b02:	e8 f9 f7 ff ff       	call   1300 <say>
+    1b07:	48 8d 3d f6 07 00 00 	lea    rdi,[rip+0x7f6]        # 2304 <_fini+0x5ac>
+    1b0e:	e8 ed f7 ff ff       	call   1300 <say>
+    1b13:	48 8d 3d 05 08 00 00 	lea    rdi,[rip+0x805]        # 231f <_fini+0x5c7>
+    1b1a:	e8 f1 f5 ff ff       	call   1110 <readline@plt>
+    1b1f:	ba 0a 00 00 00       	mov    edx,0xa
+    1b24:	31 f6                	xor    esi,esi
+    1b26:	48 89 c7             	mov    rdi,rax
+    1b29:	e8 02 f6 ff ff       	call   1130 <strtol@plt>
+    1b2e:	41 89 c4             	mov    r12d,eax
+    1b31:	41 29 dc             	sub    r12d,ebx
+    1b34:	0f 1f 40 00          	nop    DWORD PTR [rax+0x0]
+    1b38:	0f be 03             	movsx  eax,BYTE PTR [rbx]
+    1b3b:	48 8b 35 de 24 00 00 	mov    rsi,QWORD PTR [rip+0x24de]        # 4020 <stdout@@GLIBC_2.2.5>
+    1b42:	41 8d 3c 1c          	lea    edi,[r12+rbx*1]
+    1b46:	48 83 c3 01          	add    rbx,0x1
+    1b4a:	31 c7                	xor    edi,eax
+    1b4c:	e8 cf f5 ff ff       	call   1120 <putc@plt>
+    1b51:	bf 50 c3 00 00       	mov    edi,0xc350
+    1b56:	e8 15 f6 ff ff       	call   1170 <usleep@plt>
+    1b5b:	48 8b 3d be 24 00 00 	mov    rdi,QWORD PTR [rip+0x24be]        # 4020 <stdout@@GLIBC_2.2.5>
+    1b62:	e8 d9 f5 ff ff       	call   1140 <fflush@plt>
+    1b67:	49 39 dd             	cmp    r13,rbx
+    1b6a:	75 cc                	jne    1b38 <secret_win+0x118>
+    1b6c:	bf 01 00 00 00       	mov    edi,0x1
+    1b71:	e8 ea f5 ff ff       	call   1160 <sleep@plt>
+    1b76:	48 8d 3d a5 07 00 00 	lea    rdi,[rip+0x7a5]        # 2322 <_fini+0x5ca>
+    1b7d:	e8 7e f7 ff ff       	call   1300 <say>
+    1b82:	31 ff                	xor    edi,edi
+    1b84:	e8 c7 f5 ff ff       	call   1150 <exit@plt>
+    1b89:	0f 1f 80 00 00 00 00 	nop    DWORD PTR [rax+0x0]
+
+0000000000001b90 <win>:
+    1b90:	f3 0f 1e fa          	endbr64
+    1b94:	55                   	push   rbp
+    1b95:	48 8d 3d a4 07 00 00 	lea    rdi,[rip+0x7a4]        # 2340 <_fini+0x5e8>
+    1b9c:	48 89 e5             	mov    rbp,rsp
+    1b9f:	e8 5c f7 ff ff       	call   1300 <say>
+    1ba4:	48 8d 3d b5 07 00 00 	lea    rdi,[rip+0x7b5]        # 2360 <_fini+0x608>
+    1bab:	e8 50 f7 ff ff       	call   1300 <say>
+    1bb0:	31 ff                	xor    edi,edi
+    1bb2:	e8 99 f5 ff ff       	call   1150 <exit@plt>
+    1bb7:	66 0f 1f 84 00 00 00 	nop    WORD PTR [rax+rax*1+0x0]
+    1bbe:	00 00 
+
+0000000000001bc0 <room_2_2>:
+    1bc0:	f3 0f 1e fa          	endbr64
+    1bc4:	55                   	push   rbp
+    1bc5:	8b 35 45 24 00 00    	mov    esi,DWORD PTR [rip+0x2445]        # 4010 <enlighted>
+    1bcb:	48 89 e5             	mov    rbp,rsp
+    1bce:	85 f6                	test   esi,esi
+    1bd0:	74 46                	je     1c18 <room_2_2+0x58>
+    1bd2:	48 8d 3d a9 07 00 00 	lea    rdi,[rip+0x7a9]        # 2382 <_fini+0x62a>
+    1bd9:	e8 22 f7 ff ff       	call   1300 <say>
+    1bde:	48 8d 3d ae 07 00 00 	lea    rdi,[rip+0x7ae]        # 2393 <_fini+0x63b>
+    1be5:	e8 16 f7 ff ff       	call   1300 <say>
+    1bea:	8b 0d 18 24 00 00    	mov    ecx,DWORD PTR [rip+0x2418]        # 4008 <has_bicycle>
+    1bf0:	85 c9                	test   ecx,ecx
+    1bf2:	75 54                	jne    1c48 <room_2_2+0x88>
+    1bf4:	48 8d 3d cd 07 00 00 	lea    rdi,[rip+0x7cd]        # 23c8 <_fini+0x670>
+    1bfb:	e8 00 f7 ff ff       	call   1300 <say>
+    1c00:	8b 15 02 24 00 00    	mov    edx,DWORD PTR [rip+0x2402]        # 4008 <has_bicycle>
+    1c06:	31 c0                	xor    eax,eax
+    1c08:	85 d2                	test   edx,edx
+    1c0a:	74 34                	je     1c40 <room_2_2+0x80>
+    1c0c:	e8 0f fe ff ff       	call   1a20 <secret_win>
+    1c11:	0f 1f 80 00 00 00 00 	nop    DWORD PTR [rax+0x0]
+    1c18:	48 8d 3d bd 07 00 00 	lea    rdi,[rip+0x7bd]        # 23dc <_fini+0x684>
+    1c1f:	e8 dc f6 ff ff       	call   1300 <say>
+    1c24:	48 8d 3d c5 07 00 00 	lea    rdi,[rip+0x7c5]        # 23f0 <_fini+0x698>
+    1c2b:	e8 d0 f6 ff ff       	call   1300 <say>
+    1c30:	48 8d 3d 11 08 00 00 	lea    rdi,[rip+0x811]        # 2448 <_fini+0x6f0>
+    1c37:	e8 c4 f6 ff ff       	call   1300 <say>
+    1c3c:	5d                   	pop    rbp
+    1c3d:	c3                   	ret
+    1c3e:	66 90                	xchg   ax,ax
+    1c40:	e8 4b ff ff ff       	call   1b90 <win>
+    1c45:	0f 1f 00             	nop    DWORD PTR [rax]
+    1c48:	48 8d 3d 5b 07 00 00 	lea    rdi,[rip+0x75b]        # 23aa <_fini+0x652>
+    1c4f:	e8 ac f6 ff ff       	call   1300 <say>
+    1c54:	eb 9e                	jmp    1bf4 <room_2_2+0x34>
+
+0000000000001c56 <move_next_room>:
+    1c56:	f3 0f 1e fa          	endbr64
+    1c5a:	55                   	push   rbp
+    1c5b:	48 89 e5             	mov    rbp,rsp
+    1c5e:	41 54                	push   r12
+    1c60:	53                   	push   rbx
+    1c61:	48 8d 1d 88 08 00 00 	lea    rbx,[rip+0x888]        # 24f0 <_fini+0x798>
+    1c68:	48 89 df             	mov    rdi,rbx
+    1c6b:	e8 70 f4 ff ff       	call   10e0 <puts@plt>
+    1c70:	48 8d 3d a8 06 00 00 	lea    rdi,[rip+0x6a8]        # 231f <_fini+0x5c7>
+    1c77:	e8 94 f4 ff ff       	call   1110 <readline@plt>
+    1c7c:	48 89 c7             	mov    rdi,rax
+    1c7f:	49 89 c4             	mov    r12,rax
+    1c82:	e8 69 f4 ff ff       	call   10f0 <strlen@plt>
+    1c87:	48 ff c8             	dec    rax
+    1c8a:	75 34                	jne    1cc0 <move_next_room+0x6a>
+    1c8c:	41 8a 04 24          	mov    al,BYTE PTR [r12]
+    1c90:	3c 45                	cmp    al,0x45
+    1c92:	75 08                	jne    1c9c <move_next_room+0x46>
+    1c94:	ff 05 7e 23 00 00    	inc    DWORD PTR [rip+0x237e]        # 4018 <xpos>
+    1c9a:	eb 37                	jmp    1cd3 <move_next_room+0x7d>
+    1c9c:	3c 57                	cmp    al,0x57
+    1c9e:	75 08                	jne    1ca8 <move_next_room+0x52>
+    1ca0:	ff 0d 72 23 00 00    	dec    DWORD PTR [rip+0x2372]        # 4018 <xpos>
+    1ca6:	eb 2b                	jmp    1cd3 <move_next_room+0x7d>
+    1ca8:	3c 4e                	cmp    al,0x4e
+    1caa:	75 08                	jne    1cb4 <move_next_room+0x5e>
+    1cac:	ff 05 62 23 00 00    	inc    DWORD PTR [rip+0x2362]        # 4014 <ypos>
+    1cb2:	eb 1f                	jmp    1cd3 <move_next_room+0x7d>
+    1cb4:	3c 53                	cmp    al,0x53
+    1cb6:	75 08                	jne    1cc0 <move_next_room+0x6a>
+    1cb8:	ff 0d 56 23 00 00    	dec    DWORD PTR [rip+0x2356]        # 4014 <ypos>
+    1cbe:	eb 13                	jmp    1cd3 <move_next_room+0x7d>
+    1cc0:	4c 89 e6             	mov    rsi,r12
+    1cc3:	48 8d 3d 4a 08 00 00 	lea    rdi,[rip+0x84a]        # 2514 <_fini+0x7bc>
+    1cca:	31 c0                	xor    eax,eax
+    1ccc:	e8 2f f4 ff ff       	call   1100 <printf@plt>
+    1cd1:	eb 95                	jmp    1c68 <move_next_room+0x12>
+    1cd3:	5b                   	pop    rbx
+    1cd4:	41 5c                	pop    r12
+    1cd6:	5d                   	pop    rbp
+    1cd7:	c3                   	ret
+    1cd8:	0f 1f 84 00 00 00 00 	nop    DWORD PTR [rax+rax*1+0x0]
+    1cdf:	00 
+
+0000000000001ce0 <__libc_csu_init>:
+    1ce0:	f3 0f 1e fa          	endbr64
+    1ce4:	41 57                	push   r15
+    1ce6:	4c 8d 3d 63 1e 00 00 	lea    r15,[rip+0x1e63]        # 3b50 <__frame_dummy_init_array_entry>
+    1ced:	41 56                	push   r14
+    1cef:	49 89 d6             	mov    r14,rdx
+    1cf2:	41 55                	push   r13
+    1cf4:	49 89 f5             	mov    r13,rsi
+    1cf7:	41 54                	push   r12
+    1cf9:	41 89 fc             	mov    r12d,edi
+    1cfc:	55                   	push   rbp
+    1cfd:	48 8d 2d 54 1e 00 00 	lea    rbp,[rip+0x1e54]        # 3b58 <__do_global_dtors_aux_fini_array_entry>
+    1d04:	53                   	push   rbx
+    1d05:	4c 29 fd             	sub    rbp,r15
+    1d08:	48 83 ec 08          	sub    rsp,0x8
+    1d0c:	e8 ef f2 ff ff       	call   1000 <_init>
+    1d11:	48 c1 fd 03          	sar    rbp,0x3
+    1d15:	74 1f                	je     1d36 <__libc_csu_init+0x56>
+    1d17:	31 db                	xor    ebx,ebx
+    1d19:	0f 1f 80 00 00 00 00 	nop    DWORD PTR [rax+0x0]
+    1d20:	4c 89 f2             	mov    rdx,r14
+    1d23:	4c 89 ee             	mov    rsi,r13
+    1d26:	44 89 e7             	mov    edi,r12d
+    1d29:	41 ff 14 df          	call   QWORD PTR [r15+rbx*8]
+    1d2d:	48 83 c3 01          	add    rbx,0x1
+    1d31:	48 39 dd             	cmp    rbp,rbx
+    1d34:	75 ea                	jne    1d20 <__libc_csu_init+0x40>
+    1d36:	48 83 c4 08          	add    rsp,0x8
+    1d3a:	5b                   	pop    rbx
+    1d3b:	5d                   	pop    rbp
+    1d3c:	41 5c                	pop    r12
+    1d3e:	41 5d                	pop    r13
+    1d40:	41 5e                	pop    r14
+    1d42:	41 5f                	pop    r15
+    1d44:	c3                   	ret
+    1d45:	66 66 2e 0f 1f 84 00 	data16 cs nop WORD PTR [rax+rax*1+0x0]
+    1d4c:	00 00 00 00 
+
+0000000000001d50 <__libc_csu_fini>:
+    1d50:	f3 0f 1e fa          	endbr64
+    1d54:	c3                   	ret
+
+Disassembly of section .fini:
+
+0000000000001d58 <_fini>:
+    1d58:	f3 0f 1e fa          	endbr64
+    1d5c:	48 83 ec 08          	sub    rsp,0x8
+    1d60:	48 83 c4 08          	add    rsp,0x8
+    1d64:	c3                   	ret

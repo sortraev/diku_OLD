@@ -1,0 +1,45 @@
+\section{Tightness of Markov's inequality}
+
+I dub my distribution MyDist$(\eps^\ast)$ to be a distribution with two possible
+outcomes, parameterized over $\eps^\ast$.
+
+\medskip
+
+\noindent Let $X \sim \text{MyDist}(\eps^\ast)$. Then $\PP{X}$ is defined as
+such:
+
+\begin{align}
+  \PP{X = x} =
+  \begin{cases}
+    \frac{1}{(\eps^\ast)^2},\quad &x = \eps^\ast\\
+    1 - \PP{X = \eps^\ast},\quad &x = 0
+  \end{cases}\label{eq:my_dist}
+\end{align}
+
+The expected value $X$ of my distribution is then:
+
+\begin{align*}
+  \EE{X} &= \eps^\ast * \PP{X = \eps^\ast} + 0 * (1 - \PP{X = \eps^\ast})\\
+         &= \frac{\eps^\ast}{(\eps^\ast)^2}\\
+         &= \frac{1}{\eps^\ast}
+\end{align*}
+
+Markov's inequality states that $\PP{X \geq \eps^\ast} \leq
+\frac{\EE{X}}{\eps\ast}$. Using the above computation of $\EE{X}$:
+
+\begin{align}
+  \PP{X \geq \eps^\ast}                     \ &\leq\
+  \frac{\EE{X}}{\eps^\ast}\label{eq:foo}\\
+  &= \frac{1}{\eps^\ast}\frac{1}{\eps^\ast} = \frac{1}{(\eps^\ast)^2}\nonumber
+\end{align}
+
+However, from definition \ref{eq:my_dist}, I know that the inequality in \cref{eq:foo} is, in fact, an equality:
+
+\begin{align*}
+  &\PP{X \geq \eps^\ast} \ = \ \PP{X = \eps^\ast}\ =\ \frac{1}{(\eps^\ast)^2}\\
+  \Leftrightarrow\quad &\PP{X \geq \eps^\ast}\ =\  \frac{1}{(\eps^\ast)^2}
+\end{align*}
+Which is what I needed to show for my distribution.
+\qed
+
+\sectend

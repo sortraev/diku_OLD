@@ -1,0 +1,64 @@
+\section{Make Your Own (10 points)}
+
+\begin{enumerate}
+
+  \item \textit{How do you define $\mathcal X$?}
+
+    For each student I would collect current GPA, class attendance, and
+    average hand-in page count. Assuming the Danish 7 point grading scale, that
+    class attendance is described by a number between 0 and 1, and that page
+    count is a natural number, we have $\mathcal X = [-3, 12] \times [0, 1]
+    \times \mathbb N$.
+
+
+  % \item for each prior course taken by the particular student, I would collect
+  %   data on the student's lecture/class attendance, assignment point grading
+  %
+  %   \TODO{what?}. Thus the sample space would be \TODO{$\mathcal X = ...$}.
+
+  \item \textit{How do you define $\mathcal Y$?}
+
+    The label space $\mathcal Y$ would be the set of possible grades --
+    assuming the Danish 7 point grading scale, we would have $\mathcal Y = \{-3,
+    00, 02, 4, 7, 10, 12\}$.
+
+  \item \textit{How do you define $\ell(y', y)$?}
+
+    I would want incorrect predictions to be punished harder the greater the
+    difference between $y'$ and $y$ -- however, to better reduce the number of
+    incorrect predictions in the extremes, I would use a square loss function:
+    $\ell(y', y) = (y' - y)^2$.
+
+  \item \textit{How do you define $d(x, x')$?}
+
+
+    Since the three dimensions in $\mathcal X$ have very different ranges, I
+    can't use a simple Euclidean distance for $d$, since for one this would weigh
+    average page count much higher than class attendance percentage. Instead, in
+    order to weigh the differences in all three dimensions equally, I use
+    a symmetric relative difference function, and $d$ is defined as:
+
+    $$d(x, x') = \sqrt{\sum_{\substack{i \in \{GPA,\\ attendance,\\ pages\}}}
+    \left(\frac{|x_i - x'_i|}{x_i + x'_i}\right)^2}$$
+
+  \item \textit{How would you evaluate your algorithm in terms of $\ell(y', y)$}?
+
+    I am not \textit{entirely} sure that I interpret the question correctly.
+    However, I would probably evaluate model accuracy using MSE such that bad
+    predictions weigh heavier. Since $\ell$ is a square loss function, the MSE
+    is:
+
+    $$
+    \frac{1}{n}\sum_{i = 0}^n \ell(y'_i, y_i)
+    $$
+
+
+  \item \textit{Do you expect any issues after deployment?}
+
+    The biggest problem I can imagine is the issue of new students for whom
+    there exists no prior data. To alleviate this, I would generate random data
+    based on other students (with added random noise, of course).
+
+\end{enumerate}
+
+\sectend

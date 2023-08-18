@@ -1,0 +1,58 @@
+\documentclass{article}
+\input{commands_and_packages.tex}
+
+\author{\texttt{sortraev} (Anders Holst)}
+
+\title{AADS 2022/23 -- exam
+  \ifdef{\notes}{
+    \ifdef{\presentations}{
+      % both notes and presentations.
+      notes\\ and presentations
+    }
+    { % just notes.
+      notes
+    }
+  }{
+    % just presentations.
+    presentations
+  }
+}
+
+\setcounter{tocdepth}{2}
+\begin{document}
+
+\maketitle
+\newpage
+\tableofcontents
+\newpage
+
+\ifdef{\notes}{
+\section{Notes}
+\input{notes/max_flow.tex} % X2
+\input{notes/linear_programming_and_optimization.tex}
+\input{notes/randomized_algorithms.tex} % mangler
+\input{notes/hashing.tex} % fin
+\input{notes/van_emde_boas_trees.tex} % kunne godt bruge en tur mere
+
+\input{notes/np_completeness.tex} % X2
+\input{notes/exact_exp_algos_and_param_complexity.tex}
+\input{notes/approximation_algorithms.tex} % X2
+\input{notes/polygon_triangulation.tex}
+}{}
+
+\ifdef{\presentations}
+{
+\section{Presentations}
+\input{presentations/max_flow.tex}
+\input{presentations/linear_programming_and_optimization.tex}
+\input{presentations/randomized_algorithms.tex}
+\input{presentations/hashing.tex}
+\input{presentations/van_emde_boas_trees.tex}
+\input{presentations/np_completeness.tex}
+\input{presentations/exact_exp_algos_and_param_complexity.tex}
+\input{presentations/approximation_algorithms.tex}
+\input{presentations/polygon_triangulation.tex}
+}{}
+
+
+\end{document}

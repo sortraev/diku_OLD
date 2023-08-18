@@ -1,0 +1,9 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{n}{FFT\PYGZus{}CONVOLVE\PYGZus{}EPS} \PYG{o}{=} \PYG{l+m+mf}{0.0001}
+\PYG{k}{def} \PYG{n+nf}{erode}\PYG{p}{(}\PYG{n}{img}\PYG{p}{):}
+    \PYG{n}{kernel} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{ones}\PYG{p}{((}\PYG{l+m+mi}{3}\PYG{p}{,} \PYG{p}{)} \PYG{o}{*} \PYG{n}{img}\PYG{o}{.}\PYG{n}{ndim}\PYG{p}{)}
+    \PYG{k}{return} \PYG{n}{convolve}\PYG{p}{(}\PYG{n}{img}\PYG{p}{,} \PYG{n}{kernel}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}same\PYGZdq{}}\PYG{p}{)} \PYG{o}{\PYGZgt{}=} \PYG{n}{kernel}\PYG{o}{.}\PYG{n}{size} \PYG{o}{\PYGZhy{}} \PYG{n}{FFT\PYGZus{}CONVOLVE\PYGZus{}EPS}
+\PYG{k}{def} \PYG{n+nf}{dilate}\PYG{p}{(}\PYG{n}{img}\PYG{p}{):}
+    \PYG{n}{kernel} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{ones}\PYG{p}{((}\PYG{l+m+mi}{3}\PYG{p}{,} \PYG{p}{)} \PYG{o}{*} \PYG{n}{img}\PYG{o}{.}\PYG{n}{ndim}\PYG{p}{)}
+    \PYG{k}{return} \PYG{n}{convolve}\PYG{p}{(}\PYG{n}{img}\PYG{p}{,} \PYG{n}{kernel}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}same\PYGZdq{}}\PYG{p}{)} \PYG{o}{\PYGZgt{}} \PYG{n}{FFT\PYGZus{}CONVOLVE\PYGZus{}EPS}
+\end{Verbatim}

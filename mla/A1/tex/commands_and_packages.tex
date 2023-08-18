@@ -1,0 +1,132 @@
+%% FROM THE PROVIDED math_symbols.tex
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{xifthen}
+\usepackage{xparse}
+\usepackage{dsfont}
+
+
+% Left-right bracket
+\newcommand{\lr}[1]{\left (#1\right)}
+
+% Left-right square bracket
+\newcommand{\lrs}[1]{\left [#1 \right]}
+
+% Left-right curly bracket
+\newcommand{\lrc}[1]{\left \{#1\right\}}
+
+% Left-right absolute value
+\newcommand{\lra}[1]{\left |#1\right|}
+
+% Left-right upper value
+\newcommand{\lru}[1]{\left \lceil#1\right\rceil}
+
+% Scalar product
+\newcommand{\vp}[2]{\left \langle #1 , #2 \right \rangle}
+
+% The real numbers
+\newcommand{\R}{\mathbb R}
+
+% The natural numbers
+\newcommand{\N}{\mathbb N}
+
+% Expectation symbol with an optional argument
+\NewDocumentCommand{\E}{o}{\mathbb E\IfValueT{#1}{\lrs{#1}}}
+
+% Indicator function with an optional argument
+\NewDocumentCommand{\1}{o}{\mathds 1{\IfValueT{#1}{\lr{#1}}}}
+
+% Probability function
+\let\P\undefined
+\NewDocumentCommand{\P}{o}{\mathbb P{\IfValueT{#1}{\lr{#1}}}}
+
+% A hypothesis space
+\newcommand{\HH}{\mathcal H}
+
+% A sample space
+\newcommand{\XX}{\mathcal{X}}
+
+% A label space
+\newcommand{\YY}{\mathcal{Y}}
+
+% A nicer emptyset symbol
+\let\emptyset\varnothing
+
+% Sign operator
+\DeclareMathOperator{\sign}{sign}
+\newcommand{\sgn}[1]{\sign\lr{#1}}
+
+% KL operator
+\DeclareMathOperator{\KL}{KL}
+
+% kl operator
+\DeclareMathOperator{\kl}{kl}
+
+% The entropy
+\let\H\relax
+\DeclareMathOperator{\H}{H}
+
+% Majority vote
+\DeclareMathOperator{\MV}{MV}
+
+% Variance
+\DeclareMathOperator{\V}{Var}
+\NewDocumentCommand{\Var}{o}{\V\IfValueT{#1}{\lrs{#1}}}
+
+% VC
+\DeclareMathOperator{\VC}{VC}
+
+% VC-dimension
+\newcommand{\dVC}{d_{\VC}}
+
+% FAT ...
+\DeclareMathOperator{\FAT}{FAT}
+\newcommand{\dfat}{d_{\FAT}}
+\newcommand{\lfat}{\ell_{\FAT}}
+\newcommand{\Lfat}{L_{\FAT}}
+\newcommand{\hatLfat}{\hat L_{\FAT}}
+
+% Distance
+\DeclareMathOperator{\dist}{dist}
+
+
+
+%% MY PACKAGES
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+% \usepackage{cleveref}
+\usepackage{graphicx}
+\usepackage{minted}    % code snippets
+\usemintedstyle{trac}
+\setminted{fontsize=\scriptsize, highlightcolor=gray, linenos, frame=lines, framesep=10pt}
+% \usepackage{tikz}
+% \usetikzlibrary{automata, positioning}
+\usepackage[]{xcolor}
+\definecolor{gray}{RGB}{235, 230, 222}
+\definecolor{myRed}{RGB}{173, 20, 0}
+\definecolor{myGreen}{RGB}{45, 150, 0}
+\newcommand{\gray}[1]{{\setlength{\fboxsep}{0pt}\colorbox{gray}{#1}}}
+\everymath{\displaystyle} % force display style for inline math. why though?
+
+
+%% My COMMANDS
+% big, fat, red TODO's.
+\newcommand{\TODO}[1]{\textcolor{red}{TODO: #1}}
+
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}} % equation numbering for align*
+
+%% math related commands/operators.
+
+% neat section and subsection separators (but have to insert manually).
+\newcommand{\sectend}{\smallskip\noindent\makebox[\textwidth]{\rule{\textwidth}{0.4pt}}}
+\newcommand{\Sectend}{\medskip\noindent\makebox[\textwidth]{\rule{1.1\textwidth}{1pt}}}
+
+% easy monospace text for inline code. also,
+% no need to escape underscores as with \texttt.
+\newcommand{\ms}[1]{\mintinline[fontsize=\normalsize]{text}{#1}}
+
+\DeclareMathOperator*{\argmin}{argmin}
+\DeclareMathOperator{\T}{^{\text T}}
+\newcommand{\mbf}[1]{\mathbf{#1}}

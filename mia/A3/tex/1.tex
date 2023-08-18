@@ -1,0 +1,33 @@
+\section{Image registration in medical image analysis}
+
+In medical image analysis we often find the need to compare different images,
+whether it be images of the same subject but of different modalities, or images
+of different subjects where we expect some sort of similarity (ie. images of the
+same body part/s from different patients). In many cases, such a comparison is
+not immediately applicable, either due to internal or external factors: Internal
+factors are the anatomical differences from patient to patient, while the
+external factors are things such as modality, exposure angle/duration, the
+choice of tracer (in nuclear imaging), imaging noise, and so on.
+
+The medical image analyst's tool of choice in these cases is \emph{image
+registration}. Given \emph{fixed} and \emph{moving} images, registration is
+a method which can be used to geometrically transform the moving image into
+(something structurally resembling) the fixed image, using proper rigid
+transformations (those which preserve object shape and orientation, ie.
+translation and rotation, but not reflection), affine transformation (any
+transformation which can be expressed as an affine function, which includes
+scaling, shearing, and the rigid transformations), and non-rigid transformations
+(which allow local, and even arbitrary deformations) of the coordinate space.
+
+Each of the three types of transformations have their uses. For example, if the
+same patient is imaged multiple times then we might expect low impact from
+internal factors, but different cameras or operators might might result in a
+different rotation or position of the subject relative to the camera, and this
+requires only a rigid transformation. On the other hand, if we need to compare
+images of body parts of organs of two different patients, we may need to account
+for different shapes altogether, and here, we can use non-rigid transformation
+to squeeze and stretch shapes in specific parts of the image -- however, in many
+of these cases, an affine transformation may suffice, eg. if one patient simply
+has a larger head than the other.
+
+\sectend

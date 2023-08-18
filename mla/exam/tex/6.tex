@@ -1,0 +1,321 @@
+\newpage
+\section{Clustering}
+\newcommand{\sed}[1]{\lVert #1 \rVert^2}
+\newcommand{\mydist}[2]{\lVert #1 - #2 \rVert^2}
+\subsection{Task 6.1}
+
+As stated in the assignment text, the center of the singular cluster is 
+the center of the dataset, which is simply:
+
+\begin{align*}
+  \frac{1}{6}
+  \begin{pmatrix}
+  7 + 2 + 0 + 0 - 6 - 6\\
+  0 + 0 - 2 + 2 -2 + 2
+  \end{pmatrix}
+  =
+  \begin{pmatrix}
+    -0.5\\
+    0
+  \end{pmatrix}
+\end{align*}
+
+Ie. the point (-0.5, 0).
+
+\subsection{Task 6.2}
+
+\texttt{k-means++} initializes the first cluster center $c_1$ by
+uniformly and randomly sampling a single point from the input dataset.
+
+As such, the probability that a point $X \in \mathcal X$ is chosen as $c_1$ is:
+\begin{align*}
+  \forall X \in \mathcal X\, :\  \PP{c_1 = X} = \frac{1}{|\mathcal X|} =
+  \frac{1}{6}.
+\end{align*}
+
+\subsection{Task 6.3}
+
+After choosing $c_1 = A$, the algorithm computes $D(x)$, the distance between
+$x$ and the nearest known centroid to $x$, for all $x \in \mathcal X$, and %' = \mathcal X \setminus \{A\}$, and
+chooses $c_2$ as the point $x$ which maximizes $D(x)$:
+
+\begin{alignat*}{3}
+  c_2 &= \argmax_{x \in\, \mathcal {X}}\ D(x)\\
+      &= \argmax_{x \in\, \mathcal {X}}\left[ \min_{c \in \mathcal C}\, \lVert
+      x - c \rVert ^2\right],
+\end{alignat*}
+
+\newpage
+but since only one centroid has been chosen, we have $\mathcal C = \{c_1\}$, and
+thus $c_2$ is given by:
+
+\begin{alignat*}{3}
+c_2 &= \argmax_{x \in\, \mathcal {X}'}\  \lVert x - c_1 \rVert ^2\\
+    &= \argmax \left\{
+  \begin{matrix}
+    A : \mydist{A}{c_1},\\
+    B : \mydist{B}{c_1},\\
+    C : \mydist{C}{c_1},\\
+    D : \mydist{D}{c_1},\\
+    E : \mydist{E}{c_1},\\
+    F : \mydist{F}{c_1}
+  \end{matrix}\right\}\\
+& = \argmax \left\{
+  \begin{matrix}
+    A : &(7  - 7)^2 &+& (0  - 0)^2\\
+    B : &(2  - 7)^2 &+& (0  - 0)^2\\
+   C : &(0  - 7)^2 &+& (-2  - 0)^2\\
+   D : &(0  - 7)^2 &+& (2  - 0)^2\\
+   E : &(-6 - 7)^2 &+& (-2 - 0)^2\\
+   F : &(-6 - 7)^2 &+& (2  - 0)^2
+  \end{matrix}\right\}\\
+& = \argmax \left\{
+  \begin{matrix}
+    A : 0,\\
+    B : 25,\\
+    C : 53,\\
+    D : 53,\\
+    E : 173,\\
+    F : 173
+  \end{matrix}\right\}
+\end{alignat*}
+
+$E$ and $F$ are both at a maximum distance of 173 from $c_1$. To break the tie, we
+arbitrarily choose the first occuring argmax:
+
+$$
+c_2 = E.
+$$
+\newpage
+
+\subsection{Task 6.4}
+
+In finding $c_3$, we must consider the distances between each point and both
+known centroids $c_1$ and $c_2$. $c_3$ is found as::
+
+% c1 = A
+% c2 = F
+\begin{alignat*}{3}
+  c_3 &= \argmax \left\{
+  \begin{matrix}
+    A : \min\{\lVert A - c_1 \rVert ^2,\ \lVert A - c_2 \rVert ^2\},\\
+    B : \min\{\lVert B - c_1 \rVert ^2,\ \lVert B - c_2 \rVert ^2\},\\
+    C : \min\{\lVert C - c_1 \rVert ^2,\ \lVert C - c_2 \rVert ^2\},\\
+    D : \min\{\lVert D - c_1 \rVert ^2,\ \lVert D - c_2 \rVert ^2\},\\
+    E : \min\{\lVert E - c_1 \rVert ^2,\ \lVert E - c_2 \rVert ^2\},\\
+    F : \min\{\lVert F - c_1 \rVert ^2,\ \lVert F - c_2 \rVert ^2\}
+  \end{matrix}\right\}\\
+&= \argmax \left\{
+  \begin{matrix}
+    A : \min\{&(7 - 7)^2  &+& (0 - 0)^2  ,& (7 + 6)^2  &+& (0 - 2)^2 \},\\
+    B : \min\{&(2 - 7)^2  &+& (0 - 0)^2  ,& (2 + 6)^2  &+& (0 - 2)^2 \},\\
+    C : \min\{&(0 - 7)^2  &+& (-2 - 0)^2 ,& (0 + 6)^2  &+& (-2 - 2)^2 \},\\
+    D : \min\{&(0 - 7)^2  &+& (2 - 0)^2  ,& (0 + 6)^2  &+& (2 - 2)^2 \},\\
+    E : \min\{&(-6 - 7)^2 &+& (-2 - 0)^2 ,& (-6 + 6)^2 &+& (-2 - 2)^2 \},\\
+    F : \min\{&(-6 - 7)^2 &+& (2 - 0)^2  ,& (-6 + 6)^2 &+& (2 - 2)^2 \}
+  \end{matrix}\right\}\\
+&= \argmax \left\{
+  \begin{matrix}
+    A : &\min\{0,  \ 173\},\\
+    B : &\min\{25, \ 68\},\\
+    C : &\min\{53, \ 52\},\\
+    D : &\min\{53, \ 36\},\\
+    E : &\min\{173,\ 16\},\\
+    F : &\!\min\{173,\ 0\}
+  \end{matrix}\right\}\\
+&= \argmax \left\{
+  \begin{matrix}
+    A : &0, \\
+    B : &25,\\
+    C : &52,\\
+    D : &36,\\
+    E : &16,\\
+    F : &0
+  \end{matrix}\right\}\\
+&= C.
+\end{alignat*}
+
+\newcommand{\C}{\hat{\mathcal{C}}}
+% \newcommand{\C}{C}
+\subsection{Task 6.5}
+
+\textbf{Please note}: To avoid confusion with point $C$, let $\C$ denote the set of clusters
+($\mathcal C$ remains the set of cluster \textit{centers}), and $\C_i$ denote
+the cluster with cluster center $c_i$. We trivially know points $A$, $F$, and
+$B$ to belong to $\C_1$, $\C_2$, and $\C_3$, respectively, since their distances
+to the center of their assigned cluster is 0. We then have left to assign points
+$C$, $D$, and $E$.
+
+Let us start with $C$. The point is assigned to the cluster $\C_j$ for which the
+corresponding center $c_j$ is the nearest cluster center to $C$:
+
+\begin{align*}
+  C \in\ \C_j \qquad \text{ s.t. }  c_j &= \argmin_{c \in \mathcal C}\ \sed{C - c}.
+\end{align*}
+
+\newpage
+Computing this $c_j$ is as follows:
+
+\begin{align}
+   \argmin_{c \in \mathcal C}\ \sed{C - c}\nonumber
+       &= \argmin \left\{
+       \begin{matrix}
+         c_1 : \sed{C - c_1},\\
+         c_2 : \sed{C - c_2},\\
+         c_3 : \sed{C - c_3}
+       \end{matrix}
+       \right\}\nonumber\\
+     &= \argmin \left\{
+     \begin{matrix}
+       c_1 : (0 - 7)^2 + (-2 - 0)^2,\\
+       c_2 : (0 + 6)^2 + (-2 - 2)^2,\\
+       c_3 : (0 - 2)^2 + (-2 - 0)^2
+     \end{matrix}
+     \right\}\nonumber\\
+     &= \argmin \left\{
+     \begin{matrix}
+       c_1 : 53,\\
+       c_2 : 52,\\
+       c_3 : 8
+     \end{matrix}
+     \right\}\nonumber\\
+   &= c_3.\label{eq:cluster_assignment}
+\end{align}
+
+Repeating the same for point $D$:
+\begin{align}
+   \argmin_{c \in \mathcal C}\ \sed{D - c}\nonumber
+       &= \argmin \left\{
+       \begin{matrix}
+         c_1 : \sed{D - c_1},\\
+         c_2 : \sed{D - c_2},\\
+         c_3 : \sed{D - c_3}
+       \end{matrix}
+       \right\}\nonumber\\
+     &= \argmin \left\{
+     \begin{matrix}
+       c_1 : (0 - 7)^2 + (2 - 0)^2,\\
+       c_2 : (0 + 6)^2 + (2 - 2)^2,\\
+       c_3 : (0 - 2)^2 + (2 - 0)^2
+     \end{matrix}
+     \right\}\\
+     &= \argmin \left\{
+     \begin{matrix}
+       c_1 : 53,\\
+       c_2 : 36,\\
+       c_3 : 8 
+     \end{matrix}
+     \right\}\nonumber\\
+   &= c_3.\label{eq:cluster_assignment}
+\end{align}
+
+Repeating the same for point $E$:
+\begin{align}
+   \argmin_{c \in \mathcal E}\ \sed{E - c}\nonumber
+       &= \argmin \left\{
+       \begin{matrix}
+         c_1 : \sed{E - c_1},\\
+         c_2 : \sed{E - c_2},\\
+         c_3 : \sed{E - c_3}
+       \end{matrix}
+       \right\}\nonumber\\
+     &= \argmin \left\{
+     \begin{matrix}
+       c_1 : (-6- 7)^2 + (-2- 0)^2,\\
+       c_2 : (-6+ 6)^2 + (-2- 2)^2,\\
+       c_3 : (-6- 2)^2 + (-2- 0)^2
+     \end{matrix}
+     \right\}\nonumber\\
+     &= \argmin \left\{
+     \begin{matrix}
+       c_1 : 173,\\
+       c_2 : 16,\\
+       c_3 : 68
+     \end{matrix}
+     \right\}\nonumber\\
+   &= c_2.\label{eq:cluster_assignment}
+\end{align}
+
+Thus I find the final clustering to be:
+
+\begin{align*}
+\C_1 &= \{A\}\\
+\C_2 &= \{F, E\}\\
+\C_3 &= \{B, C, D\}\\
+\end{align*}
+
+Finally, the cost of the clustering is:
+
+\begin{alignat*}{3}
+   \phi(\mathcal X, \mathcal C) &= \sum_{x \in \mathcal X} \min_{c \in \mathcal
+  C}\ \sed{x - c}\\
+  &= \sum_{x \in \mathcal X}\left\{\mydist{x}{c_i} : \ x \in \C_i
+  \right\}\\[6pt]
+  &= \quad \begin{matrix}
+    &\mydist{A}{c_1} &+& \mydist{F}{c_2} &+& \mydist{E}{c_2} & \\
+   +\!\! &\mydist{B}{c_3} &+& \mydist{C}{c_3} &+& \mydist{D}{c_3} &
+  \end{matrix}\\[6pt]
+  &= 0 + 0 + 16 + 0 + 8 + 8\\
+  &= 32.
+\end{alignat*}
+
+\subsection{Task 6.6}
+
+We wish to compute a \texttt{3-means} clustering of the data points using the
+initial cluster centers $\mathcal C$. We saw in the previous exercise that the
+initial clustering is $\C$. Now, we iteratively compute new cluster centers
+$c_i'$ and reassign data points to these new cluster centers, until the cluster
+centers and/or the cluster assignments converge.
+
+In the first iteration we get:
+
+\begin{align*}
+  c_1' &= \text{center}(\C_1)\\
+       &= \frac{1}{|\C_1|}\sum_{x \in \C_1} x\\
+       &= \frac{1}{1}\sum_{x \in \{A\}} x\\
+       &= (7,\ 0),\\[12pt]
+  c_2' &= \text{center}(\C_2)\\
+       &= \frac{1}{2}\sum_{x \in \{F, E\}} x\\
+       % &= \frac{1}{2} (-6 + -6, 2 + -2)\\
+       &= \frac{1}{2} (-6 -6, 2 -2)\\
+       &= (-6,\ 0),\\[12pt]
+  c_3' &= \text{center}(\C_3)\\
+       &= \frac{1}{3}\sum_{x \in \{B, C, D\}}\\
+       &= \frac{1}{3}(2 + 0 + 0, 0 - 2 + 2) x\\
+       &= (\sfrac{2}{3},\ 0).
+\end{align*}
+
+Based on the new cluster centroids, we assign data points to the cluster with
+the nearest cluster mean using formulas similar to that of the example given in
+\Cref{eq:cluster_assignment} to create $\C'$:
+
+\begin{align*}
+  \C'_1 &= \{A\},\\
+  \C'_2 &= \{E, F\},\\
+  \C'_3 &= \{B, C, D\}.
+\end{align*}
+
+% \newpage
+At this point, we would calculate new centroids for the clusters in $\C'$ and
+once again assign points to the new clusters -- but I skip these step as the
+algorithm has already converged, and thus this would be identical to the above.
+Thus the final clustering is:
+
+\begin{align*}
+  \mathcal C' &= \{(7,\ 0), (-6,\ 0), (\sfrac{2}{3},\ 0)\},\\
+  \C' &= \Big\{\{A\},\ \{E, F\},\ \{B, C, D\}\Big\}.
+\end{align*}
+
+\sectend
+
+done :)
+
+
+\iffalse{
+   [(7  - 7)**2 + (0  - 0)**2,
+    (2  - 7)**2 + (0  - 0)**2,
+    (0  - 7)**2 + (-2  - 0)**2,
+    (0  - 7)**2 + (2  - 0)**2,
+    (-6 - 7)**2 + (-2 - 0)**2,
+    (-6 - 7)**2 + (2  - 0)**2]
+  }\fi

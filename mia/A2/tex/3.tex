@@ -1,0 +1,39 @@
+\section{Morphological operations and postprocessing}
+\label{sec:morphs}
+
+In \cref{fig:hist-seg} in \cref{sec:hist-seg} we saw how the histogram-based
+segmentation of a noisy image produced an almost equally noisy result. In images
+we must deal with two types of noise: Noise overlaying objects, and noise
+in background regions of the image, and each can come in the form of ``peppery''
+dots, or larger areas both inside and outside of image objects.
+
+An easy remedy for both are morphological openings and closings: A closing can
+be used to remove noise in foreground objects or to fuse together image objects
+which belong together by ``filling the gaps'', so to speak, while an opening can
+be used to remove small objects from the foreground by simply suffocating them.
+In \cref{fig:hist-seg}, the segments were de-noised by applying morphological
+operations to each segment in isolation.
+
+An opening/closing can be created using two kernel convolutions \footnote{So
+long as the $n$ erosions and $m$ dilations are not interleaved, which they are
+not in the traditional definition of the morphological operations.}, and it
+follows that the operations generalize to higher dimensions (eg. 3D images).
+
+However one should be wary when employing opening/closing: Erosion has the
+disadvantage that small or thin objects, which are not actually noise, such as
+tumors or blood vessels, may be lost if too many erosions are performed, while
+important inter- and/or intra-object boundaries, such as brain tissue barriers
+or, again, parallel blood vessels, may be obscured if too many dilations are
+performed in sequence.
+
+% \iffalse{
+% Section 3 (L2B) -- postprocessing of segmented images
+% * CCD, erosion, and dilation for post-processing of segmented images.
+% * benefits of erosion/dilation: can be used to easily remove noise in image
+%   objects, eg. organs, and to join together image objects which may have been
+%   separated by noise in the image.
+%
+% * give example of image
+% }\fi
+
+\sectend

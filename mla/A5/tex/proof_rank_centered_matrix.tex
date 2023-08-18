@@ -1,0 +1,42 @@
+
+Let $\mbf A$ me some matrix in $\mathbb R^{n \times d}$ and $i$'th column vector
+$\mbf a_i$ and column mean $\bar{\mbf a}$. Let then $\mbf C$ be the
+column-centering of $\mbf A$ with where each column vector $\mbf c_i$ is given
+by $\mbf c_i = \mbf a_i - \bar{\mbf a}$.
+
+
+Consider the linear combination of all column vectors of $\mbf C$:
+
+\begin{align*}
+  \sum_{i = 1}^n \mbf c_i &= \sum_{i = 1}^n \left(\mbf a_i - \bar{\mbf a}\right)
+                          &= \sum_{i = 1}^n \left(\mbf a_i - \bar{\mbf a}\right)\\
+                          &= \sum_{i = 1}^n \mbf a_i - n * \bar{\mbf a}\right)\\
+                          &= \sum_{i = 1}^n \mbf a_i - n * \bar{\mbf a}\right)
+\end{align*}
+
+
+Using the definition of $\bar {\mbf a}$:
+
+
+\begin{align}
+  &= \sum_{i = 1}^n \mbf a_i - n * \frac{1}{n}\sum_{i = 1}^n \left(\mbf a_i - \bar{\mbf
+  a}\right)\right)\nonumber\\
+  &= \mbf 0 \label{eq:combination_all}
+\end{align}
+
+And so we see that the linear combination of all columns is the zero-vector $\mbf 0$. This implies
+that any column $\mbf c_i$ of $\mbf C$ is a linear combination of the other $n - 1$ columns.
+In particular, the $k$'th column is equal to the sum of the other $n - 1$ columns times negative
+one:
+
+
+\begin{align*}
+  \sum_{i \in \{1\cdots n\} \setminus \{k\}} \mbf c_i &= \left(\sum_{i = 1}^n \mbf c_i - \mbf c_k\right)\\
+\end{align*}
+
+using \cref{eq:combination_all}:
+
+\begin{align*}
+           &= \mbf 0 - \mbf c_k\\
+           &= - \mbf c_k
+\end{align*}

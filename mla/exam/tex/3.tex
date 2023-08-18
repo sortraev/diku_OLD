@@ -1,0 +1,153 @@
+\newpage
+\section{The impact of dependence}
+
+\subsection{Task 3.1}
+
+We want to determine the probability of bounding $L(h)$ within some $\eps$ of
+We want to bound the probability that $L(h)$ deviates from $\hat L(h, S')$ by
+some $\eps$ or more.
+
+I am eventually going to use corollary 2.5 of Hoeffding's inequality (from
+Seldin's notes) to derive the bound, so to recap:
+\begin{align*}
+  \P\left(\E[Z_i] -\frac{1}{n} \sum_{i = 1}^n Z_i  \  \geq\   \eps\right)\
+  \leq\ 
+  e^{-2n\eps^2} \quad (\text{Corollary 2.5, Seldin}).
+\end{align*}
+
+Let us see how the problem fits the required form of corollary 2.5.
+
+First, define new random variables $X'$ and $Y'$ such that:
+\begin{align*}
+  X'_i = X_{(i - 1)r + 1},\\
+  Y'_i = Y_{(i - 1)r + 1}.
+\end{align*}
+Then $\hat L(h, S')$ is given by:
+\begin{align*}
+  \hat L(h, S') &= \frac{1}{(\sfrac{n}{r})}\sum_{i = 1}^{\sfrac{n}{r}} \ell(h(X'_i), Y'_i).
+\end{align*}
+
+Since the samples in $S'$ are iid, we also know that $\ell(h(X'_i), Y'_i)$ are
+also iid. with $\ell(h(X'_i), Y'_i) \in [0, 1]$ for all $i$, (assuming zero-one
+loss) and due to this independence we have $L(h) = \E[\hat{L}(h, S')]$.
+
+With this we see that we can legally apply Corollary 2.5.
+
+Apply a union bound and then Corollary 2.5 to obtain:
+\begin{align*}
+  \P\left(\exists\, h \in \mathcal H\; :\  L(h) - \hat{L}(h, S') \geq \eps
+  \right)
+  &\leq \sum_{h \in \mathcal H} \P\left(L(h) - \hat{L}(h, S') \geq \eps
+  \right)\\
+  &\leq \sum_{h \in \mathcal H} e^{-2\frac{n}{r}\eps^2}\\
+  &= |\mathcal H| e^{-2\frac{n}{r}\eps^2}\ .
+\end{align*}
+Note that $\tfrac{n}{r}$ comes from the size of $S'$. Let now $M = |\mathcal
+H|$; then the full expression of the bound is:
+\begin{align}
+  \P\left(\exists\, h \in \mathcal H\; :\  L(h) - \hat{L}(h, S') \geq \eps
+  \right)
+  \leq M e^{-2\sfrac{n}{r}\eps^2}.\label{eq:3.1}
+\end{align}
+Alternatively, we might want to express the bound in terms of a certainty
+probability $\delta$. If we set $\delta := Me^{-2\sfrac{n}{r}\eps^2}$, then the
+bound is:
+\begin{align*}
+  \PP{\exists\, h \in \mathcal H\; :\  L(h) - \hat{L}(h, S') \geq
+  \sqrt{\frac{\text{ln}\frac{M}{\delta}}{2 \sfrac{n}{r}}}}
+  \ \leq \ \delta.
+\end{align*}
+
+\subsection{Task 3.2}
+\label{sec:3.2}
+
+We now want to produce a bound based on all of the samples in $S$. However,
+since the samples in $S$ are \textit{not} independent, we cannot apply
+Hoeffding's directly. Instead, I shall attempt to express the bound on $\hat
+L(h, S)$ in terms of the bounds on $\hat L(h, S_i)$, where all $S_i$ are subsets
+of $S$ whose elements are independent.
+
+First, let $S_i$ be the set consisting of the $i$'th sample of each 
+of the $r$ households in $S$. In mathemtical terms, let $S_i$ be given by:
+\begin{align*}
+  S_i = \big\{(X_{(j - 1)r + i},\ Y_{(j - 1)r + i})\ |\ j \in \{1,\dots,
+  \sfrac{n}{r}\}\big\}.
+\end{align*}
+Note that we have $\cup_{i = 1}^r S_i = S$ and $S_i \cap S_j$ for $i \neq j$
+(every sample in $S$ is a member of exactly one subset  $S_i$).
+
+In addition, please note that in Task 3.1, the result in \Cref{eq:3.1} is
+derived using $S' = S_1$, but since all the samples in $S$ are drawn from the
+same distribution, the result still holds if we substitute any $S_i$ for $S'$.
+This will be useful later.
+
+\bigskip
+
+With this, I begin the derivation. The probability I want to bound is:
+\begin{align*}
+  \PP{\exists\, h \in \mathcal H\; :\ L(h) - \hat L(h, S) \geq \eps}.
+\end{align*}
+
+As stated, I want to transform the probability expression into something in
+which I can apply the result from Task 3.1. First, note that since every sample
+of $S$ is in exactly one $S_i$, the empirical loss over $S$ is equal to the mean
+over empirical losses over all $S_i$, allowing us to write:
+\begin{align*}
+  = \PP{\exists\, h \in \mathcal H\; :\ L(h) - \frac{1}{r}\sum_{i = 1}^r \hat
+  L(h, S_i) \geq \eps}.
+\end{align*}
+
+Multiplying all terms in the inequality with $r$ (this is legal since $r$ is
+always positive):
+
+\begin{align*}
+  = \PP{\exists\, h \in \mathcal H\; :\ rL(h) - \sum_{i = 1}^r \hat
+  L(h, S_i) \geq r \eps}.
+\end{align*}
+
+At this point I realize that if the sum over $r$ mean empirical losses $\hat
+L(h, S_i)$ deviates from $rL(h)$ by at least $r\eps$, then one or more of these
+mean empirical losses must deviate from $L(h)$ by at least $\eps$. In other
+words, the former is a sub-event of the latter. Using $A \subseteq B \implies
+P(A) \leq P(B)$, and subsequently the union bound:
+\begin{align*}
+  &\leq \PP{\exists\, i \in \{1, 2, \dots, r\},\, h \in \mathcal H\; :\  L(h) - \hat L(h,
+  S_i) \geq \eps}\\
+  &\leq \sum_{i = 1}^r \PP{\exists\, h \in \mathcal H\; :\ L(h)
+  - \hat L(h, S_i) \geq \eps}
+\end{align*}
+
+Finally, the summation body resembles the RHS of the bound derived in
+\Cref{eq:3.1}, but with $S_i$ substituted for $S'$. As discussed, the result in
+Task 3.1 holds for all $S_i$, so I can swap it in here:
+\begin{align*}
+  &= \sum_{i = 1}^r M e^{-2\sfrac{n}{r}\eps^2} \\
+  &= r M e^{-2\sfrac{n}{r}\eps^2}.
+\end{align*}
+Thus the full expression of the bound:
+\begin{align*}
+   \PP{\exists\, h \in \mathcal H\; :\  L(h) - \hat L(h, S) \geq \eps}\ \leq\ r M
+   e^{-2\sfrac{n}{r}\eps^2},
+\end{align*}
+and, equivalently, in terms of $\delta$:
+\begin{align*}
+   \PP{\exists\, h \in \mathcal H\; :\  L(h) - \hat L(h, S) \geq
+   \sqrt{\frac{\text{ln}\frac{M}{\delta}}{2 \sfrac{n}{r}}}}\ \leq\  r \delta.
+\end{align*}
+
+\subsection{Task 3.3}
+
+The bound derived in Task 3.2 using $\hat L(h, S)$ is \textit{weaker} than the
+bound found in Task 3.1 using $\hat L(h, S')$ (or rather, it is expected when
+$S'$ grows large enough).
+
+The reason we found a weaker bound in Task 3.2 is because here, we were not able
+to apply Hoeffding's bound directly to $\hat L(h, S)$ -- instead, the dependence
+in $S$ forced us to sum over known quantities.
+
+If we had had independence in $S$, then we \textit{would} have been able to
+apply Hoeffding's directly to $\hat L(h, S)$, and then we would have obtained
+the same bound in the two tasks (again, due to the principle of empirical risk
+minimzation, this is in expectation and assumes $S'$ is large enough).
+
+\sectend

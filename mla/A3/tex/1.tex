@@ -1,0 +1,33 @@
+\newcommand{\stest}{S_{\text{test}}}
+\newcommand{\strain}{S_{\text{train}}}
+\newcommand{\hhatstarstrain}{\hat{h}^{\ast}_{\strain}}
+\section{Using Generalization Bounds to Split a Sample into Training and Test
+Sets}
+
+In general, for a model space $\mathcal H$ of size $\lvert \mathcal H \rvert =
+M$, we bound can bound the expected loss $L$ with a function of the empirical
+loss over some $n$-sized sample $S$ using (formula lifted from Yevgeny's notes
+on generalization bounds):
+
+\begin{align*}
+  L(h) \ \leq\ \hat L(h, S) + \sqrt{\frac{\lnb{\sfrac{M}{\delta}}}{2n}}\, ,
+  \quad \text{with probability } \geq 1 - \delta.
+\end{align*}
+
+In this particular case, I am looking for an upper bound on the expected
+loss $L(\hhatstarstrain)$ for a specific, trained model $\hhatstarstrain$. 
+
+Since I have only a single, fixed model, I also have $M = 1$, and thus the bound
+I am looking for is simply:
+
+\begin{align*}
+  L(\hhatstarstrain) \ \leq\ \hat L(\hhatstarstrain,\, \stest) +
+  \sqrt{\frac{\lnb{\sfrac{1}{\delta}}}{2 n_{\text{test}}}} \, , \quad \text{with
+  probability } \geq 1 - \delta.
+\end{align*}
+
+
+
+\sectend
+\newpage
+

@@ -1,0 +1,120 @@
+\section{Variable Importance}
+
+\begin{itemize}
+  \item \textit{Using one-hot encoding, how many optimal solutions would the linear
+    regression have, and why?}
+\end{itemize}
+
+The linear regression problem would have \textit{more than one}, and possibly
+infinitely many solutions. Reason: If we use $C = 3$ classes, then one variable
+can always be inferred from the other two variables. To illustrate, if we know
+that a variable is neither an orange or an apple, we know that it must be a
+banana, since it must be one of three.
+
+\medskip
+
+To explain more formally, let $\mbf X$ be our feature matrix using one-hot
+encoding, and call the three encoding vectors $\mbf x_1$, $\mbf x_2$, and $\mbf
+x_3$:
+
+\begin{align}
+\mbf X &= \{\mbf x_1\ \mbf x_2\ \mbf x_3\}\nonumber\\[4pt]
+  &= \{[1, 0, 0]^{\text{T}}\  [0, 1, 0]^{\text{T}}\  [0, 0,
+  1]^{\text{T}}\}\nonumber\\[4pt]
+  &= \begin{Bmatrix}
+    1 & 0 & 0\\
+    0 & 1 & 0\\
+    0 & 0 & 1
+  \end{Bmatrix}
+  \label{eq:X}
+\end{align}
+
+Then any of the three vectors $\mbf x_i$ can be expressed as a linear
+combination of the other two:
+
+\begin{align*}
+  \mbf x_i = \mbf 1_3 - \left(\sum_{j \in \{1, 2, 3\} \setminus \{i\}} \mbf
+  x_j\right),
+\end{align*}
+
+where $\mbf 1_3$ is a 3-vector of all ones. For example, $\mbf x_3$ can be expressed
+as:
+
+\begin{align*}
+  \mbf x_3 &= \mbf 1_3 - \mbf x_1 - \mbf x_2\\
+  &= \begin{pmatrix} 1\\1\\1\end{pmatrix}
+    - \begin{pmatrix}0\\1\\0\end{pmatrix} -
+      \begin{pmatrix}0\\0\\1\end{pmatrix}.
+\end{align*}
+
+In other words, $\mbf X$ is rank-deficient (its columns are not linearly
+independent). Rank-deficiency of $\mbf X$ implies that there exists a vector
+$\mbf z \neq \mbf 0$ s.t. $\mbf{Xz} = \mbf 0$. This in turn implies that in
+solving the linear regression $\mbf y = \mbf X \hat{\mbf w}$ for the optimal
+weight vector $\hat{\mbf w}$, we can choose a vector $\mbf w = a
+\hat{\mbf w}$ for $a \neq 1$ (ie. a vector different from $\hat{\mbf w}$, but
+at least a linear scaling of $\hat{\mbf w}$) such that:
+\begin{alignat*}{3}
+  \mbf X(\hat{\mbf w} - \mbf w) &= \mbf 0\\
+  \Leftrightarrow\qquad\qquad \mbf X \hat {\mbf w} &= \mbf{Xw}\\
+  \Leftrightarrow\qquad\qquad \mbf X \hat{\mbf w} &= \mbf y.
+\end{alignat*}
+
+The issue described here is called (multi-)collinearity, and it generalizes to
+any linear regression problem in which the feature matrix is rank-deficient.
+
+\begin{itemize}
+  \item \textit{Why would it be difficult to interpret the variable importance
+    if one-hot encoding was used?}
+\end{itemize}
+
+Let again $\mbf X$ be the feature matrix using one-hot encoding as given in
+\cref{eq:X}, and let then $\mbf w = [w_1, w_2, w_3]^{\text{T}}$ be the weight
+vector we want to find in solving the linear regression $\mbf y = \mbf X \mbf w$:
+
+\begin{align}
+  \mbf y &= \mbf X \mbf w\nonumber\\
+  \Leftrightarrow\qquad \mbf y &= w_1 \mbf x_1 + w_2 \mbf x_2 +  w_3\mbf
+  x_3\label{eq:my_linreg}
+\end{align}
+
+As seen the columns in $\mbf X$ are linearly dependent, meaning either of the
+three vectors $\mbf x_i$ can be expressed as a linear combination of the other
+two. As an example, consider $\mbf x_3 = \mbf 1_3 - \mbf x_1 - \mbf x_2$, and
+substitute this into \cref{eq:my_linreg}:
+
+\begin{align*}
+  \Leftrightarrow\qquad \mbf y &= w_1 \mbf x_1 + w_2 \mbf x_2 +
+  w_3(\mbf 1_3 - \mbf x_1 - \mbf x_2)\\
+                               &= w_1 \mbf x_1 + w_2 \mbf x_2 +
+  w_3 - w_3 \mbf x_1 - w_3 \mbf x_2\\
+  &= w_3 + \mbf x_1 (w_1 - w_3) + \mbf x_2 (w_2 - w_3).
+\end{align*}
+
+We see that the features $\mbf x_1$ and $\mbf x_2$ are each affected by more
+than one weight. What happened is typically called the dummy variable trap, and
+it is now problematic (or even impossible) to interpret the importance of each
+of each individual weight, since there is no way to separate the weights and
+features!
+
+\medskip
+
+To solve the problem, we leave out one column of feature matrix $\mbf X$ -- the
+categorial variable corresponding to the left-out column can then be encoded by
+the intercept of the regression.
+
+For example, let's remove feature column $\mbf x_3$. Let $\mbf X'$ and $\mbf w'$
+be the new feature matrix and weight vector, respectively. Then the resulting
+regression problem will be on the form:
+\begin{align*}
+  \mbf y = \mbf X' \mbf w'.
+\end{align*}
+
+Since $\mbf X'$ is full-rank, both $\mbf X'$ and the product $\mbf X'^{\text{T}}
+\mbf X'$ are invertible, and hence the regression is solvable by:
+
+\begin{align*}
+  \mbf w' = (\mbf X'^{\text{T}} \mbf X')^{-1} \mbf X'^{\text{T}} \mbf y.
+\end{align*}
+
+\sectend

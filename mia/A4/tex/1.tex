@@ -1,0 +1,44 @@
+\section{CNN's in medical image analysis}
+\label{sec:cnn}
+
+\emph{This report will assume the reader is familar with basic ML, basic theory
+of ANN's (including backpropagation, activation functions, etc), and
+convolutions.}
+
+% \vspace{-0.2cm}
+
+% \subsection{Prere(Artificial) Neural networks}
+% \TODO{this}
+
+% What is a neural network? an ML model comprised of a network of connected
+% \emph{neurons}, organized in so-called \emph{layers}, each with its own
+% associated weights and biases -- much like a set of equations. Each neuron
+% outputs a value that is fed to an activation function which indicates to the
+% next layer whether or not the output of this particular neuron is important.
+
+% \subsection{Convolutional neural networks}
+
+One major problem arises when we attempt to use ANN's with image data: Input image
+data can vary greatly, and ideally we want to build a model that is robust
+regardless of the placement and orientation of objects in the image. This is
+called translation invariance. A CNN comes close by feeding the input image
+through consecutive convolution layers, each layer producing multiple feature
+maps, each map capturing different features of the image -- for example, in one
+layer we might have a set of neurons in a given layer which solely detect
+diagonal rounded edges, and another set which boosts and captures the contrast
+between foreground and background objects -- and then feeding the result of this
+through downsampling (or pooling) layers, which extract defining features and
+compresses the input into an exponentially smaller map of information.
+
+This downsampling greatly reduces computational overhead as opposed to a
+regular ANN, however, a natural consequence, of course, is that we must trade
+off translation invariance for -equivariance (ie. the output \emph{is}
+affected by translation of the input, but the translation is similar and thus
+predictable).
+
+% \TODO{mention final FC layer!!}
+
+Finally, as in regular networks, the resulting (multi-dimensional) feature map
+output from the contracting path is fed through one or more FC layers to
+generate the network prediction.
+

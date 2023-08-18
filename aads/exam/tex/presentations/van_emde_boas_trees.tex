@@ -1,0 +1,181 @@
+\newpage
+
+\subsection{Van Emde Boas trees}
+
+\begin{enumerate}
+  \item today's topic: van Emde Boas trees!
+
+  \item recursive data structure used for ordered associative array and eg.
+    priority queues.
+
+  \item essentially a search tree, but with better time complexity than eg.
+    balanced binary search trees: $O(\lg \lg u)$ for most operations, so long
+    as the size $u = |U|$ of the universe $U$ of possible keys is bounded.
+
+  \item considerably worse space complexity $\theta(u)$; only efficient for
+    reasonably small $U$, eg. $u \leq 2^{32}$. Can improve space, but this is
+    outside scope of the course and hence this presentation.
+
+  \item operations on the vEB tree can be described by the recurrence: $T(u)
+    \leq T(\sqrt[\uparrow]{u}) + O(1)$, which I will discuss later.
+
+  \item let's see an example: *draw example on blackboard*
+
+  \item the tree has size $u = 8$ and at the moment contains the keys $2, 5, 6$.
+
+  \item which two keys should we insert?
+
+  \item which key should we query the successor of?
+
+  \item *remember to describe the nature of the recursive calls during the
+    examples*
+
+  \item anyway, we are ready to revisit the recurrence given earlier. let's see
+    how recursing on a subproblem of size $\sqrt[\uparrow]{u}$ yields a
+    complexity of $O(\lg \lg u)$.
+
+    First, let $m := \lg u$ and define $S(m) = T(2^{\lg u})$. Since
+    $\sqrt[\uparrow]{u} = 2^{\lceil m / 2 \rceil}$, we have:
+
+\begin{align}
+  S(m) \quad\leq\quad S(\lceil m/2 \rceil) + O(1) \quad\leq\quad S(2m/3) + O(1).
+\end{align}
+
+    We will use the master theorem to determine a bound on this recurrence. 
+    Since we have a constant amount of work in each step, we must use the second
+    case of the master theorem, which states that $T(n) \in \theta(n^{\log_b a}
+    * \lg n)$. In this case we have $a = 1$, $b = 2/3$, and $n = m$, and hence
+    $S(m) \in O(n^{\log_{2/3} 1}\lg m) = O(\lg m)$. Substituting $\lg u = m$, we
+    have $S(m) = T(u) \in O(\lg \lg u)$.
+
+  \item now, let's see how this recurrence actually describes the behavior of
+    the vEB operations.
+
+  \item For insert(x) calls, intuitively, the describing recurrence should be
+    $T(u) \leq 2 * T(\sqrt[\uparrow]{u}) + O(1)$, since we need to both insert
+    $x$ into its cluster \emph{and} update the summary table.
+
+    However, when we inserting into an empty cluster, we only update its min and
+    don't touch the summary table, and when we insert into a non-empty cluster, the
+    summary table is already correct.
+
+  \item For successor(x) calls, we also intuitively should have a recurrence of
+    $T(u) \leq 2 * T(\sqrt[\uparrow]{u}) + O(1)$, since in the worst case we
+    spend $O(\sqrt[\downarrow]{u})$ time searching $x$'s entire cluster and then
+    another $O(\sqrt[\uparrow]{u})$ time searching for the next non-empty cluster,
+    in which the minimum will be the successor.
+
+    However, in any given successor call, one of these recursive calls are
+    eliminated: if $x$ is \emph{not} the max within its own cluster, then
+    we know that the successor is found within the same cluster, and we can
+    spend $O(\sqrt[\downarrow]{u})$ time searching for it.
+
+    Else if $x$ is the max of its cluster \emph{or} its cluster is empty
+    \footnote{In the case where we ask for the successor of an element that is
+    not in the tree} (this takes constant time to determine), we simply spend
+    $O(\sqrt[\uparrow]{u})$ time querying the summary table for the next
+    non-emtpy cluster and extract its minimum in constant time.
+
+  \item finally, I would like to add that we can improve on the space complexity
+    by using hash tables to store non-empty clusters, if we simultaneously omit
+    empty clusters. This improves the space complexity to $O(n \lg \lg |U|)$,
+    but at the cost of the vEB operations now taking $O(\lg \lg |U|)$
+    \textbf{expected} time rather than \textbf{worst case} time (since hash
+    table updates are $O(1)$ \textbf{expected} time).
+
+\end{enumerate}
+
+\newpage
+\subsection{Pseudocode}
+\begin{minted}{python}
+vEB(u):
+  if u <= 2:
+    V = # allocate mem for: u, min, max fields.
+  else:
+    upper_sqrt_u = 2 ** ceil (lg(u) / 2)
+    lower_sqrt_u = 2 ** floor(lg(u) / 2)
+    V = # allocate mem for: u, min, max, summary ref,
+        # and upper_sqrt_u cluster refs.
+
+    V.summary = vEB(upper_sqrt_u)
+    for i = 0 to upper_sqrt_u - 1:
+      V.cluster[i] = vEB(lower_sqrt_u)
+
+  V.u = u
+  V.min = NIL
+  V.max = NIL
+  return V
+\end{minted}
+
+\begin{minted}{python}
+insert(V, x):
+  # assumes x not already in V.
+  if V.min == NIL:
+    V.min = V.max = x
+    return
+  if x < V.min:      # we resume the insert call but now insert V.min in place of
+    swap(&x, &V.min) # x. this is because V.min is the only item in V that never
+                     # is recursively stored.
+  if V.cluster[high(x)].min == NIL:
+    # if this cluster is empty, register it as a new cluster in V.summary.
+    insert(V.summary, high(x))
+  # if this was the case, then the following insert call will
+  # be O(1), since the first `V.min == NIL` check will fire.
+  insert(V.cluster[high(x)], low(x))
+  if x > V.max:
+    V.max = x
+\end{minted}
+
+\newpage
+\begin{minted}{python}
+successor(V, x):
+  if V.u == 2:
+    return 1 if (x == 0 and V.max == 1) else NIL
+  else if V.min != NIL and x < V.min:
+    return V.min
+  i = high(x)
+  # if x is not max of its own cluster, then
+  # its successor must be in its own cluster.
+  max_low = V.cluster[i].max 
+  if max_low != NIL and low(x) < max_low:
+    j = successor(V.cluster[i], low(x))
+  else:
+    i = successor(V.summary, high(x))
+    if i == NIL:
+      return NIL
+    j = V.cluster[i].min
+  return index(i, j)
+\end{minted}
+
+\begin{minted}{python}
+delete(V, x):
+  # assumes x already in V.
+  if V.min == V.max:
+    V.min = V.max = NIL
+  elif V.u == 2:
+    V.max = V.min = 1 if x == 0 else 0 
+  else:
+    if x == V.min:
+      i = V.summary.min
+      # if i is NIL, this means x == V.min was the last item in the entire
+      # tree, and hence V.min and V.max are "reset" to NIL.
+      if i == NIL:
+        V.min = V.max = NIL
+        return
+      # if i is not NIL, this means there are still items left in the tree.
+      # we then want to update V.min with the new minimum, *and*, since V.min
+      # should not be recursively stored, we must remove it from the tree.
+      # therefore: set x to be this item and continue the deletion.
+      x = V.min = index(i, V.cluster[i].min)
+    delete(V.cluster[high(x)], low(x))
+    if V.cluster[high(x)].min == NIL:
+      delete(V.summary, high(x))
+    if x == V.max:
+      i = V.summary.max
+      if i == NIL: # if we are deleting the second-to-last item.
+        V.max = V.min
+      else:
+        V.max = index(i, V.cluster[i].max)
+\end{minted}
+
+

@@ -1,0 +1,4 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{def} \PYG{n+nf}{threshold}\PYG{p}{(}\PYG{n}{img}\PYG{p}{,} \PYG{n}{th}\PYG{p}{):}
+    \PYG{k}{return} \PYG{n}{np}\PYG{o}{.}\PYG{n}{uint8}\PYG{p}{(}\PYG{n}{img} \PYG{o}{\PYGZgt{}} \PYG{n}{th}\PYG{p}{)}
+\end{Verbatim}

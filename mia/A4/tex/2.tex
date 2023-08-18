@@ -1,0 +1,155 @@
+% \vspace{-0.5cm}
+\section{Binary classification of skin lesions using CNN}
+\label{sec:skinlesion}
+
+In this section, I present CNN image classification via an example. Given a
+training set of images of 727 benign and 173 malignant skin lesions, we wish to
+train a CNN model to classify new cases.
+
+\subsection{Train/test splitting and training data augmentation}
+
+First, since we have no explicit testing data, I set aside 30\% of the training
+data for testing, for a total of 270 testing cases (using stratified splitting
+to maintain class balance).
+
+Second, the supplied training data is heavily imbalanced with $\sim81\%$ benign
+cases. As is, I predict the optimizer to be likely to get stuck in a local
+minimum of simply always outputting ''benign``, for a training accuracy of
+$\sim81\%$, which is decent but which would not generalize. There are many
+viable regularization solution, but I choose \emph{data augmentation} to
+straighten out the imbalance and, hopefully, avoid the aforementioned pitfall
+can be avoided. The idea is to extend, or \emph{augment}, a dataset with random
+transformations of existing data.
+
+Typically one would implement this as a separate network layer to benefit from
+hardware acceleration, but since we in the running example need to target only
+malignant cases, we instead do it manually as part of data preprocessing. I
+augment the train data with 365 malignant cases for a total of $(173 \cdot 0.7) +
+365 \simeq 486$, to better match the $(727 \cdot 0.7) \simeq 509$ benign cases,
+using random rotation, translation, noise/blur, and brightness/contrast.
+
+\subsection{Model design and description}
+\label{sec:skinlesion_model}
+
+The model is a simple CNN consisting of a BN layer; a contraction stage of 4
+downsampling steps, each preceeded by doubly convolutional layers and succeeded
+by a BN layer; and finally, a doubly convolutional layer followed by two FC
+layers with dropout in-between to reduce overfitting. All layers use ReLU
+activation save for the output layer, which uses sigmoid activation.
+
+\subsection{Model training and validation}
+
+The next step in model development is to evaluate the design by fitting it to
+training data. To better avoid model overfitting, and to better gauge
+generalizability, one should incorporate \emph{validation} into the training
+process.
+
+To perform validation, we must, prior to training, set aside a portion of the
+training data that is \emph{not} going to be used during weight fitting,
+% \footnote{\emph{In our running example, we extracted test data from the given training
+% data set, but this should \emph{not} be confused with validation data!}}
+but which can then be used to assess not only the fitting process, but the model
+design itself, and help us decide whether we need more training and/or to
+rethink the design.
+
+Next, we choose a validation method. The two most commonly used are
+\emph{hold-out validation} and \emph{k-fold cross-validation}. In hold-out
+validation, we randomly select some portion (usualy between 10 and 30\%) of the
+training data and evaluate performance after each finished fitting, whereas with
+$k$-fold CV, we split the data into $(k - 1)$ equally sized training folds and
+$1$ validation fold, which we then use in training with hold-out validation --
+this entire training/validation cycle is then repeated a total of $k$ times, one
+for each fold, and an aggregate score can be computed.
+
+Hold-out validation has the advantage that it is computationally cheaper than
+$k$-fold CV, as the model needs only to be fitted to $(1 - a)$ times the train
+data \emph{once}, where $a$ is the fraction of data held out, whereas with
+$k$-fold CV, the model is trained on $1 - \frac{1}{k}$ of the data $k$ times,
+or, in other words, the model is trained on an amount of data corresponding to
+$k - 1$ times the actual training data. For this reason, hold-out training is
+often preferred if the training set is large and only an indicative assessment
+is needed.
+
+However, hold-out validation has a very big pitfall in that we may end up with a
+validation set that is not representative of the actual distribution. At the
+same time, $k$-fold CV allows us to assess training over \emph{all} of the
+training data, and for this reason, the method is usually preferred regardless
+of the amount of data when execution time is not a big issue.
+
+For illustrative purposes, \cref{fig:skinlesion_plots} shows the results of both
+methods for our running example, with a hold-out validation split of 15\% and $k
+= 5$ for $k$-fold CV. With hold-out validation, the final loss/accuracy was
+(2.8, 0.922), while with 5-fold CV, the mean loss/accuracy was (3.77, 0.91). We
+prefer the result of the 5-fold CV since it is more conservative.
+
+\begin{figure}
+  \begin{minipage}{0.66\textwidth}
+  \includegraphics[width=\textwidth]{figures/skinlesion_lossaccuracy.png}
+  \end{minipage}
+  ~~~
+  \begin{minipage}{0.30\textwidth}
+    \vspace{-0.4cm}
+\begin{tabular}{|c|c|c|}
+  \hline
+Fold & Val loss & Val acc\\\hline
+1    & 6.032    & 0.898  \\\hline
+2    & 2.347    & 0.918  \\\hline
+3    & 4.455    & 0.9    \\\hline
+4    & 2.110    & 0.921  \\\hline
+5    & 3.909    & 0.905  \\\hline
+\end{tabular}
+  \end{minipage}
+  \caption{{\footnotesize Per-epoch results of 15\% hold-out validation and
+  final results of 5-fold CV.}}
+\label{fig:skinlesion_plots}
+\vspace{-0.8cm}
+\end{figure}
+
+\subsection{Classifier assessment}
+
+There are many methods of classifier assessment that can be employed after model
+selection. The simplest, of course, is simple accuracy -- we compute predictions
+for the testing set and compare with the known labels for the testing set.
+
+However, while accuracy tells us how accurate our classifier happens to be on
+the testing data, the metric does not take into account that the testing data
+may not be class balanced. Recall that our testing data is quite imbalanced with
+about $\sim81\%$ benign cases -- this means that any testing accuracy result at
+or around $81\%$ may well be due to lucky random guessing (the further from
+$81\%$, the smaller the probability, of course).
+
+In addition, accuracy does not tell us much about how \emph{certain} our model is
+in the predictions it makes. In theory, we might in extreme cases observe that
+the activations produced by the last FC layer of the model -- on which we apply
+thresholding to obtain predicted labels -- are all centered around 0.5 (or some
+other arbitrary decision boundary) with very little variance. This would imply a
+very thin decision margin, which results in poor generalization.
+
+To measure a model's ability to and robustness in separating classes, we can
+examine the ROC curve and the AUC (also called AUC-ROC). To do so, we first
+extract network output activations \emph{before} the usual 0.5-thresholding;
+next, we choose a range of thresholding values between 0 and 1, and for each
+threshold, we examine the relationship between true-positive and false-positive
+rates in the prediction result.
+
+Plotting these two values against each other yields the ROC curve, and the area
+under the curve is the AUC, which, ideally, should be as close to 1 as possible.
+
+\subsubsection{Testing results and conclusion for running example}~
+
+Finally: The results of testing our skin lesion classifier is a prediction
+accuracy of 0.88 and an AUC of 0.914 (see \cref{fig:skinlesion_roc}, which also
+shows the ROC curve). An AUC of 0.914 is not bad, but it is far from perfect,
+and in fact, it is clear indication that our classifier would very likely be
+out-performed by a human with domain knowledge.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{figures/skinlesion_roc_plot.png}
+  \hspace{1cm}
+  \caption{{\footnotesize ROC Curve for the skin lesion test results.}}
+\label{fig:skinlesion_roc}
+\end{figure}
+
+
+% \sectend

@@ -1,0 +1,50 @@
+\documentclass[a4paper,12pt]{article}
+
+\input{commands_and_packages.tex}
+
+\newcommand{\concat}{\ensuremath{+\!\!\!\!+\,}}
+\newcommand{\rpm}{\raisebox{.2ex}{$\scriptstyle\pm$}}
+\newcommand{\resub}[1]{\textcolor{red}{#1}}
+\newcommand{\blue}[1]{\textcolor{blue}{#1}}
+\newcommand{\ltt}{\sqsubseteq}
+\newcommand{\twodots}{\mathinner {\ldotp \ldotp}}
+
+\title{Home Assignment 2\\Machine Learning A}
+\author{Anders Holst (wlc376)}
+
+\date{\today}
+
+\newcommand{\ddw}{\frac{\partial}{\partial \, \mbf w}} % partial wrt. w
+\newcommand{\tddw}{\tfrac{\partial}{\partial \, \mbf w}} % partial wrt. w, but tiny.
+
+\newcommand{\booltoint}[1]{\llbracket #1 \rrbracket} % bracket notation indicator function.
+
+\newcommand{\mysig}{\theta\!\left[\mbf w^{\text{T}}\mbf x_n\right]} % theta(y_n * w^T * x_n).
+\newcommand{\mysigx}{\theta\!\left[\mbf w^{\text{T}}\mbf x\right]} % theta(y * w^T * x).
+\newcommand{\meanN}{\frac{1}{N}\sum_{n = 1}^N\,} % 1 / N * sum(n = 1 .. N).
+
+\newcommand{\lnb}[1]{\ln \left\{#1\right\}} % ln {...}
+
+\newcommand{\ywx}{y_n \mbf w^{\text{T}} \mbf x_n} % y_n * w^T * x_n.
+\def\stackrel#1#2{\mathrel{\mathop{#2}\limits^{#1}}}
+\newcommand{\myeq}{\stackrel{?}{=}}
+\newcommand{\myleq}{\stackrel{?}{\leq}}
+\newcommand{\mygeq}{\stackrel{?}{\geq}}
+\begin{document}
+
+\maketitle
+
+\input{1.tex} % DONE
+\newpage
+\input{2.tex} % mangler.
+\input{3.tex} % DONE -- skal skrives ind.
+\input{4.tex} % DONE
+
+\newpage
+
+\input{5_1.tex} % DONE
+\input{5_2.tex} % DONE
+\newpage
+\input{5_3.tex} % DONE
+
+\end{document}

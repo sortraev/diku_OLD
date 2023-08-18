@@ -1,0 +1,58 @@
+\newcommand{\ea}{e^{\mbf w ^{\text{T}} \mbf x + b}}
+\newcommand{\eam}{e^{-(\mbf w ^{\text{T}} \mbf x + b)}}
+
+
+\subsection{Log-odds}
+
+Starting from the definition of $\mbf w ^{\text{T}} + b$ assuming log-odd
+encoding (as given in equation (2) in the assignment text), I use $e^{\lnb{a}} =
+a$ and some basic arithmetic to manipulate the expression:
+
+
+\begin{align*}
+  \mbf w ^{\text{T}} \mbf x+ b\ &=\ \lnb{\frac{\PP{Y = 1\ |\ X = x}}{\PP{Y = 0\ |\ X =
+  x}}}\\[4pt]
+  e^{\mbf w ^{\text{T}}\mbf x + b}\ &=\ \frac{\PP{Y = 1\ |\ X = x}}{\PP{Y = 0\ |\ X =
+  x}}\\[4pt]
+  \PP{Y = 0\ |\ X = x}\ e^{\mbf w ^{\text{T}}\mbf x + b}\ &=\ \PP{Y = 1\ |\ X =
+  x}\\[4pt]
+   (1 - \PP{Y = 1\ |\ X = x})\ e^{\mbf w ^{\text{T}}\mbf x + b}\ &=\ \PP{Y = 1\
+   |\ X = x}
+\end{align*}
+
+\noindent Using $\sigma(\mbf w ^{\text{T}} \mbf x + b) = \PP{Y = 1\ |\ X = x}$ as per
+equation (1) in the assignment text:
+
+\begin{align*}
+   (1 - \sigma(\mbf w ^{\text{T}} \mbf x + b))\ e^{\mbf w ^{\text{T}}\mbf x + b}\ &=\ \sigma(\mbf w ^{\text{T}} \mbf x + b)
+\end{align*}
+
+If $\sigma$ is, in fact, the logistic (sigmoid) function, then the above
+equation should hold once we substitute in its definition:
+
+\begin{align*}
+  \left(1 - \frac{1}{1 + \eam}\right)\ e^{\mbf w
+   ^{\text{T}}\mbf x + b}\ &\myeq\ \frac{1}{1 + \eam}\\
+\end{align*}
+
+Using distributivity of multiplication:
+
+\begin{align*}
+\Leftrightarrow\quad \ea - \frac{\ea}{1 + \eam} &\myeq \ \frac{1}{1 + \eam}\\[4pt]
+\end{align*}
+
+Now, using the magic algebraic rule $\frac{a}{b + c} = \frac{a}{b} -
+\frac{ac}{b(b + c)}$ to split the fraction on the LHS of the equation in two:
+
+\begin{align*}
+  \Leftrightarrow\quad \ea - (\ea - \frac{\ea * \eam}{1 + \eam})&\myeq \ \frac{1}{1 + \eam}\\[4pt]
+  \Leftrightarrow\quad \ea - (\ea - \frac{1}{1 + \eam})&\myeq \ \frac{1}{1 + \eam}\\[4pt]
+  \Leftrightarrow\quad \ea - \ea + \frac{1}{1 + \eam}&\myeq \ \frac{1}{1 + \eam}\\[4pt]
+  \Leftrightarrow\quad \frac{1}{1 + \eam} &= \ \frac{1}{1 + \eam}
+\end{align*}
+
+I find that the equality holds, and thus I conclude the proof.
+
+\qed
+
+\sectend

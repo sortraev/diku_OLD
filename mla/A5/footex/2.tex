@@ -1,0 +1,61 @@
+\section{PyTorch}
+\textit{All snippets in this section can be found in }\texttt{code/my\_torch.py}.
+
+I define a single layer with and explicitly initialize it -- the forward
+propagation is simply that single layer:
+
+\begin{minted}[frame=none]{python}
+class LogisticRegressionPytorch(nn.Module):
+    def __init__(self, input_dim, output_dim):
+        super(LogisticRegressionPytorch, self).__init__()
+        # LAYER DEFINITION MISSING
+        self.l1 = nn.Linear(input_dim, output_dim)
+        
+        # explicitly initialize weight and bias.
+        nn.init.uniform_(self.l1.weight)
+        nn.init.zeros_(self.l1.bias)
+
+    def forward(self, x):
+        # RETURN VALUE MISSING
+        return self.l1(x)
+\end{minted}
+
+Note that there is no output activation layer -- this is because I am going to
+be using cross entropy for my loss function, which itself performs softmaxing.
+
+Below is the definition of said loss function:
+
+\begin{minted}[frame=none]{python}
+optimizer = optim.Adam(logreg_pytorch.parameters(), lr = 0.02)
+# DEFINITION OF LOSS FUNCTION MISSING
+loss_f = F.cross_entropy
+\end{minted}
+
+The loss function is then used in training as such:
+
+\begin{minted}[frame=none]{python}
+for epoch in range(num_epochs):
+    # Zero the parameter gradients
+    optimizer.zero_grad()
+
+    # Forward + backward + optimize
+    outputs = logreg_pytorch(X_train_T)
+
+    # SOMETHING MISSING HERE
+    loss = loss_f(outputs, y_train_T)
+    
+    # SOMETHING MISSING HERE
+    loss.backward()
+
+    optimizer.step()
+\end{minted}
+
+Finally, I extract the weights and biases of the single layer as such:
+
+\begin{minted}[frame=none]{python}
+ws_torch = logreg_pytorch.l1.weight.detach().numpy()
+# SOMETHING MISSING HERE
+bs_torch = logreg_pytorch.l1.bias.detach().numpy()
+\end{minted}
+
+\sectend

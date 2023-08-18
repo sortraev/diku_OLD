@@ -1,0 +1,31 @@
+\section{Shape-based Segmentation}
+
+Another, yet advanced range of methods are the \textit{shape-based}
+segmentations. One popular such method draws inspiration from the field of
+statistics and uses principal component analysis (PCA) to extract and analyze
+important features of shapes in (medical) images.
+
+By teaching a model on existing image data of, say, lung fields, the most
+important features (or landmarks), defining the shape of the average lung field,
+are determined, and can be efficiently applied to classify and segment objects
+in new images.
+
+One disadvantage of the method (and shape-based methods in general) is the
+limited range of use. Since a shape-based model is specifically trained on
+existing data, it can only truely excel at detecting and segmenting objects
+which resemble the data on which it is trained -- this assumption is suitable
+for segmenting eg. organs and bones, since we don't expect the shapes of these
+to deviate to the point of unrecognizability, but it may be difficult to detect
+objects foreign to the body, eg. cell deformations.
+
+Another negative consequence of the supervised nature of the PCA-based method is
+the amount of training data required to build a model. While histogram and graph
+based segmentation each do require some sort of user input in the form of
+thresholding bands or object/background seeds, these methods can still be
+considered unsupervised as they do not require data independent of the input
+image, whereas, as an example, PCA-based segmentation of a lung field would
+require prior knowledge of the important features of the average lung field.
+However, in the modern age of data abundancy, especially in the world of medical
+imaging, this is not necessarily a drawback to the algorithm.
+
+\sectend

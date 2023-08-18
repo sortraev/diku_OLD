@@ -1,0 +1,51 @@
+\documentclass[a4paper,12pt]{article}
+
+\input{commands_and_packages.tex}
+
+\newcommand{\concat}{\ensuremath{+\!\!\!\!+\,}}
+\newcommand{\rpm}{\raisebox{.2ex}{$\scriptstyle\pm$}}
+\newcommand{\resub}[1]{\textcolor{red}{#1}}
+\newcommand{\blue}[1]{\textcolor{blue}{#1}}
+\newcommand{\ltt}{\sqsubseteq}
+\newcommand{\twodots}{\mathinner {\ldotp \ldotp}}
+
+\title{\large MIA -- Hand-in 2}
+\author{{\footnotesize Anders Lietzen Holst (wlc376)}\\ {\footnotesize \today}}
+
+\date{}
+
+
+\begin{document}
+
+
+% (L2E) Explain how PCA can be used in medical image segmentation
+
+% (L2A) Explain how and where medical image segmentation can be used
+% (L2B) Explain the benefits and risks of usage of image dilation/erosion operations. Give examples.
+% (L2C) Implement and test random walker for medical image segmentation (both 2D and 3D). 
+% (L2D) What are the advantages of random walker/graph cut, what kind of problems they can solve.
+
+\maketitle
+
+\input{1.tex}
+\input{3.tex}
+\input{2.tex}
+\input{4.tex}
+
+
+\begin{thebibliography}{8}
+
+  \bibitem{clrs}
+    Cormen, T.; Leiserson, C.; Rivest, R; and Stein, C. (2009).
+    \textit{Introduction to algorithms}. Cambridge (Inglaterra): MIT Press.
+
+  \bibitem{grady}
+
+    Grady, Leo (2006). \textit{Random Walks for Image Segmentation}.
+    IEEE Transactions on Pattern Analysis and Machine Intelligence, Vol. 28, no.
+    11, Nov. 2006.\\
+    \url{http://leogrady.net/wp-content/uploads/2017/01/grady2006random.pdf}
+
+\end{thebibliography}
+
+\end{document}

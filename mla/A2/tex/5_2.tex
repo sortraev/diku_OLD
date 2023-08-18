@@ -1,0 +1,249 @@
+
+\newpage 
+\subsection{Logistic regression loss gradient}
+
+\subsubsection{Part 1 -- using \{-1, 1\} labels}
+
+The gradient I want to compute is:
+
+\begin{align*}
+  \nabla_{\mbf w} E_\text{in}(\mbf w) &= \ddw \meanN \lnb{1 + e^{-\ywx}}
+\end{align*}
+
+\noindent For labels $Y \in \{-1, 1\}$.
+
+First I use the constant rule as well as the summation rule for differentiation
+to move the derivative inside:
+
+\begin{align*}
+  &= \meanN \ddw \lnb{1 + e^{-\ywx}}
+\end{align*}
+
+\noindent Using $\tfrac{d}{dx}\ln (f(x)) = f(x)^{-1} * \tfrac{d}{dx} f(x)$:
+
+\begin{align*}
+  &= \meanN \frac{1}{1 + e^{-\ywx}} * \tddw\left(1 + e^{-\ywx}\right)\\
+\end{align*}
+
+\noindent And next, the exponent rule for differentiation:
+
+\begin{align*}
+  &= \meanN \frac{1}{1 + e^{-\ywx}} * (- y_n) \mbf x_n (1 + e^{-\ywx})\\
+  &= \meanN \frac{1}{1 + e^{\ywx}} * (- y_n) \mbf x_n
+\end{align*}
+
+\noindent Finally, I use the definition of the Sigmoid function to conclude the
+proof:
+
+\begin{align*}
+  &= \meanN - y_n \mbf x_n \theta\!\left[-y_n \mbf w^{\text{T}}\mbf x_n\right].
+\end{align*}
+\qed
+
+When a label $y_n$ is mispredicted, we have $\ywx < 0$ and thus $-\ywx > 0$ and
+$\theta\left[-\ywx\right] > 0.5$ -- conversely, when $y_n$ is correctly
+classified, we have $\theta\left[-\ywx\right] < 0.5$, meaning misclassifications
+contribute more than correct classifications.
+
+\subsubsection{Part 2 -- using \{0, 1\} labels}
+
+First I define the distribution $\P (Y = y \, |\, X = x)$ given labels $Y \in \{0,
+1\}$ in terms of the sigmoid function:
+
+\begin{align*}
+  \P(Y = y\,|\,X = \mbf x) = 
+  \begin{cases}
+    \mysigx,     &y = 1\\
+    1 - \mysigx, &y = 0
+  \end{cases}
+\end{align*}
+
+With some clever use of the indicator function, I rewrite the above to something
+that will be more useful in a moment:
+
+\begin{align*}
+  \P(Y = y\,|\,X = x) \ =\ \booltoint{y = 1} * \mysigx + \booltoint{y = 0} * \left(1 -
+  \mysigx\right)
+\end{align*}
+
+However, since I know $Y$ to only take values 0 and 1, I can further substitute
+exponentiation with 0 and 1 for the indicator function:
+
+\begin{align*}
+  \P(Y = y\,|\,X = x) \ =\ \mysigx^y * \left(1 - \mysigx\right)^{1 - y}
+\end{align*}
+
+This rewrite is going to be useful in a moment, once I start manipulating logarithms.
+
+Using $\P $ as defined above, the problem I want to solve is the derivative wrt.
+$\mbf w$ of below log-likelihood:
+
+\begin{align*}
+  \nabla_{\mbf w} E_\text{in}(\mbf w)&= \ddw \meanN\Big( \lnb{\mysig^{y_n} *
+  \left(1 - \mysig\right)^{1 - y_n}}\Big)
+  % \nabla_{\mbf w} E_\text{in}(\mbf w)&= \ddw \meanN\Big( \lnb{\mysig^{y_n}} +
+  % \lnb{\left(1 - \mysig\right)^{1 - y_n}}\Big)
+\end{align*}
+
+\noindent Using first $\ln (ab) = \ln (a) + \ln (b)$ and $\ln (x^y) = y \ln (x)$:
+\begin{align*}
+  &= \ddw \meanN\Big( y_n * \lnb{\mysig} +
+  (1 - y_n) * \lnb{1 - \mysig}\Big)
+\end{align*}
+
+\noindent Using the constant rule and summation rule for differentiation:
+
+\begin{align*}
+  &= \meanN\ddw \Big(y_n \lnb{\mysig} + (1 - y_n)\lnb{1 - \mysig}\Big)\\[4pt]
+  &= \meanN \Big(y_n \tddw \lnb{\mysig} + (1 - y_n) \, \tddw \lnb{1 - \mysig}\Big)
+\end{align*}
+
+\noindent Using $\tfrac{d}{dx} \lnb{f(x)} = \tfrac{1}{f(x)} * \tfrac{d}{dx} f(x)$:
+
+\begin{align*}
+  &= \meanN \Big(
+  y_n * \frac{1}{\mysig} * \tddw \mysig + (1 - y_n) * \frac{1}{1 - \mysig} * \tddw
+  \left(1 - \mysig\right)
+  \Big)
+\end{align*}
+
+Moving factors onto numerators and outside of the last differential; then
+factoring:
+
+\begin{align*}
+  &= \meanN \Big(
+  \frac{y_n}{\mysig} * \tddw \mysig - \frac{1 - y_n}{1 - \mysig} * \tddw
+  \mysig
+  \Big)\\[4pt]
+  &= \meanN \Big(
+  \frac{y_n}{\mysig} - \frac{1 - y_n}{1 - \mysig}
+  \Big) * \tddw \mysig
+\end{align*}
+
+At this point I use the fact that $\tfrac{d}{dx}\theta\!\left[x\right] =
+\theta\!\left[x\right] * (1 - \theta\!\left[x\right])$ in conjunction with the
+exponent rule to compute $\tddw \mysig$:
+
+\begin{align*}
+  &= \meanN \Big(
+  \frac{y_n}{\mysig} - \frac{1 - y_n}{1 - \mysig}
+  \Big) * \mysig * (1 - \mysig) * \mbf x_n
+\end{align*}
+
+\noindent Using some basic algebra to compute the difference of fractions:
+
+\begin{align*}
+  &= \meanN \Big(
+  \frac{y_n - \mysig}{\mysig * (1 - \mysig)}
+  \Big) * \mysig * (1 - \mysig) * \mbf x_n
+\end{align*}
+
+\noindent The denominator cancels out to conclude the proof:
+
+\begin{align*}
+  \meanN \left(
+  y_n - \mysig
+  \right) * \mbf x_n\ = \ \nabla_{\mbf w} E_\text{in}(\mbf w)
+\end{align*}
+\qed
+
+
+\newcommand{\wz}{\mbf w_0}
+\newcommand{\wo}{\mbf w_1}
+\newcommand{\wzt}{\mbf w_0^{\text{T}}}
+\newcommand{\wot}{\mbf w_1^{\text{T}}}
+\newcommand{\wztx}{\mbf w_0^{\text{T}} \mbf x_n}
+\newcommand{\wotx}{\mbf w_1^{\text{T}} \mbf x_n}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\abs}[1]{\left|#1\right|}
+
+
+To see how misclassifications contribute more to the gradient of
+$E_{\text{in}}(\mbf w)$, let $\wz$ and $\wo$ be two vectors which, when
+dotted with $\mbf x_n$, correspond to classifications of 0 and 1, respectively.
+In other words, let $\wz$ and $\wo$ be vectors such that:
+
+\begin{align*}
+  \wzt \mbf x_n &< 0\\
+  \wot \mbf x_n &\geq 0
+\end{align*}
+
+and thus:
+
+\begin{align}
+  0\ \leq\ \theta[\wztx]\ <\ 0.5\ \leq\ \theta[\wotx]\ \leq\ 1.\label{eq:thetas}
+\end{align}
+
+Now, assume $y_n = 1$, and let's examine the relationship between the
+contribution to the gradient of guessing 0 vs. guessing 1:
+
+\begin{alignat*}{2}
+  \norm{\underbrace{\big(1 - \theta[\wzt \mbf x_n]\big)\ \mbf x_n
+  }_{\text{guessing 0 for } y_n =\; 1}}\ &\mygeq\ \norm{\underbrace{\big(1 - \theta[\wot \mbf
+  x_n]\big)\ \mbf x_n}_{\text{guessing 1 for } y_n =\; 1}}\\[4pt]
+\end{alignat*}
+
+Using first $\lVert a * \mbf y\rVert = |a| * \lVert \mbf y \rVert$:
+
+\begin{alignat*}{2}
+  \Leftrightarrow\quad\abs{1 - \theta[\wzt \mbf x_n]} * \norm{\mbf x_n
+  }\quad &\mygeq\quad \abs{1 - \theta[\wot \mbf x_n]} *\norm{\mbf x_n}\\[4pt]
+  \Leftrightarrow\quad\abs{1 - \theta[\wzt \mbf x_n]} \quad &\mygeq\quad \abs{1 - \theta[\wot \mbf x_n]}
+\end{alignat*}
+
+Since $\theta[s] \in [0, 1]$ for any $s$, we know that the values
+in these absolute operators are always non-negative, so we can safely remove the
+absolute value operators:
+
+\begin{align*}
+  \Leftrightarrow\quad1 - \theta[\wzt \mbf x_n] \quad &\mygeq\quad
+  1 - \theta[\wot \mbf x_n]\\[4pt]
+  \Leftrightarrow\quad- \theta[\wzt \mbf x_n] \quad &\mygeq\quad
+  - \theta[\wot \mbf x_n]\\[4pt]
+  \Leftrightarrow\quad \theta[\wzt \mbf x_n] \quad &\leq\quad
+  \theta[\wot \mbf x_n]
+\end{align*}
+
+The arrived at equality is true as per \cref{eq:thetas}, and thus we see that if
+$y_n = 1$, then guessing 0 yields a larger contribution to the gradient than
+does guessing 1.
+
+% \smallskip\noindent\makebox[\textwidth]{\rule{\textwidth}{0.3pt}}
+
+\bigskip
+
+\bigskip
+
+\noindent Conversely, assume now $y_n = 0$. Then we have the following inequality:
+\begin{alignat*}{2}
+  \norm{\underbrace{\big(0 - \theta[\wzt \mbf x_n]\big)\ \mbf x_n
+  }_{\text{guessing 0 for } y_n =\; 0}}\ &\myleq\ \norm{\underbrace{\big(0 - \theta[\wot \mbf
+  x_n]\big)\ \mbf x_n}_{\text{guessing 1 for }y_n =\; 0}  }\\[6pt]
+  \Leftrightarrow\quad
+   \norm{- \mbf x_n \theta[\wzt \mbf x_n] }\  &\myleq\ \norm{- \mbf x_n \theta[\wot \mbf x_n] }
+\end{alignat*}
+
+\smallskip
+
+Using $\lVert \mbf y * b\rVert = \lVert \mbf y \rVert * |b|$:
+\begin{align*}
+  \Leftrightarrow\quad\norm{- \mbf x_n }\abs{\theta[\wzt \mbf x_n]} \  &\myleq\
+  \norm{- \mbf x_n  }\abs{\theta[\wot \mbf x_n]}\\[4pt]
+   \Leftrightarrow\quad\abs{\theta[\wzt \mbf x_n]} \  &\myleq\ \abs{\theta[\wot \mbf
+   x_n]}\\[4pt]
+\end{align*}
+
+Using again non-negativity of the sigmoid function to remove absolute operators,
+and \cref{eq:thetas} to verify the inequality:
+
+\begin{align*}
+   \Leftrightarrow\quad\theta[\wzt \mbf x_n] \  &\leq\ \theta[\wot \mbf
+   x_n]
+\end{align*}
+
+Once again we arrive back at the assumption, so here we see that if $y_n = 0$,
+then guessing 1 contributes more to the gradient than guessing 1.
+
+\qed
+
+\sectend

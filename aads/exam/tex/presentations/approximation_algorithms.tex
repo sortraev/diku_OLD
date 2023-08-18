@@ -1,0 +1,246 @@
+\newpage
+\subsection{Approximation algorithms}
+
+\begin{enumerate}
+  \item hello.
+
+  \item approximations algorithms is one of three three methods to overcome hard
+    problems that we have studied: when we need exact solutions, we might be
+    forced to use exponential or FPT algorithms, but when an exact solution is
+    not all important, we can use an approximation algorithm to obtain
+    polynomial time with some bounded degree of approximation.
+
+  \item the primary measure of ``goodness'' for an approximation algorithm is
+    the approximation ratio. Regardless of whether the problem is a maximization
+    or minimization, we define the approximation ratio as such:
+
+    An approximation algorithm has approximation ratio $\rho(n)$ if for all
+    inputs of size $n$:
+
+    \begin{textred}
+      \begin{align}
+        \max\left\{\underbrace{\frac{C^\ast}{C}}_{\text{max}},\,
+        \underbrace{\frac{C}{C^\ast}}_{\text{min}} \right\} \leq \rho(n),
+      \end{align}
+    \end{textred}
+
+    where $C^\ast$ is the cost of the optimal solution and $C$ is the cost of our
+    approximation.
+
+  \item first, I will discuss the PTAS and FPTAS classes of apx. algos, 
+    which are algorithms parameterized with $\eps$:
+
+    \begin{textred}
+      \begin{align}
+        \text{FPTAS} \subseteq \text{PTAS} \subseteq \text{APX} \subseteq
+        \text{??}.
+      \end{align}
+    \end{textred}
+
+  \item PTAS are APX algorithms for which the approximation ratio is $(1 +
+    \eps)$ for some chosen $\eps$ and the runtime is poly in the problem size;
+    FPTAS are PTAS algorithms, but the runtime is also poly in $1/\eps$.
+
+  \item if there is time afterwards, I will show an example of an approximation
+    algorithm for which the approximation ratio is constant but not
+    parameterized.
+
+  \item example: the optimization problem APPROX-SUBSET-SUM. Recall the NP-hard
+    optimization variant of SUBSET-SUM: given a list (or multi-set) of positive
+    numbers $S$ and a target $t$; find the subset of $S$ whose sum is the
+    greatest but $\leq t$.
+
+    An exact algorithm looks like so: \emph{*see
+    \cref{sec:fptas_subset_sum_pseudocode} for pseudocode*}
+
+  \item I will not go in depth with the runtime, but note that in line 5, we
+    duplicate \texttt{L}$_{k - 1}$ onto itself, and in the worst case we filter
+    out little or none of the list in line 6. Hence the complexity is
+    exponential in the worst case.
+    
+  \item the idea behind the approximation scheme is as follows: after the merge
+    in line 5, trim the list by removing all elements $x$ for which there exists
+    some other element $y$ that represents $x$ with precision determined by
+    $\delta$:
+
+    \begin{textred}
+      \begin{align}
+        \forall s \in L_k\  \exists s' \in L_k'\ :\ s' \leq s \leq s' (1 +
+        \delta)^k.
+      \end{align}
+    \end{textred}
+
+    where $\delta$ is a function of $\eps$ and $L'$ is the ``trimmed version''
+    of $L$. The $k$ exponent comes from the fact that we may have performed
+    trimming up to $k$ times.
+
+  \item \emph{*see \cref{sec:fptas_subset_sum_pseudocode} for pseudocode*}
+
+  \item example: FPTAS-SUBSET-SUM([2, 50, 3, 40], 89, 0.1). here the optimal
+    value would be 55, but FPTAS-SUBSET-SUM returns 50 for $\delta = 0.1$.
+
+  \item let's prove that FPTAS-SUBSET-SUM is, in fact, FPTAS.
+
+  \item to do so, we need to prove that 1) it produces a \emph{feasible}
+    solution to SUBSET-SUM; 2) its approximation ratio is $(1 + \eps)$; and 3)
+    that its runtime is polynomial in $n$ and $1/\eps$:
+
+    \begin{textred}
+      \begin{align*}
+        &\text{1) feasible solution }(\text{ie.} \leq t).\\
+        &\text{2) }\rho(n) \leq 1 + \eps.\\
+        &\text{3) runtime poly in } n \text{ and } 1/\eps.
+      \end{align*}
+    \end{textred}
+
+  \item 1) due to trimming, we have $\text{last}(L'_k) \leq \text{last}(L_k)$ for all $k$,
+    which implies $\text{last}(L'_n) \leq \text{last}(L_n) \leq t$. Hence the solution is
+    feasible (but not necessarily optimal).
+
+  \item 2) let $\delta$ denote the trimming ratio. From trimming we have that
+    (this should already be on the blackboard; expand on it there):
+
+    \begin{textred}
+      \begin{align}
+        \forall s \in L_k\  \exists s' \in L_k'\ :\ s' \leq s \leq s' (1 +
+        \delta)^k\\
+        \implies \frac{s}{s'}\ \leq\ (1 + \delta)^k.
+      \end{align}
+    \end{textred}
+
+    Since this holds for any $s$ in any $L_k$, it also holds for the last
+    element of $L_n$, ie. the final and optimal solution:
+
+    \begin{textred}
+      \begin{align}
+        \exists s' \in L'_n\ :\ \frac{C^\ast}{s'}\ \leq\ (1 + \delta)^n.
+      \end{align}
+    \end{textred}
+
+    In fact, we have $s' = \text{last}(L'_n)$. Hence $(1 + \delta)^n$ is our
+    approximation ratio, but we want $(1 + \eps)$.
+
+    \medskip
+
+    \textbf{Claim}:
+
+    \begin{textred}
+      \begin{align}
+        2n\delta \leq 1 \quad\implies\quad (1 + \delta)^n \leq 1 + 2n\delta. 
+      \end{align}
+    \end{textred}
+
+    The proof is by induction. 
+
+    \textbf{Base case}: this is trivial, since for \textcolor{red}{$n = 0$} we
+    have:
+
+    \begin{textred}
+      \begin{align}
+      2 * 0 * \delta \leq 1\quad \implies\quad (1 +
+    \delta)^0 \leq 1 + 2 * 0 * \delta = 1.
+      \end{align}
+    \end{textred}
+
+    \textbf{Induction hypothesis and step}: assume claim holds for $(n - 1)$. Then we have:
+
+    \begin{textred}
+      \begin{align}
+        (1 + \delta)^n &= (1 + \delta)^{n - 1} * (1 + \delta)\\[3pt]
+        %
+                       &\leq (1 + 2(n - 1)\delta) * (1 + \delta)
+                       \label{eq:apx:1}\\[3pt]
+        %
+                       &= 1 + \delta + 2(n-1)\delta + \delta *
+                       2(n-1)\delta\label{eq:apx:2}\\[3pt]
+       %
+                       &= 1 + 2n\delta -2\delta + \underbrace{\delta + \delta *
+                       \underbrace{2(n-1)\delta}_{<1}}_{< 2\delta}\label{eq:apx:3}\\[3pt]
+                       &\leq 1 + 2n\delta.\label{eq:apx:4}
+      \end{align}
+    \end{textred}
+
+    where \cref{eq:apx:1} follows from the induction hypothesis;
+    \cref{eq:apx:3} is a rewrite; and \cref{eq:apx:4} uses the fact that
+    $2(n-1)\delta < 1$ by the induction hypothesis.
+
+    This concludes the proof of 2). If we choose \textcolor{red}{$\delta :=
+    \frac{\eps}{2n}$}, we achieve the desired approximation ratio
+    \textcolor{red}{$\rho(n) \leq 1 + \eps$}.
+
+  \item 3) the runtime is $O\left(\sum_{k = 1}^n |L'_k|\right)$.
+           I want to show that $|L'_k| = O\left(\frac{n \ln t}{\eps}\right)$ for
+           any $t$ and $\eps$.
+
+    Let $L'_k = [0, s_1, s_2, \dots, s_m]$. Then we know that:
+
+    \begin{textred}
+      \begin{align}
+        t \ \geq\  s_m \ >\  s_{m - 1}*(1 + \delta) \ >\  \dots \ >\
+        s_1 * (1 + \delta)^m \ \geq\  (1 + \delta)^m.
+      \end{align}
+    \end{textred}
+
+    The last inequality follows from positivity of the input numbers.
+
+    From this we get:
+
+    \begin{textred}
+      \begin{alignat}{3}
+        &(1 + \delta)^m         \quad&&\leq\quad t\\
+        \Leftrightarrow\quad& m \quad&&\leq\quad \log_{1 + \delta} t\\
+                                    &&&= \frac{\ln t}{\ln (1 + \delta)}\\
+                                    &&&\leq \frac{\ln t}{\delta/(1 +
+                                    \delta)}\label{eq:apx:5}\\
+                                    &&&= \frac{(1 + \delta)\ln t}{\delta}\\
+                                    &&&\leq \frac{2\ln t}{\delta}\label{eq:apx:6}\\
+                                    &&&\leq \frac{2\ln t}{\eps / (2n)}\\
+                                    &&&\leq \frac{4n\ln t}{\eps}\\
+                                    &&&= O\left(\frac{n \ln t}{\eps}\right).
+      \end{alignat}
+    \end{textred}
+
+    \Cref{eq:apx:5} follows from a lemma in CLRS which I will not prove;
+    \cref{eq:apx:6} follows from $\delta \leq 1$.
+
+    Finally, since $|L'_k| = O\left(\frac{n \ln t}{\eps}\right)$, the total
+    runtime is:
+
+
+    \begin{textred}
+      \begin{alignat}{3}
+        O\left(\sum_{k = 1}^n \frac{n \ln t}{\eps}\right) = O\left(\frac{n^2 \ln t}{\eps}\right).
+      \end{alignat}
+    \end{textred}
+
+
+  \item if time: instead of approximation schemes, we also like
+    approximation algorithms for which we can bound the approximation ratio by
+    some function of the input size, or even a constant.
+
+
+  \item 2-approximate metric TSP:
+\begin{minted}[linenos=true, frame=lines]{text}
+2-APX-TSP(G):
+  T = MST(G)
+  W = Euler tour of T
+  H = remove duplicates in W (except for the last vertex)
+  return H
+\end{minted}
+
+\item 2-approximate vertex cover:
+\begin{minted}[linenos=true, frame=lines]{text}
+2-APX-VERTEX-COVER(G):
+  V' = {}
+  while G.E is not empty:
+    (u, v) = random edge from G.E
+    V' = UNION(out, {u, v})
+    remove u, v, and their incident edges from G
+  return V'
+\end{minted}
+
+\item 2-approximate weighted vertex cover:
+
+  \TODO{this?}
+
+\end{enumerate}

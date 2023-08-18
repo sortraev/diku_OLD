@@ -1,0 +1,73 @@
+\newpage
+
+\subsection{Approximation algorithms}
+
+\paragraph{Disposition}
+
+\begin{itemize}
+  \item hello and intro.
+  \item motivation.
+  \item approximation ratio.\\
+  \item FPTAS
+  \item FPTAS example: APPROX-SUBSET-SUM.
+  \item if time: 2-approximate vertex-cover.
+\end{itemize}
+
+\paragraph{Notes}
+
+\begin{enumerate}
+  \item hello.
+  \item motivation: speed over exactness.
+  \item approximation ratio.
+  \item approximation schemes: PTAS and FPTAS.\\
+
+  \item SUBSET-SUM and APPROX-SUBSET-SUM.
+  \item example: APPROX-SUBSET-SUM([3, 50, 2, 40], 89, 0.1).\\
+
+  \item proof: APPROX-SUBSET-SUM is FPTAS.
+    \begin{enumerate}
+      \item feasible solution.
+      \item $(1 + \eps)$ approximation ratio.
+      \item poly runtime.
+    \end{enumerate}
+\end{enumerate}
+
+\newpage
+\subsubsection{Pseudocode: SUBSET-SUM and FPTAS-SUBSET-SUM}
+\label{sec:fptas_subset_sum_pseudocode}
+
+\begin{minted}[escapeinside=@@, linenos=true, frame=lines]{text}
+SUBSET-SUM(S, t):
+  L@$_0$@ = [0]
+  n = |S|
+  for k = 1 .. n:
+    L@$_k$@ = MERGE(L@$_{k-1}$@, [x in L@$_{k-1}$@ : x + s@$_k$@])
+    L@$_k$@ = [x in L@$_k$@ : x <= t]
+  return last(L@$_n$@)
+\end{minted}
+
+
+
+\begin{minted}[escapeinside=@@, linenos=true, frame=lines]{text}
+FPTAS-SUBSET-SUM(S, t, @$\eps$@):
+  L'@$_0$@ = [0]
+  n = |S|
+  for k = 1 .. n:
+    L'@$_k$@ = MERGE(L'@$_{k-1}$@, [x in L'@$_{k-1}$@ : x + s@$_k$@])
+    L'@$_k$@ = TRIM(L'@$_k$@, @$\eps$@ / (2 * n))
+    L'@$_k$@ = [x in L'@$_k$@ : x <= t]
+  return last(L'@$_n$@)
+\end{minted}
+
+\begin{minted}[escapeinside=@@, linenos=true, frame=lines]{text}
+TRIM(S, @$\delta$@):
+  m = |S|
+  if m == 0:
+      return S
+  L = [s@$_1$@]
+  for i = 2 .. m:
+    if s@$_i$@ > last(L) * @$\delta$@:
+      L = APPEND(L, s@$_i$@)
+  return L
+\end{minted}
+

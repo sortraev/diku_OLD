@@ -1,0 +1,201 @@
+\newpage
+\subsection{NP-completeness}
+
+\begin{enumerate} \item what is a ``hard'' problem? answer: we think of ``hard''
+      as something which cannot be solved in polynomial time.
+
+  \item today we will be discussing the NP-complete class of problems. These are
+    decision problems which: can be verified in polynomial time (NP) and which
+    are at least as hard as all other problems in NP (NP-hard).
+
+    \begin{textred}
+      \begin{align}
+        \text{NP-complete}
+        \begin{cases}
+          \text{NP}\\
+          \text{NP-hard}
+        \end{cases}
+      \end{align}
+    \end{textred}
+
+  \item I am going to show NP-completeness of the k-vertex cover problem, and,
+    if there is time, the decision variant of the traveling salesperson problem.
+
+  \item first, I want to define three terms: languages, verifiability, and
+    reducibility.
+
+  \item in an effort to formalize the concept of a ``problem'', we use the
+    framework of \emph{languages}, that is, strings of characters from some
+    given alphabet. For our purposes, the language will be strings of zeroes and
+    ones:
+
+      \begin{textred}
+      \begin{align}
+        \Sigma^\ast = \{0, 1\}^\ast.
+      \end{align}
+      \end{textred}
+
+  \item next is verifiability. For a lot of problems, we are able to verify a
+    possible solution as fast as or faster than computing a new solution from
+    scratch.
+
+    Verifiability requires a ``certificate'' string, here called $y$, describing
+    a solution to the given input string, which can be checked using a
+    verification algorithm, here called $A$.
+
+    If for a given language we know how to verify a string in time polynomial
+    in the size of that string, then we say that the language belongs to NP:
+      \begin{textred}
+      \begin{align}
+        L = \{x \in \Sigma^\ast\ :\ \exists y  \in \Sigma^\ast \ . \ |y| =
+        O(|x|^c) \ .\  A(x, y) = 1\}.
+      \end{align}
+      \end{textred}
+    For some languages, however, verifying a solution might take superpolynomial
+    time, sometimes because it involves computing the solution string from
+    scratch (example: TSP).
+
+  \item the last is reducibility. Often when we analyze the complexity of a
+    problem, or language, we ``reduce'' the language to be an instance of
+    another language for which we know the complexity.
+
+  \item we say that a language $L'$ is reducible to another language $L$ if an
+    instance of $L'$ can be transformed into an instance of $L$. Ideally, we
+    want this transformation to be possible in polynomial time, and we say that
+    a language $L'$ is polynomial-time reducible to $L$ if there exists a
+    polynomial-time computable function $f : \Sigma^\ast$ satisfying:
+
+    \begin{textred}
+    \begin{align}
+       x \in L' \iff f(x) \in L.
+    \end{align}
+    \end{textred}
+
+    if so, then we say that \textcolor{red}{$L' \leq_P L$}.
+
+  \item \TODO{something missing here!!!!!!!!!!!!!!}
+
+  \item example: k-vertex cover. If you are not familiar with the vertex cover
+    problem \emph{and/or its decision variant}, please let me know now.
+
+  \item I will show k-vertex cover is in NP-hard by reducing CLIQUE, which we know
+    to be NP-complete, to k-vertex cover.
+
+    What I propose is: $G$ has a clique of size $k$ \textbf{iff} its complement
+    graph $\bbar G$ has a vertex cover of size $|V| - k$. In other words:
+    CLIQUE($G$, $k$) has a solution \textbf{iff} VERTEX-COVER($\bbar G$, $|V| -
+    k$) has a solution.
+
+  \item assume CLIQUE($G$, $k$) has a solution $V'$ of size $k$.
+
+  \item consider an edge \red{$e = (u, v) \in \bbar E$}. Then $e$ cannot be in
+    $E$ and we have:
+
+    \begin{textred}
+    \begin{align}
+      e \not \in E \implies u \not \in V' \text{ or } v \not \in V',
+    \end{align}
+    \end{textred}
+
+    since $u$ and $v$ cannot both be in the clique if they do not share an edge.
+    If any of them are not in the clique, then they are in the complement set:
+    
+    \begin{textred}
+    \begin{align}
+      u \in V \setminus V' \text{ or } v \in V \setminus V'
+    \end{align}
+    \end{textred}
+
+    since at least one of $u$ or $v$ is in the complement set, we say that the
+    edge $(u, v)$ is \emph{covered} by the complement set $V \setminus V'$.
+
+  \item Since this holds for any $e \in \bbar E$, the complement graph $\bbar G$
+    is a cover of size:
+
+      \begin{textred}
+      \begin{align}
+        |V \setminus V'| = |V| - |V'| = |V| - k.
+      \end{align}
+      \end{textred}
+
+  \item We will now show the backwards direction of the bi-implication. Assume
+    that the complement graph $\bbar G$ has a vertex cover $V'$ of size $|V| -
+    k$.
+
+    For all $u, v \in V$, if $(u, v) \in \bbar E$ then at least one of its
+    endpoints must be in $V'$:
+
+    \begin{textred}
+    \begin{align}
+        \forall u, v \in V\ :\ (u, v) \in \bbar E \implies u \in V' \text{ or } v \in V'
+    \end{align}
+    \end{textred}
+
+    since at least one of $u$ or $v$ must cover the edge.
+
+    The contrapositive of this expression is:
+
+    \begin{textred}
+    \begin{align}
+        \forall u, v \in V\ :\ u \not \in V' \text{ and } v \not \in V' \implies
+        (u, v) \not \in \bbar E \iff (u, v) \in E,
+    \end{align}
+    \end{textred}
+
+    and hence we have \red{$(u, v) \in E$}.
+
+  \item constructing the complement graph takes \red{$O(|V|^2)$} time, hence the
+    reduction takes polynomial time.\\[4pt]
+
+
+  \item next up, if there is still time, is the traveling salesperson problem or
+    TSP. Regular TSP is NP-hard but not NP, and hence we consider instead the
+    decision variant of the problem, which is NP-complete, as we shall also see.
+
+  \item if you are not familiar with TSP or its decision variant, please shout
+    now! In any case, we define the language TSP to be:
+
+    \begin{textred}
+      \begin{align}
+        \text{TSP} = \{(G, c, k)\ :\ &\ G \text{ complete},\\
+                                   \ &\ c\, :\ V \times V \mapsto \mathbb R,\\
+                                   \ &\ k \in \mathbb N \cup \{0\},\\
+                                   \ &\ G \text{ has a tour of cost} \leq k\}.
+    \end{align}
+    \end{textred}
+
+  \item let's show that TSP is NP-complete. First, we show that TSP is in NP by
+    describing a possible certificate as such: the certificate is a sequence of
+    $|V|$ vertices. The verification checks that the graph is complete, and if
+    it is, then any sequence of distinct vertices form a simple cycle.
+    Verification then checks that each vertex in $G$ is represented exactly once
+    in the certificate, and that the weight of the cycle is $\leq k$.
+
+  \item checking graph completeness takes \textcolor{red}{$O(|V|^2)$} time, and
+    checking the cycle and computing its weight takes \textcolor{red}{$O(|V|)$}
+    time.
+
+  \item we will show NP-hardness by reducing HAM-CYCLE to TSP. The
+    transformation of the input problem goes as such: let $G = (V, E)$. Then
+    \textcolor{red}{HAM-CYCLE($G$) has a solution \textbf{iff} TSP($G'$, $c'$,
+    0) has a solution}, where $G'$ is the completion of $G$ and
+    \textcolor{red}{$c'(i, j) = [(v_i, v_j) \not \in E] * \infty$}. As such the
+    weight of an edge in $E'$ is 0 if it is also an edge in $E$; else it is
+    infinite. We could also assign a weight of 1 to edges not in $E$.
+
+  \item assume HAM-CYCLE($G$) has a solution. Let one such hamiltonian cycle in
+    $G$ be called $h$. Since $h$ contains only edges in $E$, it has weight 0.
+    Since $E'$ is a superset of $E$, $h$ is also a hamiltonian cycle in $E'$.
+    Hence there is a cycle of weight $\leq 0$ in $G'$, satisfying TSP($G'$,
+    $c'$, 0).
+
+    Assume now that TSP($G'$, $c'$, 0) has a solution. Let one such cycle of
+    weight $\leq 0$ be called $h$. Since $h$ has weight $\leq 0$ and all edges
+    are non-negative, all edges in $h$ must be 0. Then, since only edges in $E$
+    have weight 0, all edges in $h$ must be in $E$ as well. Hence $G$ has a
+    hamiltonian cycle.
+
+  \item constructing the complete graph $G'$ takes \textcolor{red}{$O(|V|^2)$}
+    time. Hence the reduction is polynomial time.
+
+\end{enumerate}

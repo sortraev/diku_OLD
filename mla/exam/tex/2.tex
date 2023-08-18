@@ -1,0 +1,134 @@
+\newpage
+\section{Weighted neighbors}
+
+\newcommand{\Z}{\mathbb Z}
+\newcommand{\hf}{h_{f_{i}, d}}
+\newcommand{\hfd}{h_{f_{i}, d_{j}}}
+
+\subsection{Task 2.1}
+
+We note that since $f_i$ is parameterized over $\Z$, the set of integers, the
+hypothesis space $\mathcal H$ is \emph{not} finite, and thus we cannot use
+Hoeffding's inequality alone to produce a generalization bound. $\mathcal H$ is,
+however, \emph{countably} infinite, which means we can use Occam's razor to
+produce the desired bound.
+
+All we need to do is to define a valid complexity measure $\pi$ for
+which $\sum_{\hf \in \mathcal H} \pi(\hf) \leq 1$. Since $f_i$ is
+parameterized over $\Z$, this requirement can be expressed as:
+\begin{align}
+  \sum_{i = -\infty}^\infty \pi(\hf) \leq 1.\label{eq:pi_req}
+\end{align}
+
+I borrow inspiration from the famous geometric series $\sum_{i = 1}^\infty
+2^{-i} = 1$ and define my $\pi$ as:
+\begin{align}
+  \pi(\hf) = \frac{2^{-|i|}}{3}.\label{eq:my_pi}
+\end{align}
+
+Let us see how $\pi$ as given in \Cref{eq:my_pi} satisfies \Cref{eq:pi_req} by
+first splitting up the infinite sum:
+
+\begin{alignat*}{4}
+  \sum_{i = -\infty}^\infty\pi(\hf) &= \sum_{i = -\infty}^{-1}\pi(\hf)\quad
+  &&+\quad \pi(h_{f_0, d}) \quad &&+\quad \sum_{i = 1}^\infty \pi(\hf)\\[4pt]
+  &= \sum_{i = -\infty}^{-1}\frac{2^{-|i|}}{3}\quad &&+\quad \frac{2^{-|0|}}{3}
+  \quad &&+\quad \sum_{i = 1}^\infty \frac{2^{-|i|}}{3}\\[4pt]
+  &= \sum_{i = -\infty}^{-1}\frac{2^{-|i|}}{3}\quad &&+\quad \frac{1}{3} \quad &&+\quad \sum_{i = 1}^\infty \frac{2^{-|i|}}{3}
+\end{alignat*}
+
+Note that due to the absolute value operator in the exponent, the sum is
+symmetric about zero:
+\begin{align*}
+  &= \sum_{i = 1}^{\infty}\frac{2^{-|i|}}{3}\ +\ \frac{1}{3} \ +\ \sum_{i = 1}^\infty \frac{2^{-|i|}}{3}\\
+  % &= \Big(2 * \sum_{i = 1}^{\infty}\frac{2^{-i}}{3}\ +\ \frac{1}{3}      \Big)\\
+  &= \Big(\frac{1}{3}\ +\ 2 * \sum_{i = 1}^{\infty}\frac{2^{-i}}{3}\Big)\\
+  &= \frac{1}{3} + 2 * \frac{1}{3}\\[4pt]
+  &= 1.
+\end{align*}
+
+Thus we see that $\pi$ as given in \Cref{eq:my_pi} is a valid
+complexity measure.
+
+Applying Theorem 3.3 (from Seldin's lecture notes) directly, I derive the
+generalization bound as:
+
+\begin{alignat*}{3}
+  &\PP{\exists\, \hf \in \mathcal H\; :\ L(\hf) \geq \hat{L}(\hf, S) + \sqrt{\frac{\ln \left(\frac{1}{\pi(\hf)\delta}\right)}{2n}}}\\
+  =\quad &\PP{\exists\, \hf \in \mathcal H\; :\ L(\hf) \geq \hat{L}(\hf, S) + \sqrt{\frac{\ln \left(\frac{1}{\frac{2^{-|i|}}{3}\delta}\right)}{2n}}}\\
+  =\quad &\PP{\exists\, \hf \in \mathcal H\; :\ L(\hf) \geq \hat{L}(\hf, S) +
+  \sqrt{\frac{\ln \left(\sfrac{3 * 2^{|i|}}{ \delta}\right)}{2n}}}\\
+  \leq \quad &\delta.\\
+\end{alignat*}
+
+As a final note: In some cases, we might want a $\pi$ which distributes the
+complexity as evenly as possible among each of the $\hf$, and if we choose eg.
+$\pi(\hf) = 1.337^{-|i|} / 6.93472$, we achieve a more even distribution of
+complexity when $i$ is close to zero\footnote{In this case, we would, of course,
+still have infinitely many hypotheses $\hf$ for which $\pi(\hf)$ is
+infinitesimal.}, and if we want a $\pi$ which does not sum to 1, we must simply
+scale appropriately. For simplicity, however, I chose $\pi$ as defined in
+\Cref{eq:my_pi}.
+
+
+\newpage
+\subsection{Task 2.2}
+
+Once again, we note that since $d_j$ is parameterized over $\mathbb Z^+$, the
+positive integers, the hypothesis spaec $\mathcal H$ remains countable, however
+infinite it may be.
+
+Choossing a complexity measure $\pi(\hfd)$ which will sum to 1 (or less) is
+going to be a little more tedious, but it is still very possible.
+
+I define $\pi(\hfd)$ as such:
+
+\begin{align*}
+  \pi(\hfd) = \frac{2^{-|i|}}{3} * \frac{24}{(\tau * j)^2},
+\end{align*}
+
+where $\tau = 2\pi$ (the constant, not to be confused with the complexity
+measure), and let us see how $\pi(\hfd)$ satisfies the property of complexity
+measures:
+
+\begin{alignat*}{4}
+  \sum_{\hfd \in \mathcal H}\pi(\hfd) &= \sum_{\hfd \in \mathcal H} \frac{2^{-|i|}}{3} * \frac{24}{(\tau * j)^2}\\
+  &= \sum_{i = -\infty}^\infty \sum_{j = 1}^\infty \frac{2^{-|i|}}{3} * \frac{24}{(\tau * j)^2}\\
+  &= \left(\sum_{i = -\infty}^\infty \frac{2^{-|i|}}{3}\right) * \left(\sum_{j = 1}^\infty \frac{24}{(\tau * j)^2}\right)\\
+  &= 1 * \sum_{j = 1}^\infty \frac{24}{(\tau * j)^2}\\
+  &= \frac{24}{\tau^2}\sum_{j = 1}^\infty j^{-2}
+\end{alignat*}
+
+The last summation is equal to $\pi^2 / 6$, as proven in 1735 by
+Euler\footnote{Fun fact: This is called the \textit{Basel problem}, named after
+the city Basel, hometown of both Euler and Jacob Bernoulli (father of a famous
+and, in this case, very relevant probability distribution), who also attempted
+to solve the problem at one point. For proof of the solution and a bit of history, please see:
+\url{https://www.math.cmu.edu/~bwsulliv/basel-problem.pdf}.}.
+
+Substituting this in:
+\begin{alignat*}{4}
+  &= \frac{24}{\tau^2}\frac{\pi^2}{6}\\
+  &= \frac{24\pi^2}{(2 \pi)^2 * 6}\\
+  &= 1.
+\end{alignat*}
+
+With this I have shown $\pi(\hfd)$ to be a valid complexity measure. Once again,
+I can apply Theorem 3.3 (of Seldin's notes) to express the desired bound:
+
+\begin{alignat*}{3}
+  &\PP{\exists\, \hfd \in \mathcal H\; :\ L(\hfd) \geq \hat{L}(\hfd, S) + \sqrt{\frac{\ln \left(\frac{1}{\pi(\hfd)\delta}\right)}{2n}}}\\
+  =\quad &\PP{\exists\, \hfd \in \mathcal H\; :\ L(\hfd) \geq \hat{L}(\hfd, S) + \sqrt{\frac{
+    \ln
+  \left(
+\frac{1}{\frac{2^{-|i|}}{3} * \frac{24}{(\tau * j)^2} * \delta}
+  \right)}{2n}}}\\
+  =\quad &\PP{\exists\, \hfd \in \mathcal H\; :\ L(\hfd) \geq \hat{L}(\hfd, S) + \sqrt{\frac{
+    \ln
+  \left(
+\frac{\tau j^2 * 2^{|i| - 1}}{\delta}
+  \right)}{2n}}}\\[4pt]
+\leq\quad &\delta.
+\end{alignat*}
+
+\sectend
